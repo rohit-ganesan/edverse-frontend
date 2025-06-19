@@ -59,15 +59,15 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
   return (
     <RadixCard size="2" className={`p-6 ${className}`}>
       <Box className="mb-4">
-        <Heading size="4" className="text-gray-900">
+        <Heading size="4" className="text-gray-900 dark:text-gray-100">
           Notice Board
         </Heading>
       </Box>
 
       {notices.length === 0 ? (
         <Box className="text-center py-8">
-          <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <Text size="2" className="text-gray-500">
+          <FileText className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+          <Text size="2" className="text-gray-500 dark:text-gray-400">
             No notices at the moment
           </Text>
         </Box>
@@ -78,18 +78,22 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
               key={notice.id}
               align="start"
               gap="3"
-              className="p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+              className="p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
             >
-              <Box className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Box className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FileText className={`w-5 h-5 ${getTypeColor(notice.type)}`} />
               </Box>
               <Box className="flex-1 min-w-0">
-                <Text size="2" weight="medium" className="text-gray-900 mb-1">
+                <Text
+                  size="2"
+                  weight="medium"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   {notice.title}
                 </Text>
                 <Flex align="center" gap="2">
-                  <Calendar className="w-3 h-3 text-gray-400" />
-                  <Text size="1" className="text-gray-600">
+                  <Calendar className="w-3 h-3 text-gray-400 dark:text-gray-500" />
+                  <Text size="1" className="text-gray-600 dark:text-gray-400">
                     {formatDate(notice.date)}
                   </Text>
                   <Box
@@ -97,10 +101,10 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
                       px-2 py-1 rounded text-xs font-medium capitalize
                       ${
                         notice.type === 'event'
-                          ? 'bg-blue-100 text-blue-700'
+                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
                           : notice.type === 'announcement'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-orange-100 text-orange-700'
+                            ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                            : 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300'
                       }
                     `}
                   >

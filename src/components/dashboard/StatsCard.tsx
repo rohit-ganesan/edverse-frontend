@@ -24,10 +24,10 @@ export function StatsCard({
     <RadixCard size="2" className={`p-6 ${className}`}>
       <Flex justify="between" align="start">
         <Box>
-          <Text size="2" className="text-gray-600 mb-1">
+          <Text size="2" className="text-gray-600 dark:text-gray-400 mb-1">
             {title}
           </Text>
-          <Heading size="6" className="text-gray-900 mb-2">
+          <Heading size="6" className="text-gray-900 dark:text-gray-100 mb-2">
             {value}
           </Heading>
           {trend && (
@@ -51,10 +51,10 @@ export function StatsCard({
             w-12 h-12 rounded-full flex items-center justify-center
             ${
               trend?.isPositive
-                ? 'bg-green-100'
+                ? 'bg-green-100 dark:bg-green-900'
                 : trend?.isPositive === false
-                  ? 'bg-red-100'
-                  : 'bg-blue-100'
+                  ? 'bg-red-100 dark:bg-red-900'
+                  : 'bg-blue-100 dark:bg-blue-900'
             }
           `}
         >
@@ -63,10 +63,10 @@ export function StatsCard({
               w-6 h-6
               ${
                 trend?.isPositive
-                  ? 'text-green-600'
+                  ? 'text-green-600 dark:text-green-400'
                   : trend?.isPositive === false
-                    ? 'text-red-600'
-                    : 'text-blue-600'
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-blue-600 dark:text-blue-400'
               }
             `}
           />

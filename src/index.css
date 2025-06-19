@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark mode root styling */
+.dark {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   font-family:

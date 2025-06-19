@@ -66,7 +66,7 @@ export function QuickActions({
   return (
     <RadixCard size="2" className={`p-6 ${className}`}>
       <Box className="mb-4">
-        <Heading size="4" className="text-gray-900">
+        <Heading size="4" className="text-gray-900 dark:text-gray-100">
           Quick Actions
         </Heading>
       </Box>
@@ -80,14 +80,18 @@ export function QuickActions({
             onClick={action.onClick}
           >
             <Flex align="center" gap="3" className="w-full">
-              <Box className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <action.icon className="w-5 h-5 text-gray-600" />
+              <Box className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                <action.icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </Box>
               <Box className="text-left">
-                <Text size="2" weight="medium" className="text-gray-900 block">
+                <Text
+                  size="2"
+                  weight="medium"
+                  className="text-gray-900 dark:text-gray-100 block"
+                >
                   {action.title}
                 </Text>
-                <Text size="1" className="text-gray-600">
+                <Text size="1" className="text-gray-600 dark:text-gray-400">
                   {action.subtitle}
                 </Text>
               </Box>

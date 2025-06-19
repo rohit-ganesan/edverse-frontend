@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, Flex, Text, Separator } from '@radix-ui/themes';
+import { Box, Flex, Text, Heading, Separator } from '@radix-ui/themes';
 import {
   Home,
   BookOpen,
@@ -198,7 +198,7 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
         <Box
           className={`
             flex items-center px-3 py-2 rounded-lg cursor-pointer transition-colors
-            ${active ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100 text-gray-700'}
+            ${active ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}
             ${level > 0 ? 'ml-6' : ''}
           `}
           onClick={() => {
@@ -243,16 +243,32 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
   return (
     <Box
       className={`
-        w-64 h-full bg-white border-r border-gray-200 flex flex-col
+        w-64 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col
         ${className}
       `}
     >
+      {/* Logo Section */}
+      <Box className="px-4 py-6 border-b border-gray-200 dark:border-gray-700">
+        <Link to="/dashboard" className="no-underline">
+          <Flex align="center" gap="3">
+            <Box className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Text size="4" weight="bold" className="text-white">
+                E
+              </Text>
+            </Box>
+            <Heading size="5" className="text-gray-900 dark:text-gray-100">
+              EdVerse
+            </Heading>
+          </Flex>
+        </Link>
+      </Box>
+
       {/* Menu Section */}
       <Box className="px-4 py-4">
         <Text
           size="1"
           weight="medium"
-          className="text-gray-500 uppercase tracking-wide mb-3"
+          className="text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
         >
           MENU
         </Text>
@@ -268,7 +284,7 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
         <Text
           size="1"
           weight="medium"
-          className="text-gray-500 uppercase tracking-wide mb-3"
+          className="text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
         >
           OTHER
         </Text>

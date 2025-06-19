@@ -13,7 +13,7 @@ export function DashboardLayout({
   className = '',
 }: DashboardLayoutProps): JSX.Element {
   return (
-    <Box className={`min-h-screen bg-gray-50 ${className}`}>
+    <Box className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <Flex className="h-screen">
         {/* Sidebar */}
         <Sidebar />
