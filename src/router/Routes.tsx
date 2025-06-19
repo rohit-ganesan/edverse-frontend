@@ -4,6 +4,9 @@ import { LoginPage } from 'pages/LoginPage';
 import { SignUpPage } from 'pages/SignUpPage';
 import { DashboardPage } from 'pages/DashboardPage';
 import { CoursesPage } from 'pages/CoursesPage';
+import { AcademicsPage } from 'pages/AcademicsPage';
+import { TeachersPage } from 'pages/TeachersPage';
+import { StudentsPage } from 'pages/StudentsPage';
 import { DebugPage } from 'pages/DebugPage';
 
 export function AppRoutes(): JSX.Element {
@@ -29,6 +32,30 @@ export function AppRoutes(): JSX.Element {
           element={
             <ProtectedRoute>
               <CoursesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/academics"
+          element={
+            <ProtectedRoute>
+              <AcademicsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teachers"
+          element={
+            <ProtectedRoute>
+              <TeachersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute>
+              <StudentsPage />
             </ProtectedRoute>
           }
         />

@@ -1,102 +1,91 @@
-// No React import needed with new JSX transform
-import { Link } from 'react-router-dom';
-import { Container, Flex, Box, Heading, Text, Grid } from '@radix-ui/themes';
-import { Button } from 'components/ui/RadixButton';
-import { RadixCard } from 'components/ui/RadixCard';
-import { useAuth } from 'features/auth/AuthContext';
-import { BookOpen, TrendingUp, Award, LogOut } from 'lucide-react';
+import { Box, Flex, Grid } from '@radix-ui/themes';
+import { DashboardLayout } from 'components/layout/DashboardLayout';
+import { StatsCard } from 'components/dashboard/StatsCard';
+import { QuickActions } from 'components/dashboard/QuickActions';
+import {
+  ChartCard,
+  MockAreaChart,
+  MockBarChart,
+  MockDonutChart,
+} from 'components/dashboard/ChartCard';
+import { NoticeBoard } from 'components/dashboard/NoticeBoard';
+import { Shield, Users, GraduationCap } from 'lucide-react';
 
 export function DashboardPage(): JSX.Element {
-  const { user, signOut } = useAuth();
-
-  const handleSignOut = async (): Promise<void> => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
-
   return (
-    <Box className="min-h-screen bg-gray-50">
-      <Box className="bg-white shadow">
-        <Container size="4">
-          <Flex justify="between" align="center" className="py-6">
-            <Heading size="7" className="text-blue-600">
-              EdVerse
-            </Heading>
-            <Flex align="center" gap="4">
-              <Text color="gray">Welcome, {user?.email || 'User'}</Text>
-              <Button onClick={handleSignOut} variant="outline" size="2">
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
-            </Flex>
-          </Flex>
-        </Container>
-      </Box>
+    <DashboardLayout>
+      {/* Stats Cards */}
+      <Grid columns="3" gap="6" className="mb-6">
+        <StatsCard
+          title="Admins"
+          value="10"
+          icon={Shield}
+          trend={{ value: 5, isPositive: true }}
+        />
+        <StatsCard
+          title="Teachers"
+          value="51"
+          icon={Users}
+          trend={{ value: 4, isPositive: true }}
+        />
+        <StatsCard
+          title="Students"
+          value="946"
+          icon={GraduationCap}
+          trend={{ value: 10, isPositive: true }}
+        />
+      </Grid>
 
-      <Container size="4" className="py-6">
-        <Box className="px-4 py-6">
-          <Box className="border-4 border-dashed border-gray-200 rounded-lg min-h-96 flex items-center justify-center p-8">
-            <Flex
-              direction="column"
-              align="center"
-              className="text-center"
-              gap="6"
-            >
-              <Box>
-                <Heading size="6" className="mb-2">
-                  Welcome to EdVerse!
-                </Heading>
-                <Text size="4" color="gray">
-                  Your learning dashboard will be built here.
-                </Text>
-              </Box>
-              <Grid columns="3" gap="4" className="max-w-2xl">
-                <Link to="/courses" className="no-underline">
-                  <RadixCard
-                    size="2"
-                    className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                  >
-                    <Flex direction="column" gap="3">
-                      <BookOpen className="w-8 h-8 text-blue-600" />
-                      <Box>
-                        <Heading size="4">Courses</Heading>
-                        <Text size="2" color="gray">
-                          Explore and enroll in courses
-                        </Text>
-                      </Box>
-                    </Flex>
-                  </RadixCard>
-                </Link>
-                <RadixCard size="2" className="p-6">
-                  <Flex direction="column" gap="3">
-                    <TrendingUp className="w-8 h-8 text-green-600" />
-                    <Box>
-                      <Heading size="4">Progress</Heading>
-                      <Text size="2" color="gray">
-                        Track your learning progress
-                      </Text>
-                    </Box>
-                  </Flex>
-                </RadixCard>
-                <RadixCard size="2" className="p-6">
-                  <Flex direction="column" gap="3">
-                    <Award className="w-8 h-8 text-yellow-600" />
-                    <Box>
-                      <Heading size="4">Achievements</Heading>
-                      <Text size="2" color="gray">
-                        View your accomplishments
-                      </Text>
-                    </Box>
-                  </Flex>
-                </RadixCard>
-              </Grid>
-            </Flex>
-          </Box>
+      {/* Main Content Grid */}
+      <Grid columns="3" gap="6" className="mb-6">
+        {/* Attendance Chart - Spans 2 columns */}
+        <Box className="col-span-2">
+          <ChartCard
+            title="Attendance Stats - Interactive"
+            subtitle="Showing total attendances for the last 7 days"
+            showSelector
+            selectorOptions={[
+              { value: 'last-7-days', label: 'Last 7 days' },
+              { value: 'last-30-days', label: 'Last 30 days' },
+              { value: 'last-3-months', label: 'Last 3 months' },
+            ]}
+          >
+            <MockAreaChart />
+          </ChartCard>
         </Box>
-      </Container>
-    </Box>
+
+        {/* Quick Actions */}
+        <QuickActions />
+      </Grid>
+
+      {/* Bottom Row */}
+      <Grid columns="3" gap="6">
+        {/* Ledger Chart - Spans 2 columns */}
+        <Box className="col-span-2">
+          <ChartCard
+            title="Ledger"
+            subtitle="This session"
+            showSelector
+            selectorOptions={[
+              { value: 'current-session', label: 'Select Session' },
+              { value: 'previous-session', label: 'Previous Session' },
+            ]}
+          >
+            <MockBarChart />
+          </ChartCard>
+        </Box>
+
+        {/* Right Column - Donut Chart and Notice Board */}
+        <Flex direction="column" gap="6">
+          {/* Donut Chart */}
+          <ChartCard title="Financial Overview">
+            <MockDonutChart value={475} />
+          </ChartCard>
+
+          {/* Notice Board */}
+          <NoticeBoard />
+        </Flex>
+      </Grid>
+    </DashboardLayout>
   );
 }
