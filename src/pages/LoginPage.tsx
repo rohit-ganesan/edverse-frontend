@@ -1,18 +1,40 @@
 // No React import needed with new JSX transform
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Container, Flex, Box, Heading, Text } from '@radix-ui/themes';
 import { LoginForm } from 'features/auth/components/LoginForm';
+import { useAuth } from 'features/auth/AuthContext';
 
 export function LoginPage(): JSX.Element {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-primary-600 mb-2">EdVerse</h1>
-          <p className="text-gray-600">Welcome back to your learning journey</p>
-        </div>
-      </div>
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <Container className="min-h-screen bg-gray-50">
+      <Flex
+        direction="column"
+        align="center"
+        justify="center"
+        className="min-h-screen py-12"
+        gap="8"
+      >
+        <Box className="text-center">
+          <Heading size="8" className="text-blue-600 mb-2">
+            EdVerse
+          </Heading>
+          <Text size="4" color="gray">
+            Welcome back to your learning journey
+          </Text>
+        </Box>
         <LoginForm />
-      </div>
-    </div>
+      </Flex>
+    </Container>
   );
 }

@@ -29,6 +29,10 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log(
+        'Auth state changed:',
+        user ? `User: ${user.email}` : 'No user'
+      );
       setUser(user);
       setLoading(false);
     });
@@ -37,16 +41,47 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   }, []);
 
   const signUp = async (email: string, password: string): Promise<void> => {
-    await createUserWithEmailAndPassword(auth, email, password);
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      // Re-throw with more specific error message
+      if (error.code === 'auth/configuration-not-found') {
+        throw new Error(
+          'Firebase Authentication is not properly configured. Please check the Firebase Console.'
+        );
+      }
+      throw error;
+    }
   };
 
   const signIn = async (email: string, password: string): Promise<void> => {
-    await signInWithEmailAndPassword(auth, email, password);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      if (error.code === 'auth/configuration-not-found') {
+        throw new Error(
+          'Firebase Authentication is not properly configured. Please check the Firebase Console.'
+        );
+      }
+      throw error;
+    }
   };
 
   const signInWithGoogle = async (): Promise<void> => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error('Google sign in error:', error);
+      if (error.code === 'auth/configuration-not-found') {
+        throw new Error(
+          'Google Authentication is not properly configured. Please check the Firebase Console.'
+        );
+      }
+      throw error;
+    }
   };
 
   const signOut = async (): Promise<void> => {

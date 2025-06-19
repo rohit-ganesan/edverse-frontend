@@ -1,7 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from 'components/ui/Button';
-import { Input } from 'components/ui/Input';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Heading, Text, Flex, Box } from '@radix-ui/themes';
+import { Button } from 'components/ui/RadixButton';
+import { RadixTextField } from 'components/ui/RadixTextField';
+import { RadixCard } from 'components/ui/RadixCard';
+import { RadixSeparator } from 'components/ui/RadixSeparator';
 import { useAuth } from 'features/auth/AuthContext';
 import { AuthFormData } from 'types/auth';
 
@@ -14,7 +17,15 @@ export function SignUpForm(): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to dashboard when user is authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -48,8 +59,9 @@ export function SignUpForm(): JSX.Element {
 
     try {
       await signUp(formData.email, formData.password);
-    } catch (err) {
-      setError('Failed to create account. Please try again.');
+    } catch (err: any) {
+      console.error('SignUp error:', err);
+      setError(err.message || 'Failed to create account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -61,89 +73,93 @@ export function SignUpForm(): JSX.Element {
 
     try {
       await signInWithGoogle();
-    } catch (err) {
-      setError('Failed to sign up with Google.');
+    } catch (err: any) {
+      console.error('Google SignUp error:', err);
+      setError(err.message || 'Failed to sign up with Google.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
-        <div className="mb-6">
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-        </div>
+    <Box className="max-w-md mx-auto">
+      <RadixCard size="3" className="p-6">
+        <Flex direction="column" gap="6">
+          <Box className="text-center">
+            <Heading size="6" className="mb-2">
+              Create your account
+            </Heading>
+          </Box>
 
-        {error && (
-          <div className="mb-4 p-4 rounded-md bg-red-50 border border-red-200">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
+          {error && (
+            <Box className="p-4 rounded-md bg-red-50 border border-red-200">
+              <Text size="2" color="red">
+                {error}
+              </Text>
+            </Box>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            label="Email address"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            autoComplete="email"
-          />
+          <form onSubmit={handleSubmit}>
+            <Flex direction="column" gap="4">
+              <RadixTextField
+                name="email"
+                type="email"
+                label="Email address"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                size="3"
+                placeholder="Enter your email"
+              />
 
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            label="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            autoComplete="new-password"
-            helperText="Must be at least 6 characters long"
-          />
+              <RadixTextField
+                name="password"
+                type="password"
+                label="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                size="3"
+                placeholder="Create a password"
+                helperText="Must be at least 6 characters long"
+              />
 
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            label="Confirm Password"
-            value={formData.confirmPassword || ''}
-            onChange={handleChange}
-            required
-            autoComplete="new-password"
-          />
+              <RadixTextField
+                name="confirmPassword"
+                type="password"
+                label="Confirm Password"
+                value={formData.confirmPassword || ''}
+                onChange={handleChange}
+                required
+                size="3"
+                placeholder="Confirm your password"
+              />
 
-          <Button
-            type="submit"
-            className="w-full"
-            loading={loading}
-            disabled={loading}
-          >
-            Sign up
-          </Button>
-        </form>
+              <Button
+                type="submit"
+                size="3"
+                className="w-full"
+                loading={loading}
+                disabled={loading}
+              >
+                Sign up
+              </Button>
+            </Flex>
+          </form>
 
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
+          <Box>
+            <Flex align="center" gap="3" className="mb-4">
+              <RadixSeparator className="flex-1" />
+              <Text size="2" color="gray">
                 Or continue with
-              </span>
-            </div>
-          </div>
+              </Text>
+              <RadixSeparator className="flex-1" />
+            </Flex>
 
-          <div className="mt-6">
             <Button
               onClick={handleGoogleSignIn}
               variant="outline"
+              size="3"
               className="w-full"
               disabled={loading}
             >
@@ -167,21 +183,21 @@ export function SignUpForm(): JSX.Element {
               </svg>
               Sign up with Google
             </Button>
-          </div>
-        </div>
+          </Box>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link
-              to="/login"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+          <Box className="text-center">
+            <Text size="2" color="gray">
+              Already have an account?{' '}
+              <Link
+                to="/login"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Sign in
+              </Link>
+            </Text>
+          </Box>
+        </Flex>
+      </RadixCard>
+    </Box>
   );
 }

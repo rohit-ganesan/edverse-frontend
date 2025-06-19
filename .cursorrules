@@ -1,23 +1,30 @@
-# Phase 1: Project & Auth Foundation
+# Phase 1: Project & Auth Foundation (Revised with Radix UI)
 
 # Code Style and Structure
 - All code in TypeScript with strict mode.
 - Use React functional components and Hooks only.
-- Organize auth code in src/features/auth.
+- Organize auth code in `src/features/auth`.
+- Use Radix UI components for all base UI elements (buttons, dialogs, inputs, toasts):
+  - Import from `@radix-ui/react-<component>` packages.
+  - Wrap Radix primitives in local `src/components/ui/` wrappers to apply Tailwind theming.
+  - Prefer Radix’s accessible primitives over custom HTML elements.
 
 # Project Configuration
 - use yarn package manager
 - Absolute imports from `src/`.
 - Tailwind CSS configured in `tailwind.config.js`.
 - Firebase initialized in `src/lib/firebase.ts` (Auth, Firestore, Storage).
+- Add Radix UI peer dependencies and set up any required CSS resets (e.g., include `@radix-ui/react-toast/styles.css`).
 
 # TypeScript Usage
 - Prefer interfaces; avoid `any`.
 - Explicit return types on all exported functions.
+- For Radix components, type any extended props using `ComponentProps<typeof RadixComponent>`.
 
 # Syntax & Formatting
 - Enforce Prettier via husky pre-commit.
 - ESLint (Airbnb + TS); CI fails on warnings.
+- Commit messages follow Conventional Commits.
 
 # Firebase Integration
 - Implement AuthProvider + `useAuth` hook with Firebase Auth.
@@ -31,3 +38,4 @@
 
 # Testing
 - Add at least one Jest test for AuthProvider.
+- Add component tests for Radix wrappers (e.g., button, dialog) using React Testing Library.
