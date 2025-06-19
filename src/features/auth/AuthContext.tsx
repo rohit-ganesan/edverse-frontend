@@ -73,9 +73,30 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     return unsubscribe;
   }, []);
 
-  const signUp = async (email: string, password: string): Promise<void> => {
+  const signUp = async (
+    email: string,
+    password: string,
+    profile?: Partial<UserProfile>
+  ): Promise<void> => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // If profile data is provided, save it to Firestore
+      if (profile && userCredential.user) {
+        const userProfile: UserProfile = {
+          firstName: profile.firstName || '',
+          lastName: profile.lastName || '',
+          address: profile.address || '',
+          role: profile.role || 'Student',
+        };
+
+        await setDoc(doc(db, 'users', userCredential.user.uid), userProfile);
+        setUserProfile(userProfile);
+      }
     } catch (error: unknown) {
       const context: ErrorContext = {
         component: 'AuthContext',

@@ -9,6 +9,7 @@ import { TeachersPage } from 'pages/TeachersPage';
 import { StudentsPage } from 'pages/StudentsPage';
 import { ProfilePage } from 'pages/ProfilePage';
 import { DebugPage } from 'pages/DebugPage';
+import { TestPage } from 'pages/TestPage';
 
 export function AppRoutes(): JSX.Element {
   return (
@@ -65,6 +66,14 @@ export function AppRoutes(): JSX.Element {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/test"
+          element={
+            <ProtectedRoute>
+              <TestPage />
             </ProtectedRoute>
           }
         />

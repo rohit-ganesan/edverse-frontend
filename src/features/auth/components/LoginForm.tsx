@@ -41,6 +41,10 @@ export function LoginForm(): JSX.Element {
     }));
   };
 
+  const isFormValid = (): boolean => {
+    return !!(formData.email?.trim() && formData.password?.trim());
+  };
+
   const validateForm = (): string | null => {
     const validation = validateWithSchema(loginSchema, formData);
     if (!validation.success && validation.errors) {
@@ -97,8 +101,8 @@ export function LoginForm(): JSX.Element {
   };
 
   return (
-    <Box className="max-w-md mx-auto">
-      <RadixCard size="3" className="p-6">
+    <Box className="w-full max-w-lg mx-auto">
+      <RadixCard size="3" className="p-6 w-full">
         <Flex direction="column" gap="6">
           <Box className="text-center">
             <Heading size="6" className="mb-2">
@@ -146,7 +150,7 @@ export function LoginForm(): JSX.Element {
                 size="3"
                 className="w-full"
                 loading={loading}
-                disabled={loading}
+                disabled={!isFormValid() || loading}
               >
                 Sign in
               </Button>

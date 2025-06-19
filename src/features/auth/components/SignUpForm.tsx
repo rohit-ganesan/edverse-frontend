@@ -5,17 +5,39 @@ import { Button } from 'components/ui/RadixButton';
 import { RadixTextField } from 'components/ui/RadixTextField';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixSeparator } from 'components/ui/RadixSeparator';
+import { RadixRadioGroup } from 'components/ui/RadixRadioGroup';
 import { useAuth } from 'features/auth/AuthContext';
-import { AuthFormData } from 'types/auth';
+import { AuthFormData, UserRole } from 'types/auth';
 import { logError, ErrorContext } from 'lib/errorUtils';
 import { signUpSchema, validateWithSchema } from 'lib/validation';
 import { AlertTriangle } from 'lucide-react';
 
+const ROLE_OPTIONS = [
+  {
+    value: 'Student',
+    label: 'Student',
+    description: 'Access courses, assignments, and learning materials',
+  },
+  {
+    value: 'Instructor',
+    label: 'Instructor',
+    description: 'Create courses, manage students, and track progress',
+  },
+  {
+    value: 'Administrator',
+    label: 'Administrator',
+    description: 'Full system access and user management',
+  },
+];
+
 export function SignUpForm(): JSX.Element {
   const [formData, setFormData] = useState<AuthFormData>({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
+    role: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -42,6 +64,24 @@ export function SignUpForm(): JSX.Element {
     }));
   };
 
+  const handleRoleChange = (value: string): void => {
+    setFormData((prev) => ({
+      ...prev,
+      role: value as UserRole,
+    }));
+  };
+
+  const isFormValid = (): boolean => {
+    return !!(
+      formData.firstName?.trim() &&
+      formData.lastName?.trim() &&
+      formData.role?.trim() &&
+      formData.email?.trim() &&
+      formData.password?.trim() &&
+      formData.confirmPassword?.trim()
+    );
+  };
+
   const validateForm = (): string | null => {
     const validation = validateWithSchema(signUpSchema, formData);
     if (!validation.success && validation.errors) {
@@ -65,7 +105,12 @@ export function SignUpForm(): JSX.Element {
     }
 
     try {
-      await signUp(formData.email, formData.password);
+      const userProfile = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        role: formData.role,
+      };
+      await signUp(formData.email, formData.password, userProfile);
     } catch (err: unknown) {
       const context: ErrorContext = {
         component: 'SignUpForm',
@@ -97,8 +142,8 @@ export function SignUpForm(): JSX.Element {
   };
 
   return (
-    <Box className="max-w-md mx-auto">
-      <RadixCard size="3" className="p-6">
+    <Box className="w-full max-w-lg mx-auto">
+      <RadixCard size="3" className="p-6 w-full">
         <Flex direction="column" gap="6">
           <Box className="text-center">
             <Heading size="6" className="mb-2">
@@ -119,6 +164,40 @@ export function SignUpForm(): JSX.Element {
 
           <form onSubmit={handleSubmit}>
             <Flex direction="column" gap="4">
+              {/* Name Fields - Stacked vertically */}
+              <RadixTextField
+                name="firstName"
+                type="text"
+                label="First Name"
+                value={formData.firstName || ''}
+                onChange={handleChange}
+                required
+                size="3"
+                placeholder="Enter your first name"
+              />
+
+              <RadixTextField
+                name="lastName"
+                type="text"
+                label="Last Name"
+                value={formData.lastName || ''}
+                onChange={handleChange}
+                required
+                size="3"
+                placeholder="Enter your last name"
+              />
+
+              {/* Role Selection */}
+              <RadixRadioGroup
+                name="role"
+                label="Account Type"
+                value={formData.role || ''}
+                onChange={handleRoleChange}
+                options={ROLE_OPTIONS}
+                required
+                helperText="Choose the type of account that best describes your role"
+              />
+
               <RadixTextField
                 name="email"
                 type="email"
@@ -158,9 +237,9 @@ export function SignUpForm(): JSX.Element {
                 size="3"
                 className="w-full"
                 loading={loading}
-                disabled={loading}
+                disabled={!isFormValid() || loading}
               >
-                Sign up
+                Create Account
               </Button>
             </Flex>
           </form>

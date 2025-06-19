@@ -11,7 +11,11 @@ export interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    profile?: Partial<UserProfile>
+  ) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -22,4 +26,9 @@ export interface AuthFormData {
   email: string;
   password: string;
   confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
 }
+
+export type UserRole = 'Student' | 'Instructor' | 'Administrator';

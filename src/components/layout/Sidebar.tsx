@@ -139,6 +139,12 @@ const menuItems: MenuItem[] = [
 
 const otherItems: MenuItem[] = [
   {
+    id: 'test',
+    label: '🧪 Integration Test',
+    icon: Settings,
+    path: '/test',
+  },
+  {
     id: 'whats-new',
     label: "What's New",
     icon: Sparkles,
