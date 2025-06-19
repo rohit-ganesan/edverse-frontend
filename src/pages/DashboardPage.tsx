@@ -4,6 +4,7 @@ import { Container, Flex, Box, Heading, Text, Grid } from '@radix-ui/themes';
 import { Button } from 'components/ui/RadixButton';
 import { RadixCard } from 'components/ui/RadixCard';
 import { useAuth } from 'features/auth/AuthContext';
+import { BookOpen, TrendingUp, Award, LogOut } from 'lucide-react';
 
 export function DashboardPage(): JSX.Element {
   const { user, signOut } = useAuth();
@@ -27,6 +28,7 @@ export function DashboardPage(): JSX.Element {
             <Flex align="center" gap="4">
               <Text color="gray">Welcome, {user?.email || 'User'}</Text>
               <Button onClick={handleSignOut} variant="outline" size="2">
+                <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
             </Flex>
@@ -57,28 +59,37 @@ export function DashboardPage(): JSX.Element {
                     size="2"
                     className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
                   >
-                    <Flex direction="column" gap="2">
-                      <Heading size="4">Courses</Heading>
-                      <Text size="2" color="gray">
-                        Explore and enroll in courses
-                      </Text>
+                    <Flex direction="column" gap="3">
+                      <BookOpen className="w-8 h-8 text-blue-600" />
+                      <Box>
+                        <Heading size="4">Courses</Heading>
+                        <Text size="2" color="gray">
+                          Explore and enroll in courses
+                        </Text>
+                      </Box>
                     </Flex>
                   </RadixCard>
                 </Link>
                 <RadixCard size="2" className="p-6">
-                  <Flex direction="column" gap="2">
-                    <Heading size="4">Progress</Heading>
-                    <Text size="2" color="gray">
-                      Track your learning progress
-                    </Text>
+                  <Flex direction="column" gap="3">
+                    <TrendingUp className="w-8 h-8 text-green-600" />
+                    <Box>
+                      <Heading size="4">Progress</Heading>
+                      <Text size="2" color="gray">
+                        Track your learning progress
+                      </Text>
+                    </Box>
                   </Flex>
                 </RadixCard>
                 <RadixCard size="2" className="p-6">
-                  <Flex direction="column" gap="2">
-                    <Heading size="4">Achievements</Heading>
-                    <Text size="2" color="gray">
-                      View your accomplishments
-                    </Text>
+                  <Flex direction="column" gap="3">
+                    <Award className="w-8 h-8 text-yellow-600" />
+                    <Box>
+                      <Heading size="4">Achievements</Heading>
+                      <Text size="2" color="gray">
+                        View your accomplishments
+                      </Text>
+                    </Box>
                   </Flex>
                 </RadixCard>
               </Grid>

@@ -1,6 +1,7 @@
 import { ComponentProps, forwardRef } from 'react';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import { Flex, Text } from '@radix-ui/themes';
+import { X, CheckCircle, AlertTriangle, Info } from 'lucide-react';
 
 /**
  * Toast Provider component - wrap your app with this
@@ -112,19 +113,7 @@ export const ToastClose = forwardRef<
     toast-close=""
     {...props}
   >
-    <svg
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M6 18L18 6M6 6l12 12"
-      />
-    </svg>
+    <X className="h-4 w-4" />
   </ToastPrimitive.Close>
 ));
 ToastClose.displayName = ToastPrimitive.Close.displayName;
@@ -150,53 +139,11 @@ export function Toast({
   const getIcon = () => {
     switch (variant) {
       case 'success':
-        return (
-          <svg
-            className="h-5 w-5 text-green-600 flex-shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        );
+        return <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />;
       case 'error':
-        return (
-          <svg
-            className="h-5 w-5 text-red-600 flex-shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
-        );
+        return <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />;
       default:
-        return (
-          <svg
-            className="h-5 w-5 text-blue-600 flex-shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        );
+        return <Info className="h-5 w-5 text-blue-600 flex-shrink-0" />;
     }
   };
 

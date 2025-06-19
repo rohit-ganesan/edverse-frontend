@@ -3,6 +3,7 @@ import { Container, Flex, Box, Heading, Text } from '@radix-ui/themes';
 import { Button } from 'components/ui/RadixButton';
 import { RadixCard } from 'components/ui/RadixCard';
 import { useAuth } from 'features/auth/AuthContext';
+import { ArrowLeft, LogOut } from 'lucide-react';
 
 export function CoursesPage(): JSX.Element {
   const { user, signOut } = useAuth();
@@ -26,6 +27,7 @@ export function CoursesPage(): JSX.Element {
             <Flex align="center" gap="4">
               <Text color="gray">Welcome, {user?.email || 'User'}</Text>
               <Button onClick={handleSignOut} variant="outline" size="2">
+                <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
             </Flex>
@@ -56,7 +58,8 @@ export function CoursesPage(): JSX.Element {
               </Text>
               <Link to="/dashboard">
                 <Button variant="outline" size="3">
-                  ← Back to Dashboard
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
                 </Button>
               </Link>
             </Flex>
