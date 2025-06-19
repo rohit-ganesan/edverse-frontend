@@ -16,6 +16,7 @@ import {
 } from 'firebase/auth';
 import { auth } from 'lib/firebase';
 import { AuthContextType } from 'types/auth';
+import { logError, ErrorContext } from 'lib/errorUtils';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -43,29 +44,34 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const signUp = async (email: string, password: string): Promise<void> => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
-      console.error('Sign up error:', error);
-      // Re-throw with more specific error message
-      if (error.code === 'auth/configuration-not-found') {
-        throw new Error(
-          'Firebase Authentication is not properly configured. Please check the Firebase Console.'
-        );
-      }
-      throw error;
+    } catch (error: unknown) {
+      const context: ErrorContext = {
+        component: 'AuthContext',
+        action: 'signUp',
+        userId: email,
+      };
+      const appError = logError(error, context);
+
+      const newError = new Error(appError.userFriendlyMessage);
+      newError.name = 'AuthError';
+      throw newError;
     }
   };
 
   const signIn = async (email: string, password: string): Promise<void> => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
-      console.error('Sign in error:', error);
-      if (error.code === 'auth/configuration-not-found') {
-        throw new Error(
-          'Firebase Authentication is not properly configured. Please check the Firebase Console.'
-        );
-      }
-      throw error;
+    } catch (error: unknown) {
+      const context: ErrorContext = {
+        component: 'AuthContext',
+        action: 'signIn',
+        userId: email,
+      };
+      const appError = logError(error, context);
+
+      const newError = new Error(appError.userFriendlyMessage);
+      newError.name = 'AuthError';
+      throw newError;
     }
   };
 
@@ -73,14 +79,16 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-    } catch (error: any) {
-      console.error('Google sign in error:', error);
-      if (error.code === 'auth/configuration-not-found') {
-        throw new Error(
-          'Google Authentication is not properly configured. Please check the Firebase Console.'
-        );
-      }
-      throw error;
+    } catch (error: unknown) {
+      const context: ErrorContext = {
+        component: 'AuthContext',
+        action: 'signInWithGoogle',
+      };
+      const appError = logError(error, context);
+
+      const newError = new Error(appError.userFriendlyMessage);
+      newError.name = 'AuthError';
+      throw newError;
     }
   };
 

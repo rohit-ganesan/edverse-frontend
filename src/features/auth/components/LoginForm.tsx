@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heading, Text, Flex, Box } from '@radix-ui/themes';
 import { Button } from 'components/ui/RadixButton';
 import { RadixTextField } from 'components/ui/RadixTextField';
@@ -7,6 +7,8 @@ import { RadixCard } from 'components/ui/RadixCard';
 import { RadixSeparator } from 'components/ui/RadixSeparator';
 import { useAuth } from 'features/auth/AuthContext';
 import { AuthFormData } from 'types/auth';
+import { logError, ErrorContext } from 'lib/errorUtils';
+import { loginSchema, validateWithSchema } from 'lib/validation';
 
 export function LoginForm(): JSX.Element {
   const [formData, setFormData] = useState<AuthFormData>({
@@ -18,13 +20,17 @@ export function LoginForm(): JSX.Element {
 
   const { signIn, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Redirect to dashboard when user is authenticated
+  // Get the intended destination from location state, default to dashboard
+  const from = location.state?.from?.pathname || '/dashboard';
+
+  // Redirect to intended destination when user is authenticated
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, from]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -34,18 +40,38 @@ export function LoginForm(): JSX.Element {
     }));
   };
 
+  const validateForm = (): string | null => {
+    const validation = validateWithSchema(loginSchema, formData);
+    if (!validation.success && validation.errors) {
+      // Return the first error message
+      const firstError = Object.values(validation.errors)[0];
+      return firstError || 'Please check your input.';
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    // Client-side validation
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      setLoading(false);
+      return;
+    }
+
     try {
       await signIn(formData.email, formData.password);
-    } catch (err: any) {
-      console.error('SignIn error:', err);
-      setError(
-        err.message || 'Failed to sign in. Please check your credentials.'
-      );
+    } catch (err: unknown) {
+      const context: ErrorContext = {
+        component: 'LoginForm',
+        action: 'signIn',
+      };
+      const appError = logError(err, context);
+      setError(appError.userFriendlyMessage);
     } finally {
       setLoading(false);
     }
@@ -57,9 +83,13 @@ export function LoginForm(): JSX.Element {
 
     try {
       await signInWithGoogle();
-    } catch (err: any) {
-      console.error('Google SignIn error:', err);
-      setError(err.message || 'Failed to sign in with Google.');
+    } catch (err: unknown) {
+      const context: ErrorContext = {
+        component: 'LoginForm',
+        action: 'signInWithGoogle',
+      };
+      const appError = logError(err, context);
+      setError(appError.userFriendlyMessage);
     } finally {
       setLoading(false);
     }
@@ -76,10 +106,25 @@ export function LoginForm(): JSX.Element {
           </Box>
 
           {error && (
-            <Box className="p-4 rounded-md bg-red-50 border border-red-200">
-              <Text size="2" color="red">
-                {error}
-              </Text>
+            <Box className="p-4 rounded-lg bg-red-50 border border-red-200">
+              <Flex align="center" gap="2">
+                <svg
+                  className="h-5 w-5 text-red-600 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+                <Text size="2" className="text-red-800 font-medium">
+                  {error}
+                </Text>
+              </Flex>
             </Box>
           )}
 

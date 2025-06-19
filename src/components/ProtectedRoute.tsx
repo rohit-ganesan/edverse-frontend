@@ -1,28 +1,28 @@
 // No React import needed with new JSX transform
-import { Navigate } from 'react-router-dom';
+import { PropsWithChildren } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from 'features/auth/AuthContext';
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
+interface ProtectedRouteProps extends PropsWithChildren {}
 
 export function ProtectedRoute({ children }: ProtectedRouteProps): JSX.Element {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
+  // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
+  // If not authenticated, redirect to login with the current location
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // User is authenticated, render the protected component
   return <>{children}</>;
 }

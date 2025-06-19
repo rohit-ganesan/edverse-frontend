@@ -1,4 +1,5 @@
 // No React import needed with new JSX transform
+import { Link } from 'react-router-dom';
 import { Container, Flex, Box, Heading, Text, Grid } from '@radix-ui/themes';
 import { Button } from 'components/ui/RadixButton';
 import { RadixCard } from 'components/ui/RadixCard';
@@ -51,14 +52,19 @@ export function DashboardPage(): JSX.Element {
                 </Text>
               </Box>
               <Grid columns="3" gap="4" className="max-w-2xl">
-                <RadixCard size="2" className="p-6">
-                  <Flex direction="column" gap="2">
-                    <Heading size="4">Courses</Heading>
-                    <Text size="2" color="gray">
-                      Explore and enroll in courses
-                    </Text>
-                  </Flex>
-                </RadixCard>
+                <Link to="/courses" className="no-underline">
+                  <RadixCard
+                    size="2"
+                    className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                  >
+                    <Flex direction="column" gap="2">
+                      <Heading size="4">Courses</Heading>
+                      <Text size="2" color="gray">
+                        Explore and enroll in courses
+                      </Text>
+                    </Flex>
+                  </RadixCard>
+                </Link>
                 <RadixCard size="2" className="p-6">
                   <Flex direction="column" gap="2">
                     <Heading size="4">Progress</Heading>

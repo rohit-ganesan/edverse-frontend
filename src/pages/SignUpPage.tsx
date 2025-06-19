@@ -1,6 +1,6 @@
 // No React import needed with new JSX transform
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Flex, Box, Heading, Text } from '@radix-ui/themes';
 import { SignUpForm } from 'features/auth/components/SignUpForm';
 import { useAuth } from 'features/auth/AuthContext';
@@ -8,13 +8,17 @@ import { useAuth } from 'features/auth/AuthContext';
 export function SignUpPage(): JSX.Element {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Redirect to dashboard if already authenticated
+  // Get the intended destination from location state, default to dashboard
+  const from = location.state?.from?.pathname || '/dashboard';
+
+  // Redirect to intended destination if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, from]);
 
   return (
     <Container className="min-h-screen bg-gray-50">

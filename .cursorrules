@@ -1,41 +1,80 @@
-# Phase 1: Project & Auth Foundation (Revised with Radix UI)
+# Phase 1: Project & Auth Foundation (React + Firebase)
 
 # Code Style and Structure
-- All code in TypeScript with strict mode.
-- Use React functional components and Hooks only.
-- Organize auth code in `src/features/auth`.
-- Use Radix UI components for all base UI elements (buttons, dialogs, inputs, toasts):
-  - Import from `@radix-ui/react-<component>` packages.
-  - Wrap Radix primitives in local `src/components/ui/` wrappers to apply Tailwind theming.
-  - Prefer Radix’s accessible primitives over custom HTML elements.
+- All code in TypeScript with strict mode enabled.
+- Use React functional components and Hooks; never use class components.
+- Organize code by feature: each feature folder contains its components, subcomponents, helpers, static content, and types.
+- Use descriptive, verb-oriented variable names (e.g., isLoading, hasError, fetchCourses).
+- Favor named exports for components.
+- Wrap Radix UI primitives (buttons, dialogs, inputs) in `src/components/ui/` for consistent theming.
 
 # Project Configuration
-- use yarn package manager
-- Absolute imports from `src/`.
-- Tailwind CSS configured in `tailwind.config.js`.
-- Firebase initialized in `src/lib/firebase.ts` (Auth, Firestore, Storage).
-- Add Radix UI peer dependencies and set up any required CSS resets (e.g., include `@radix-ui/react-toast/styles.css`).
+- Absolute imports from `src/`; avoid deep relative paths.
+- Tailwind CSS configured in `tailwind.config.js`, extend theme with brand colors.
+- Firebase initialized in `src/lib/firebase.ts`: Auth, Firestore, Storage.
+- React Router v6 installed; routing code lives in `src/router/`.
+- Prettier and ESLint (Airbnb + TypeScript) set up; CI fails on warnings/errors.
 
 # TypeScript Usage
-- Prefer interfaces; avoid `any`.
-- Explicit return types on all exported functions.
-- For Radix components, type any extended props using `ComponentProps<typeof RadixComponent>`.
+- Prefer interfaces for object shapes; avoid `any`.
+- Use discriminated unions or string-literal unions instead of enums.
+- Annotate return types on all exported functions and components.
+- Type Radix wrappers using `ComponentProps<typeof RadixComponent>` where applicable.
 
-# Syntax & Formatting
-- Enforce Prettier via husky pre-commit.
-- ESLint (Airbnb + TS); CI fails on warnings.
-- Commit messages follow Conventional Commits.
+# Routing & Auth
+- Define routes in `src/router/Routes.tsx` under `<BrowserRouter>`.
+- Public routes: `/login`, `/signup`; protected routes wrapped in a `ProtectedRoute` component.
+- `ProtectedRoute` uses `useAuth()` to check `user`; redirects to `/login` if unauthenticated.
+- Preserve original requested path and redirect back post-login.
 
-# Firebase Integration
-- Implement AuthProvider + `useAuth` hook with Firebase Auth.
-- No Firestore reads/writes until Phase 2.
+# UI & Styling
+- Use Tailwind utility classes exclusively; no inline styles.
+- Use Radix UI for all base elements; apply Tailwind classes via wrapper components.
+- Ensure a global CSS reset (e.g., include Radix resets or Tailwind Preflight).
 
-# CI/CD
-- GitHub Actions pipeline:
-  1. Install dependencies  
-  2. Run ESLint → fail on warnings  
-  3. Build app (`npm run build`)
+# State Management & Data Fetching
+- Use React Query for all server-state:
+  - Define one hook per resource (e.g., `useAuthUser`, `useCourses`).
+  - Set `staleTime` = 5 minutes; `refetchOnWindowFocus` = true.
+- Use Zustand for local or UI state (e.g., modal open/close, theme).
+
+# Performance Optimization
+- Code-split large routes with `React.lazy` + `Suspense`.
+- Debounce high-frequency inputs (e.g., search) at 300ms.
+- Paginate large collections using Firestore `limit` + `startAfter`.
+- Lazy-load non-critical assets (images, charts).
+
+# Error Handling & Validation
+- Wrap async calls in `try…catch`; use a central `logError(error, context)` util.
+- Surface user-friendly toasts (e.g., via Radix Toast) for recoverable errors.
+- Use Zod for runtime validation of API payloads and form inputs.
 
 # Testing
-- Add at least one Jest test for AuthProvider.
-- Add component tests for Radix wrappers (e.g., button, dialog) using React Testing Library.
+- Write Jest + React Testing Library tests for:
+  - `AuthProvider` behavior.
+  - `ProtectedRoute` redirects.
+  - Key UI components (Radix wrappers).
+- Use Firebase Emulator Suite to mock Auth and Firestore in tests.
+- Enforce >90% coverage for feature folders; CI fails on coverage drop.
+
+# Security
+- Sanitize all user inputs to prevent XSS.
+- Enforce HTTPS calls to APIs.
+- Warn in code comments if using Firebase services that incur Blaze-plan charges.
+- Do not commit Firebase service account keys or sensitive configs.
+
+# Firebase Best Practices
+- Use only Auth and Firestore in Phase 1; defer Storage, Functions to later phases.
+- Reference https://firebase.google.com/docs for setup and security rules.
+- Keep Firestore reads/writes minimal until Phase 2.
+
+# Key Conventions
+- Commit messages follow Conventional Commits (e.g., `feat(auth): add login hook`).
+- Husky pre-commit to run linting and tests.
+- PRs require passing CI and one approving review.
+
+# Documentation
+- Add `README.md` in `src/features/auth` outlining Auth flow and hooks.
+- Maintain high-level `docs/` folder with “Phase 1 Setup” guide.
+- Document environment variables (`.env.example`) and Firebase emulator usage.
+
