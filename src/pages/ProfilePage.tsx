@@ -9,21 +9,88 @@ import { useAuth } from 'features/auth/AuthContext';
 import { User, MapPin, Mail, Shield } from 'lucide-react';
 
 export function ProfilePage(): JSX.Element {
-  const { user, userProfile, updateUserProfile } = useAuth();
+  const authContext = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Get user and profile safely
+  const user = authContext?.user;
+  const userProfile = authContext?.userProfile;
+  const updateUserProfile = authContext?.updateUserProfile;
+
+  // Initialize form data with safe defaults - must be called before conditional returns
   const [formData, setFormData] = useState({
     firstName: userProfile?.firstName || '',
     lastName: userProfile?.lastName || '',
     address: userProfile?.address || '',
     role: userProfile?.role || 'Administrator',
   });
-  const [loading, setLoading] = useState(false);
+
+  // Defensive check for auth context - after hooks
+  if (!authContext) {
+    console.error('ProfilePage: Auth context is not available');
+    return (
+      <DashboardLayout>
+        <Box className="p-6">
+          <div className="text-center">
+            <h1 className="text-xl font-semibold text-gray-900 mb-2">
+              Authentication Error
+            </h1>
+            <p className="text-gray-600">
+              Unable to load authentication context. Please refresh the page.
+            </p>
+          </div>
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  // Safe getters for user data
+  const getUserDisplayName = (): string => {
+    if (userProfile?.firstName && userProfile?.lastName) {
+      return `${userProfile.firstName} ${userProfile.lastName}`;
+    }
+
+    if (user?.displayName) {
+      return user.displayName;
+    }
+
+    return 'User';
+  };
+
+  const getUserEmail = (): string => {
+    return user?.email || 'Not available';
+  };
+
+  const getUserRole = (): string => {
+    return userProfile?.role || 'Administrator';
+  };
+
+  const getUserAddress = (): string | null => {
+    return userProfile?.address || null;
+  };
 
   const handleInputChange = (field: string, value: string): void => {
+    if (!field || typeof value !== 'string') {
+      console.warn('ProfilePage: Invalid input change parameters');
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async (): Promise<void> => {
+    if (!updateUserProfile) {
+      console.error('ProfilePage: updateUserProfile function is not available');
+      return;
+    }
+
+    // Validate form data
+    if (!formData.firstName?.trim() || !formData.lastName?.trim()) {
+      console.error('ProfilePage: First name and last name are required');
+      return;
+    }
+
     setLoading(true);
     try {
       await updateUserProfile(formData);
@@ -36,6 +103,7 @@ export function ProfilePage(): JSX.Element {
   };
 
   const handleCancel = (): void => {
+    // Reset form data to current profile values
     setFormData({
       firstName: userProfile?.firstName || '',
       lastName: userProfile?.lastName || '',
@@ -43,6 +111,33 @@ export function ProfilePage(): JSX.Element {
       role: userProfile?.role || 'Administrator',
     });
     setIsEditing(false);
+  };
+
+  const handleStartEditing = (): void => {
+    // Refresh form data when starting to edit
+    setFormData({
+      firstName: userProfile?.firstName || '',
+      lastName: userProfile?.lastName || '',
+      address: userProfile?.address || '',
+      role: userProfile?.role || 'Administrator',
+    });
+    setIsEditing(true);
+  };
+
+  // Safe form field values
+  const getFieldValue = (
+    field: keyof typeof formData,
+    profileField?: string
+  ): string => {
+    if (isEditing) {
+      return formData[field] || '';
+    }
+
+    if (profileField && userProfile) {
+      return (userProfile as any)[profileField] || '';
+    }
+
+    return userProfile?.[field] || '';
   };
 
   return (
@@ -64,7 +159,7 @@ export function ProfilePage(): JSX.Element {
               Personal Information
             </Heading>
             {!isEditing && (
-              <RadixButton variant="outline" onClick={() => setIsEditing(true)}>
+              <RadixButton variant="outline" onClick={handleStartEditing}>
                 Edit Profile
               </RadixButton>
             )}
@@ -86,15 +181,13 @@ export function ProfilePage(): JSX.Element {
                   weight="medium"
                   className="text-gray-900 dark:text-gray-100 block mb-1"
                 >
-                  {userProfile?.firstName && userProfile?.lastName
-                    ? `${userProfile.firstName} ${userProfile.lastName}`
-                    : user?.displayName || 'User'}
+                  {getUserDisplayName()}
                 </Text>
                 <Text
                   size="2"
                   className="text-gray-600 dark:text-gray-400 block"
                 >
-                  {userProfile?.role || 'Administrator'}
+                  {getUserRole()}
                 </Text>
               </Box>
             </Flex>
@@ -104,9 +197,7 @@ export function ProfilePage(): JSX.Element {
               <Grid columns="2" gap="4">
                 <FormField
                   label="First Name"
-                  value={
-                    isEditing ? formData.firstName : userProfile?.firstName
-                  }
+                  value={getFieldValue('firstName', 'firstName')}
                   placeholder="Enter first name"
                   isEditing={isEditing}
                   onChange={(value) => handleInputChange('firstName', value)}
@@ -114,7 +205,7 @@ export function ProfilePage(): JSX.Element {
 
                 <FormField
                   label="Last Name"
-                  value={isEditing ? formData.lastName : userProfile?.lastName}
+                  value={getFieldValue('lastName', 'lastName')}
                   placeholder="Enter last name"
                   isEditing={isEditing}
                   onChange={(value) => handleInputChange('lastName', value)}
@@ -123,17 +214,13 @@ export function ProfilePage(): JSX.Element {
 
               <FormField
                 label="Address"
-                value={isEditing ? formData.address : userProfile?.address}
+                value={getFieldValue('address', 'address')}
                 placeholder="Enter your address"
                 isEditing={isEditing}
                 onChange={(value) => handleInputChange('address', value)}
               />
 
-              <FormField
-                label="Role"
-                value={userProfile?.role || 'Administrator'}
-                isEditing={false}
-              />
+              <FormField label="Role" value={getUserRole()} isEditing={false} />
             </Flex>
 
             {isEditing && (
@@ -159,22 +246,22 @@ export function ProfilePage(): JSX.Element {
             <LineItem
               icon={Mail}
               label="Email Address"
-              value={user?.email || 'Not available'}
+              value={getUserEmail()}
               variant="bordered"
             />
 
             <LineItem
               icon={Shield}
               label="Account Type"
-              value={userProfile?.role || 'Administrator'}
+              value={getUserRole()}
               variant="bordered"
             />
 
-            {userProfile?.address && (
+            {getUserAddress() && (
               <LineItem
                 icon={MapPin}
                 label="Location"
-                value={userProfile.address}
+                value={getUserAddress() || ''}
                 variant="bordered"
               />
             )}

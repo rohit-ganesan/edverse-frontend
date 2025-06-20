@@ -32,10 +32,28 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   // Load user profile from Firestore
   const loadUserProfile = async (userId: string): Promise<void> => {
+    if (!userId) {
+      console.error('loadUserProfile: userId is required');
+      setUserProfile(null);
+      return;
+    }
+
+    if (!db) {
+      console.error('loadUserProfile: Firestore database is not initialized');
+      setUserProfile(null);
+      return;
+    }
+
     try {
       const userDoc = await getDoc(doc(db, 'users', userId));
       if (userDoc.exists()) {
-        setUserProfile(userDoc.data() as UserProfile);
+        const profileData = userDoc.data();
+        if (profileData) {
+          setUserProfile(profileData as UserProfile);
+        } else {
+          console.warn('loadUserProfile: Profile data is empty');
+          setUserProfile(null);
+        }
       } else {
         // Create default profile for new users
         const defaultProfile: UserProfile = {
@@ -54,14 +72,20 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   };
 
   useEffect(() => {
+    if (!auth) {
+      console.error('AuthProvider: Firebase auth is not initialized');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log(
         'Auth state changed:',
-        user ? `User: ${user.email}` : 'No user'
+        user ? `User: ${user.email || 'Unknown email'}` : 'No user'
       );
       setUser(user);
 
-      if (user) {
+      if (user?.uid) {
         await loadUserProfile(user.uid);
       } else {
         setUserProfile(null);
@@ -78,6 +102,14 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     password: string,
     profile?: Partial<UserProfile>
   ): Promise<void> => {
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+
+    if (!auth) {
+      throw new Error('Firebase auth is not initialized');
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -86,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       );
 
       // If profile data is provided, save it to Firestore
-      if (profile && userCredential.user) {
+      if (profile && userCredential?.user?.uid && db) {
         const userProfile: UserProfile = {
           firstName: profile.firstName || '',
           lastName: profile.lastName || '',
@@ -112,6 +144,14 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   };
 
   const signIn = async (email: string, password: string): Promise<void> => {
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+
+    if (!auth) {
+      throw new Error('Firebase auth is not initialized');
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error: unknown) {
@@ -129,6 +169,10 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   };
 
   const signInWithGoogle = async (): Promise<void> => {
+    if (!auth) {
+      throw new Error('Firebase auth is not initialized');
+    }
+
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -146,14 +190,26 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   };
 
   const signOut = async (): Promise<void> => {
+    if (!auth) {
+      throw new Error('Firebase auth is not initialized');
+    }
+
     await firebaseSignOut(auth);
   };
 
   const updateUserProfile = async (
     profile: Partial<UserProfile>
   ): Promise<void> => {
-    if (!user) {
+    if (!user?.uid) {
       throw new Error('No user logged in');
+    }
+
+    if (!profile || Object.keys(profile).length === 0) {
+      throw new Error('Profile data is required');
+    }
+
+    if (!db) {
+      throw new Error('Firestore database is not initialized');
     }
 
     try {

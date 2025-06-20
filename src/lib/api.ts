@@ -132,22 +132,60 @@ export class ApiService {
     userId: string,
     profileData: any
   ): Promise<{ success: boolean }> {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    if (!profileData || typeof profileData !== 'object') {
+      throw new Error('Profile data is required and must be an object');
+    }
+
     try {
       const result = await updateUserProfileFn({ userId, profileData });
+
+      if (!result?.data) {
+        throw new Error('No response data received from server');
+      }
+
       return result.data as { success: boolean };
     } catch (error) {
       console.error('Error updating user profile:', error);
-      throw new Error('Failed to update user profile');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user profile';
+      throw new Error(errorMessage);
     }
   }
 
   static async getDashboardStats(): Promise<DashboardStats> {
     try {
       const result = await getDashboardStatsFn();
-      return (result.data as { stats: DashboardStats }).stats;
+
+      if (!result?.data) {
+        throw new Error('No response data received from server');
+      }
+
+      const responseData = result.data as { stats?: DashboardStats };
+
+      if (!responseData.stats) {
+        // Return default stats if none provided
+        return {
+          totalStudents: 0,
+          totalInstructors: 0,
+          totalCourses: 0,
+          totalAdmins: 0,
+        };
+      }
+
+      return responseData.stats;
     } catch (error) {
       console.error('Error getting dashboard stats:', error);
-      throw new Error('Failed to get dashboard statistics');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to get dashboard statistics';
+      throw new Error(errorMessage);
     }
   }
 
@@ -158,22 +196,50 @@ export class ApiService {
   static async createCourse(
     courseData: Omit<Course, 'id' | 'students' | 'createdAt' | 'updatedAt'>
   ): Promise<{ success: boolean; courseId: string }> {
+    if (!courseData) {
+      throw new Error('Course data is required');
+    }
+
+    if (!courseData.name?.trim()) {
+      throw new Error('Course name is required');
+    }
+
+    if (!courseData.instructorId?.trim()) {
+      throw new Error('Instructor ID is required');
+    }
+
     try {
       const result = await createCourseFn({ courseData });
+
+      if (!result?.data) {
+        throw new Error('No response data received from server');
+      }
+
       return result.data as { success: boolean; courseId: string };
     } catch (error) {
       console.error('Error creating course:', error);
-      throw new Error('Failed to create course');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to create course';
+      throw new Error(errorMessage);
     }
   }
 
   static async getUserCourses(): Promise<Course[]> {
     try {
       const result = await getUserCoursesFn();
-      return (result.data as { courses: Course[] }).courses;
+
+      if (!result?.data) {
+        console.warn('No response data received from getUserCourses');
+        return [];
+      }
+
+      const responseData = result.data as { courses?: Course[] };
+      return responseData.courses || [];
     } catch (error) {
       console.error('Error getting user courses:', error);
-      throw new Error('Failed to get courses');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to get courses';
+      throw new Error(errorMessage);
     }
   }
 
@@ -184,10 +250,19 @@ export class ApiService {
   static async getStudents(): Promise<Student[]> {
     try {
       const result = await getStudentsFn();
-      return (result.data as { students: Student[] }).students;
+
+      if (!result?.data) {
+        console.warn('No response data received from getStudents');
+        return [];
+      }
+
+      const responseData = result.data as { students?: Student[] };
+      return responseData.students || [];
     } catch (error) {
       console.error('Error getting students:', error);
-      throw new Error('Failed to get students');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to get students';
+      throw new Error(errorMessage);
     }
   }
 
@@ -195,12 +270,29 @@ export class ApiService {
     studentId: string,
     courseId: string
   ): Promise<{ success: boolean }> {
+    if (!studentId?.trim()) {
+      throw new Error('Student ID is required');
+    }
+
+    if (!courseId?.trim()) {
+      throw new Error('Course ID is required');
+    }
+
     try {
       const result = await enrollStudentInCourseFn({ studentId, courseId });
+
+      if (!result?.data) {
+        throw new Error('No response data received from server');
+      }
+
       return result.data as { success: boolean };
     } catch (error) {
       console.error('Error enrolling student in course:', error);
-      throw new Error('Failed to enroll student in course');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to enroll student in course';
+      throw new Error(errorMessage);
     }
   }
 
@@ -211,10 +303,19 @@ export class ApiService {
   static async getInstructors(): Promise<Instructor[]> {
     try {
       const result = await getInstructorsFn();
-      return (result.data as { instructors: Instructor[] }).instructors;
+
+      if (!result?.data) {
+        console.warn('No response data received from getInstructors');
+        return [];
+      }
+
+      const responseData = result.data as { instructors?: Instructor[] };
+      return responseData.instructors || [];
     } catch (error) {
       console.error('Error getting instructors:', error);
-      throw new Error('Failed to get instructors');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to get instructors';
+      throw new Error(errorMessage);
     }
   }
 
@@ -227,15 +328,22 @@ export class ApiService {
     message: string;
   }> {
     try {
-      const migrationFn: HttpsCallable = httpsCallable(
+      const migrationFn = httpsCallable(
         functions,
         'runTeacherToInstructorMigration'
       );
       const result = await migrationFn();
+
+      if (!result?.data) {
+        throw new Error('No response data received from migration');
+      }
+
       return result.data as { success: boolean; message: string };
     } catch (error) {
-      console.error('Error running migration:', error);
-      throw new Error('Failed to run migration');
+      console.error('Error running teacher to instructor migration:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to run migration';
+      throw new Error(errorMessage);
     }
   }
 
@@ -249,108 +357,121 @@ export class ApiService {
     type: 'info' | 'warning' | 'success' | 'error' = 'info',
     targetRole: string = 'all'
   ): Promise<{ success: boolean; notificationId: string }> {
+    if (!title?.trim()) {
+      throw new Error('Notification title is required');
+    }
+
+    if (!message?.trim()) {
+      throw new Error('Notification message is required');
+    }
+
     try {
       const result = await createNotificationFn({
-        title,
-        message,
+        title: title.trim(),
+        message: message.trim(),
         type,
-        targetRole,
+        targetRole: targetRole.trim(),
       });
+
+      if (!result?.data) {
+        throw new Error('No response data received from server');
+      }
+
       return result.data as { success: boolean; notificationId: string };
     } catch (error) {
       console.error('Error creating notification:', error);
-      throw new Error('Failed to create notification');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to create notification';
+      throw new Error(errorMessage);
     }
   }
 
   static async getUserNotifications(): Promise<Notification[]> {
     try {
       const result = await getUserNotificationsFn();
-      return (result.data as { notifications: Notification[] }).notifications;
-    } catch (error: any) {
-      console.error('Error getting notifications:', error);
 
-      // Log more detailed error information for debugging
-      if (error.code) {
-        console.error('Error code:', error.code);
-      }
-      if (error.details) {
-        console.error('Error details:', error.details);
+      if (!result?.data) {
+        console.warn('No response data received from getUserNotifications');
+        return [];
       }
 
-      // Provide more specific error messages based on error type
-      if (error.code === 'functions/unauthenticated') {
-        throw new Error('Please sign in to view notifications');
-      } else if (error.code === 'functions/not-found') {
-        throw new Error('Notification service is not available');
-      } else if (error.code === 'functions/internal') {
-        throw new Error('Server error occurred while fetching notifications');
-      } else if (error.code === 'functions/unavailable') {
-        throw new Error('Notification service is temporarily unavailable');
-      } else {
-        throw new Error('Unable to load notifications at this time');
-      }
+      const responseData = result.data as { notifications?: Notification[] };
+      return responseData.notifications || [];
+    } catch (error) {
+      console.error('Error getting user notifications:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to get notifications';
+      throw new Error(errorMessage);
     }
   }
 
   // =============================================================================
-  // Development & Testing
+  // Test Functions
   // =============================================================================
 
+  /**
+   * Test connection to Firebase Cloud Functions
+   * @param testData Optional test data to send
+   * @returns Promise with test result
+   */
   static async testConnection(
     testData?: any
   ): Promise<{ message: string; timestamp: string; data?: any }> {
     try {
-      const result = await testFunctionFn(
-        testData || { test: 'Hello from frontend!' }
-      );
+      const result = await testFunctionFn(testData || {});
+
+      if (!result?.data) {
+        return {
+          message: 'Connection successful but no data returned',
+          timestamp: new Date().toISOString(),
+        };
+      }
+
       return result.data as { message: string; timestamp: string; data?: any };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error testing connection:', error);
-      throw new Error('Failed to test backend connection');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Connection test failed';
+      throw new Error(errorMessage);
     }
   }
 
-  // Initialize user profile and sample data for development
+  // =============================================================================
+  // Initialization Functions
+  // =============================================================================
+
+  /**
+   * Initialize user data and collections
+   * @returns Promise with initialization result
+   */
   static async initializeUserData(): Promise<{
     success: boolean;
     message: string;
   }> {
     try {
-      // Get the current user from auth context - we'll need to pass this from the component
-      // For now, let's create a simpler approach that doesn't require updateUserProfile
+      const initializeFn = httpsCallable(functions, 'initializeUserData');
+      const result = await initializeFn();
 
-      // Just create some sample notifications
-      await this.createNotification(
-        'Welcome to EdVerse!',
-        'Your educational management system is ready to use.',
-        'success',
-        'all'
-      );
+      if (!result?.data) {
+        throw new Error('No response data received from initialization');
+      }
 
-      await this.createNotification(
-        'System Maintenance',
-        'Scheduled maintenance will occur this weekend.',
-        'info',
-        'all'
-      );
-
-      return {
-        success: true,
-        message: 'Sample notifications created successfully',
-      };
-    } catch (error: any) {
+      return result.data as { success: boolean; message: string };
+    } catch (error) {
       console.error('Error initializing user data:', error);
-      return {
-        success: false,
-        message: `Failed to initialize user data: ${error.message}`,
-      };
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to initialize user data';
+      throw new Error(errorMessage);
     }
   }
 }
 
 // =============================================================================
-// Error Handling Utilities
+// Error Handling
 // =============================================================================
 
 export class ApiError extends Error {
@@ -365,30 +486,33 @@ export class ApiError extends Error {
 }
 
 export const handleApiError = (error: any): ApiError => {
-  if (error.code === 'functions/unauthenticated') {
-    return new ApiError(
-      'Authentication required. Please sign in.',
-      'AUTH_REQUIRED'
-    );
-  } else if (error.code === 'functions/permission-denied') {
-    return new ApiError(
-      'You do not have permission to perform this action.',
-      'PERMISSION_DENIED'
-    );
-  } else if (error.code === 'functions/not-found') {
-    return new ApiError('The requested resource was not found.', 'NOT_FOUND');
-  } else if (error.code === 'functions/internal') {
-    return new ApiError(
-      'An internal server error occurred. Please try again later.',
-      'INTERNAL_ERROR'
-    );
-  } else {
-    return new ApiError(
-      error.message || 'An unexpected error occurred.',
-      'UNKNOWN_ERROR'
-    );
+  if (error instanceof ApiError) {
+    return error;
   }
+
+  let message = 'An unexpected error occurred';
+  let code: string | undefined;
+  let details: any;
+
+  if (error?.code) {
+    code = error.code;
+    message = error.message || message;
+  } else if (error?.message) {
+    message = error.message;
+  } else if (typeof error === 'string') {
+    message = error;
+  }
+
+  if (error?.details) {
+    details = error.details;
+  }
+
+  return new ApiError(message, code, details);
 };
+
+// =============================================================================
+// React Hook for API Calls
+// =============================================================================
 
 export const useApiCall = <T>(
   apiFunction: () => Promise<T>,
@@ -398,35 +522,33 @@ export const useApiCall = <T>(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await apiFunction();
-        setData(result);
-      } catch (err: any) {
-        setError(handleApiError(err).message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
+      if (!apiFunction || typeof apiFunction !== 'function') {
+        throw new Error('Invalid API function provided');
+      }
+
+      const result = await apiFunction();
+      setData(result);
+    } catch (err) {
+      const apiError = handleApiError(err);
+      setError(apiError.message);
+      console.error('API call failed:', apiError);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependencies);
 
   const refetch = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await apiFunction();
-      setData(result);
-    } catch (err: any) {
-      setError(handleApiError(err).message);
-    } finally {
-      setLoading(false);
-    }
+    await fetchData();
   };
 
   return { data, loading, error, refetch };

@@ -181,3 +181,124 @@ When adding new components:
 4. Add test coverage
 5. Update this README with usage examples
 6. Maintain the established visual hierarchy and spacing patterns ⭐ NEW
+
+### NoticeItem
+
+The `NoticeItem` component provides a standardized way to display notices and notifications with proper null safety and date formatting.
+
+```tsx
+import { NoticeItem } from 'components/ui/NoticeItem';
+import { Info } from 'lucide-react';
+
+<NoticeItem
+  id="notice-1"
+  title="System Maintenance"
+  message="Scheduled maintenance will occur this weekend."
+  type="info"
+  createdAt={new Date()}
+  icon={Info}
+  onClick={() => console.log('Notice clicked')}
+/>;
+```
+
+**Props:**
+
+- `id` (required): Unique identifier for the notice
+- `title` (required): Notice title text
+- `message` (optional): Notice description/message
+- `type` (required): Notice type - 'success', 'info', 'warning', or 'error'
+- `createdAt` (required): Date/timestamp when notice was created (supports multiple formats)
+- `icon` (required): Lucide icon component to display
+- `onClick` (optional): Click handler function
+- `className` (optional): Additional CSS classes
+
+**Features:**
+
+- Robust date formatting with multiple timestamp format support
+- Proper null safety and error handling
+- Type-based color coding and icons
+- Responsive design with hover effects
+- Accessibility support
+
+### StatsCard
+
+Display statistical information with icons and optional trend indicators.
+
+```tsx
+import { StatsCard } from 'components/ui/StatsCard';
+import { Users } from 'lucide-react';
+
+<StatsCard
+  title="Total Users"
+  value="1,234"
+  icon={Users}
+  iconColor="text-blue-600"
+  iconBgColor="bg-blue-100"
+  trend={{ value: '5%', isPositive: true }}
+/>;
+```
+
+### PageHeader
+
+Standardized page header with title, description, and action buttons.
+
+```tsx
+import { PageHeader } from 'components/ui/PageHeader';
+import { Plus, Download } from 'lucide-react';
+
+<PageHeader
+  title="Dashboard"
+  description="Welcome to your dashboard"
+  actions={[
+    {
+      label: 'Export Data',
+      icon: Download,
+      onClick: () => console.log('Export clicked'),
+    },
+    {
+      label: 'Add New',
+      icon: Plus,
+      onClick: () => console.log('Add clicked'),
+      isPrimary: true,
+    },
+  ]}
+/>;
+```
+
+## Design Principles
+
+1. **Consistency**: All components follow the same design patterns and use consistent spacing, colors, and typography
+2. **Accessibility**: Components include proper ARIA labels, keyboard navigation, and screen reader support
+3. **Null Safety**: All components include proper validation and error handling for props
+4. **Responsive**: Components work across different screen sizes
+5. **Theming**: Components support both light and dark themes through Tailwind CSS classes
+6. **Type Safety**: Full TypeScript support with proper interfaces and prop validation
+
+## Styling
+
+Components use Tailwind CSS for styling with consistent design tokens:
+
+- **Colors**: Primary (blue), success (green), warning (orange), error (red)
+- **Spacing**: Consistent padding and margin using Tailwind scale
+- **Typography**: Radix UI Text and Heading components with size variants
+- **Shadows**: Subtle shadows for depth and hierarchy
+- **Borders**: Consistent border radius and colors
+
+## Error Handling
+
+All components include comprehensive error handling:
+
+- Prop validation with helpful error messages
+- Graceful fallbacks for missing or invalid data
+- Console warnings for development debugging
+- Safe rendering that prevents crashes
+
+## Testing
+
+Components should be tested for:
+
+- Proper rendering with valid props
+- Error handling with invalid props
+- Accessibility compliance
+- Responsive behavior
+- Theme switching (light/dark mode)

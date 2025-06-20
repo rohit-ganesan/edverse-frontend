@@ -27,11 +27,25 @@ interface BreadcrumbItem {
 }
 
 export function Header({ className = '' }: HeaderProps): JSX.Element {
-  const { user, userProfile, signOut } = useAuth();
-  const { toggleTheme, isDark } = useTheme();
+  const authContext = useAuth();
+  const themeContext = useTheme();
   const location = useLocation();
   const [searchValue, setSearchValue] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Defensive checks for contexts
+  if (!authContext) {
+    console.error('Header: Auth context is not available');
+    return <Box className="h-16 bg-gray-50 dark:bg-gray-900" />;
+  }
+
+  if (!themeContext) {
+    console.error('Header: Theme context is not available');
+    return <Box className="h-16 bg-gray-50 dark:bg-gray-900" />;
+  }
+
+  const { user, userProfile, signOut } = authContext;
+  const { toggleTheme, isDark } = themeContext;
 
   const handleSignOut = async (): Promise<void> => {
     try {
@@ -41,8 +55,30 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
     }
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (e?.target) {
+      setSearchValue(e.target.value);
+    }
+  };
+
+  const handleToggleUserMenu = (): void => {
+    setShowUserMenu((prev) => !prev);
+  };
+
+  const handleThemeToggle = (): void => {
+    try {
+      toggleTheme();
+    } catch (error) {
+      console.error('Error toggling theme:', error);
+    }
+  };
+
   // Generate breadcrumbs based on current path
   const getBreadcrumbs = (): BreadcrumbItem[] => {
+    if (!location?.pathname) {
+      return [{ label: 'Dashboard' }];
+    }
+
     const pathSegments = location.pathname.split('/').filter(Boolean);
     const breadcrumbs: BreadcrumbItem[] = [];
 
@@ -69,6 +105,36 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
 
   const breadcrumbs = getBreadcrumbs();
 
+  // Safe user display name
+  const getUserDisplayName = (): string => {
+    if (userProfile?.firstName && userProfile?.lastName) {
+      return `${userProfile.firstName} ${userProfile.lastName}`;
+    }
+
+    if (user?.displayName) {
+      return user.displayName;
+    }
+
+    if (user?.email) {
+      const emailPrefix = user.email.split('@')[0];
+      return emailPrefix || 'User';
+    }
+
+    return 'User';
+  };
+
+  const getUserRole = (): string => {
+    return userProfile?.role || 'Administrator';
+  };
+
+  const getUserEmail = (): string => {
+    return user?.email || '';
+  };
+
+  const getUserAddress = (): string | null => {
+    return userProfile?.address || null;
+  };
+
   return (
     <Box
       className={`
@@ -86,7 +152,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
               <RadixTextField
                 placeholder="Search..."
                 value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
+                onChange={handleSearchChange}
                 size="2"
                 className="w-full pl-12 pr-4 py-2 rounded-full bg-gray-50 dark:bg-gray-900 border border-gray-300/50 dark:border-gray-600/50 shadow-sm hover:shadow-md transition-all duration-200 focus:bg-white dark:focus:bg-gray-800 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-400/20 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
@@ -95,7 +161,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
 
           {/* Breadcrumbs */}
           <Flex align="center" gap="2">
-            {breadcrumbs.map((item, index) => (
+            {breadcrumbs?.map((item, index) => (
               <Flex key={index} align="center" gap="2">
                 {item.path ? (
                   <Link to={item.path} className="no-underline">
@@ -103,7 +169,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                       size="2"
                       className="text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap transition-colors duration-200"
                     >
-                      {item.label}
+                      {item.label || 'Unknown'}
                     </Text>
                   </Link>
                 ) : (
@@ -111,7 +177,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                     size="2"
                     className="text-gray-500 dark:text-gray-500 whitespace-nowrap"
                   >
-                    {item.label}
+                    {item.label || 'Unknown'}
                   </Text>
                 )}
                 {index < breadcrumbs.length - 1 && (
@@ -158,7 +224,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
               variant="ghost"
               size="2"
               className="p-2"
-              onClick={() => setShowUserMenu(!showUserMenu)}
+              onClick={handleToggleUserMenu}
             >
               <Flex align="center" gap="3">
                 <Box className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -170,17 +236,13 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                     weight="medium"
                     className="text-gray-900 dark:text-gray-100 block truncate max-w-[150px]"
                   >
-                    {userProfile?.firstName && userProfile?.lastName
-                      ? `${userProfile.firstName} ${userProfile.lastName}`
-                      : user?.displayName ||
-                        user?.email?.split('@')[0] ||
-                        'User'}
+                    {getUserDisplayName()}
                   </Text>
                   <Text
                     size="1"
                     className="text-gray-600 dark:text-gray-400 block"
                   >
-                    {userProfile?.role || 'Administrator'}
+                    {getUserRole()}
                   </Text>
                 </Box>
               </Flex>
@@ -200,24 +262,20 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                     weight="medium"
                     className="text-gray-900 dark:text-gray-100 block mb-2"
                   >
-                    {userProfile?.firstName && userProfile?.lastName
-                      ? `${userProfile.firstName} ${userProfile.lastName}`
-                      : user?.displayName ||
-                        user?.email?.split('@')[0] ||
-                        'User'}
+                    {getUserDisplayName()}
                   </Text>
                   <Text
                     size="1"
                     className="text-gray-600 dark:text-gray-400 block mb-1 break-all"
                   >
-                    {user?.email}
+                    {getUserEmail()}
                   </Text>
-                  {userProfile?.address && (
+                  {getUserAddress() && (
                     <Text
                       size="1"
                       className="text-gray-500 dark:text-gray-500 block"
                     >
-                      {userProfile.address}
+                      {getUserAddress()}
                     </Text>
                   )}
                 </Box>
@@ -237,7 +295,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                     <Text size="2">Settings</Text>
                   </Link>
                   <button
-                    onClick={toggleTheme}
+                    onClick={handleThemeToggle}
                     className="flex items-center w-full px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     {isDark ? (

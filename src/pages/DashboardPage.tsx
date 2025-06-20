@@ -23,10 +23,13 @@ import { useAuth } from 'features/auth/AuthContext';
 import { useEffect, useState } from 'react';
 
 export function DashboardPage(): JSX.Element {
-  const { user } = useAuth();
+  const authContext = useAuth();
   const [testResult, setTestResult] = useState<string>('');
 
-  // Fetch dashboard statistics from backend
+  // Get user safely
+  const user = authContext?.user;
+
+  // Fetch dashboard statistics from backend - must be called before any conditional returns
   const {
     data: stats,
     loading: statsLoading,
@@ -34,27 +37,56 @@ export function DashboardPage(): JSX.Element {
     refetch: refetchStats,
   } = useApiCall(() => ApiService.getDashboardStats(), [user]);
 
-  // Test backend connection on component mount
+  // Test backend connection on component mount - must be called before any conditional returns
   useEffect(() => {
     const testBackend = async () => {
-      if (user) {
-        try {
-          const result = await ApiService.testConnection({
-            userId: user.uid,
-            page: 'dashboard',
-            timestamp: new Date().toISOString(),
-          });
+      if (!user?.uid) {
+        console.warn('DashboardPage: No user available for backend test');
+        return;
+      }
+
+      try {
+        const result = await ApiService.testConnection({
+          userId: user.uid,
+          page: 'dashboard',
+          timestamp: new Date().toISOString(),
+        });
+
+        if (result?.message) {
           setTestResult(`✅ Backend connected: ${result.message}`);
           console.log('Backend test result:', result);
-        } catch (error) {
-          setTestResult(`❌ Backend connection failed: ${error}`);
-          console.error('Backend test failed:', error);
+        } else {
+          setTestResult('✅ Backend connected: No message returned');
         }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        setTestResult(`❌ Backend connection failed: ${errorMessage}`);
+        console.error('Backend test failed:', error);
       }
     };
 
     testBackend();
   }, [user]);
+
+  // Defensive check for auth context - after hooks
+  if (!authContext) {
+    console.error('DashboardPage: Auth context is not available');
+    return (
+      <DashboardLayout>
+        <Box className="p-6">
+          <div className="text-center">
+            <h1 className="text-xl font-semibold text-gray-900 mb-2">
+              Authentication Error
+            </h1>
+            <p className="text-gray-600">
+              Unable to load authentication context. Please refresh the page.
+            </p>
+          </div>
+        </Box>
+      </DashboardLayout>
+    );
+  }
 
   // Default values while loading or if there's an error
   const displayStats = stats || {
@@ -62,6 +94,45 @@ export function DashboardPage(): JSX.Element {
     totalInstructors: 0,
     totalStudents: 0,
     totalCourses: 0,
+  };
+
+  // Safe stat value conversion
+  const getStatValue = (value: unknown, fallback: string = '0'): string => {
+    if (statsLoading) return '...';
+    if (value === null || value === undefined) return fallback;
+    if (typeof value === 'number') return value.toString();
+    if (typeof value === 'string') return value;
+    return fallback;
+  };
+
+  const handleExportData = (): void => {
+    try {
+      console.log('Export data clicked');
+      // TODO: Implement export functionality
+    } catch (error) {
+      console.error('Error exporting data:', error);
+    }
+  };
+
+  const handleAddNew = (): void => {
+    try {
+      console.log('Add new clicked');
+      // TODO: Implement add new functionality
+    } catch (error) {
+      console.error('Error adding new item:', error);
+    }
+  };
+
+  const handleRefetchStats = (): void => {
+    try {
+      if (refetchStats) {
+        refetchStats();
+      } else {
+        console.warn('Refetch function is not available');
+      }
+    } catch (error) {
+      console.error('Error refetching stats:', error);
+    }
   };
 
   return (
@@ -73,12 +144,12 @@ export function DashboardPage(): JSX.Element {
           {
             label: 'Export Data',
             icon: Download,
-            onClick: () => console.log('Export data clicked'),
+            onClick: handleExportData,
           },
           {
             label: 'Add New',
             icon: Plus,
-            onClick: () => console.log('Add new clicked'),
+            onClick: handleAddNew,
             isPrimary: true,
           },
         ]}
@@ -97,7 +168,7 @@ export function DashboardPage(): JSX.Element {
         stats={[
           {
             title: 'Admins',
-            value: statsLoading ? '...' : displayStats.totalAdmins.toString(),
+            value: getStatValue(displayStats?.totalAdmins),
             icon: Shield,
             iconColor: 'text-blue-600',
             iconBgColor: 'bg-blue-100',
@@ -105,9 +176,7 @@ export function DashboardPage(): JSX.Element {
           },
           {
             title: 'Instructors',
-            value: statsLoading
-              ? '...'
-              : displayStats.totalInstructors.toString(),
+            value: getStatValue(displayStats?.totalInstructors),
             icon: Users,
             iconColor: 'text-green-600',
             iconBgColor: 'bg-green-100',
@@ -115,7 +184,7 @@ export function DashboardPage(): JSX.Element {
           },
           {
             title: 'Students',
-            value: statsLoading ? '...' : displayStats.totalStudents.toString(),
+            value: getStatValue(displayStats?.totalStudents),
             icon: GraduationCap,
             iconColor: 'text-purple-600',
             iconBgColor: 'bg-purple-100',
@@ -123,7 +192,7 @@ export function DashboardPage(): JSX.Element {
           },
           {
             title: 'Courses',
-            value: statsLoading ? '...' : displayStats.totalCourses.toString(),
+            value: getStatValue(displayStats?.totalCourses),
             icon: Building,
             iconColor: 'text-orange-600',
             iconBgColor: 'bg-orange-100',
@@ -137,10 +206,13 @@ export function DashboardPage(): JSX.Element {
       {statsError && (
         <Box className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-red-700 dark:text-red-400 text-sm">
-            Error loading dashboard statistics: {statsError}
+            Error loading dashboard statistics:{' '}
+            {typeof statsError === 'string'
+              ? statsError
+              : 'Unknown error occurred'}
           </p>
           <button
-            onClick={refetchStats}
+            onClick={handleRefetchStats}
             className="mt-2 text-red-600 dark:text-red-400 text-sm underline hover:no-underline"
           >
             Try again

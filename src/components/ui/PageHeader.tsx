@@ -24,8 +24,72 @@ export function PageHeader({
   actions = [],
   className = '',
 }: PageHeaderProps): JSX.Element {
+  // Validate required props
+  if (!title || typeof title !== 'string') {
+    console.error('PageHeader: title is required and must be a string');
+    return (
+      <Box className={`mb-8 ${className || ''}`}>
+        <Heading size="8" className="text-gray-900 dark:text-white mb-2">
+          Error: Invalid Title
+        </Heading>
+        <Text size="4" className="text-gray-600 dark:text-gray-400">
+          The page title is missing or invalid.
+        </Text>
+      </Box>
+    );
+  }
+
+  if (!description || typeof description !== 'string') {
+    console.error('PageHeader: description is required and must be a string');
+    return (
+      <Box className={`mb-8 ${className || ''}`}>
+        <Heading size="8" className="text-gray-900 dark:text-white mb-2">
+          {title}
+        </Heading>
+        <Text size="4" className="text-gray-600 dark:text-gray-400">
+          Error: Invalid description
+        </Text>
+      </Box>
+    );
+  }
+
+  // Ensure actions is an array
+  const safeActions = Array.isArray(actions) ? actions : [];
+
+  // Filter out invalid actions
+  const validActions = safeActions.filter((action) => {
+    if (!action || typeof action !== 'object') {
+      console.warn('PageHeader: Invalid action object found');
+      return false;
+    }
+
+    if (!action.label || typeof action.label !== 'string') {
+      console.warn('PageHeader: Action must have a valid label');
+      return false;
+    }
+
+    return true;
+  });
+
+  const handleActionClick = (action: ActionButton, index: number): void => {
+    try {
+      if (action.onClick && typeof action.onClick === 'function') {
+        action.onClick();
+      } else {
+        console.warn(
+          `PageHeader: Action "${action.label}" has no onClick handler`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `PageHeader: Error executing action "${action.label}":`,
+        error
+      );
+    }
+  };
+
   return (
-    <Box className={`mb-8 ${className}`}>
+    <Box className={`mb-8 ${className || ''}`}>
       <Flex justify="between" align="center" className="mb-6">
         <Box>
           <Heading size="8" className="text-gray-900 dark:text-white mb-2">
@@ -35,9 +99,9 @@ export function PageHeader({
             {description}
           </Text>
         </Box>
-        {actions.length > 0 && (
+        {validActions.length > 0 && (
           <Flex gap="3" align="center">
-            {actions.map((action, index) => {
+            {validActions.map((action, index) => {
               const IconComponent = action.icon;
               const variant = action.isPrimary
                 ? 'solid'
@@ -45,10 +109,10 @@ export function PageHeader({
 
               return (
                 <RadixButton
-                  key={index}
+                  key={`action-${index}-${action.label}`}
                   variant={variant}
                   size="3"
-                  onClick={action.onClick}
+                  onClick={() => handleActionClick(action, index)}
                   className={
                     action.isPrimary ? 'bg-blue-600 hover:bg-blue-700' : ''
                   }
