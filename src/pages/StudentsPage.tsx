@@ -107,7 +107,7 @@ export function StudentsPage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Students Management"
+        title="Students"
         description="Manage student records and academic progress"
         actions={headerActions}
       />

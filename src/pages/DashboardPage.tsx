@@ -1,6 +1,7 @@
 import { Box, Flex, Grid } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
-import { StatsCard } from 'components/dashboard/StatsCard';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import { QuickActions } from 'components/dashboard/QuickActions';
 import {
   ChartCard,
@@ -9,7 +10,14 @@ import {
   MockDonutChart,
 } from 'components/dashboard/ChartCard';
 import { NoticeBoard } from 'components/dashboard/NoticeBoard';
-import { Shield, Users, GraduationCap, Building } from 'lucide-react';
+import {
+  Shield,
+  Users,
+  GraduationCap,
+  Building,
+  Plus,
+  Download,
+} from 'lucide-react';
 import { useApiCall, ApiService } from 'lib/api';
 import { useAuth } from 'features/auth/AuthContext';
 import { useEffect, useState } from 'react';
@@ -58,6 +66,24 @@ export function DashboardPage(): JSX.Element {
 
   return (
     <DashboardLayout>
+      <PageHeader
+        title="Dashboard"
+        description="Welcome to your EdVerse dashboard. Monitor key metrics and manage your student management system."
+        actions={[
+          {
+            label: 'Export Data',
+            icon: Download,
+            onClick: () => console.log('Export data clicked'),
+          },
+          {
+            label: 'Add New',
+            icon: Plus,
+            onClick: () => console.log('Add new clicked'),
+            isPrimary: true,
+          },
+        ]}
+      />
+
       {/* Backend Connection Status (Development) */}
       {process.env.NODE_ENV === 'development' && testResult && (
         <Box className="mb-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -67,39 +93,45 @@ export function DashboardPage(): JSX.Element {
         </Box>
       )}
 
-      {/* Stats Cards */}
-      <Grid columns="4" gap="6" className="mb-6">
-        <StatsCard
-          title="Admins"
-          value={statsLoading ? '...' : displayStats.totalAdmins.toString()}
-          icon={Shield}
-          trend={{ value: 5, isPositive: true }}
-          loading={statsLoading}
-        />
-        <StatsCard
-          title="Instructors"
-          value={
-            statsLoading ? '...' : displayStats.totalInstructors.toString()
-          }
-          icon={Users}
-          trend={{ value: 4, isPositive: true }}
-          loading={statsLoading}
-        />
-        <StatsCard
-          title="Students"
-          value={statsLoading ? '...' : displayStats.totalStudents.toString()}
-          icon={GraduationCap}
-          trend={{ value: 10, isPositive: true }}
-          loading={statsLoading}
-        />
-        <StatsCard
-          title="Courses"
-          value={statsLoading ? '...' : displayStats.totalCourses.toString()}
-          icon={Building}
-          trend={{ value: 3, isPositive: true }}
-          loading={statsLoading}
-        />
-      </Grid>
+      <StatsGrid
+        stats={[
+          {
+            title: 'Admins',
+            value: statsLoading ? '...' : displayStats.totalAdmins.toString(),
+            icon: Shield,
+            iconColor: 'text-blue-600',
+            iconBgColor: 'bg-blue-100',
+            trend: { value: '5%', isPositive: true },
+          },
+          {
+            title: 'Instructors',
+            value: statsLoading
+              ? '...'
+              : displayStats.totalInstructors.toString(),
+            icon: Users,
+            iconColor: 'text-green-600',
+            iconBgColor: 'bg-green-100',
+            trend: { value: '4%', isPositive: true },
+          },
+          {
+            title: 'Students',
+            value: statsLoading ? '...' : displayStats.totalStudents.toString(),
+            icon: GraduationCap,
+            iconColor: 'text-purple-600',
+            iconBgColor: 'bg-purple-100',
+            trend: { value: '10%', isPositive: true },
+          },
+          {
+            title: 'Courses',
+            value: statsLoading ? '...' : displayStats.totalCourses.toString(),
+            icon: Building,
+            iconColor: 'text-orange-600',
+            iconBgColor: 'bg-orange-100',
+            trend: { value: '3%', isPositive: true },
+          },
+        ]}
+        columns="4"
+      />
 
       {/* Error Display */}
       {statsError && (

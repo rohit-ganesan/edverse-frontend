@@ -90,7 +90,7 @@ export function InstructorsPage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Instructors Management"
+        title="Instructors"
         description="Manage faculty members and their information"
         actions={headerActions}
       />

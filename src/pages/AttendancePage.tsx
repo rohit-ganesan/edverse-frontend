@@ -289,7 +289,7 @@ export function AttendancePage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Attendance Management"
+        title="Attendance"
         description="Track, monitor, and analyze student attendance patterns"
         actions={[
           {

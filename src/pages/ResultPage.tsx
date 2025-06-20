@@ -316,7 +316,7 @@ export function ResultPage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Results Management"
+        title="Results"
         description="Manage student results, grades, and academic performance"
         actions={headerActions}
       />

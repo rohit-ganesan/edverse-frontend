@@ -313,7 +313,7 @@ export function FeePage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Fee Management"
+        title="Fee"
         description="Comprehensive fee collection, tracking, and communication system"
         actions={[
           {

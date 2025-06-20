@@ -72,7 +72,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
   return (
     <Box
       className={`
-        bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4
+        bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200/30 dark:border-gray-700/30
         ${className}
       `}
     >
@@ -82,13 +82,13 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
           {/* Search */}
           <Box className="w-80">
             <Box className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 z-10" />
               <RadixTextField
                 placeholder="Search..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 size="2"
-                className="w-full pl-10"
+                className="w-full pl-12 pr-4 py-2 rounded-full bg-gray-50 dark:bg-gray-900 border border-gray-300/50 dark:border-gray-600/50 shadow-sm hover:shadow-md transition-all duration-200 focus:bg-white dark:focus:bg-gray-800 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-400/20 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
             </Box>
           </Box>
@@ -101,7 +101,7 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                   <Link to={item.path} className="no-underline">
                     <Text
                       size="2"
-                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 whitespace-nowrap"
+                      className="text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap transition-colors duration-200"
                     >
                       {item.label}
                     </Text>
@@ -109,13 +109,13 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                 ) : (
                   <Text
                     size="2"
-                    className="text-gray-900 dark:text-gray-100 font-medium whitespace-nowrap"
+                    className="text-gray-500 dark:text-gray-500 whitespace-nowrap"
                   >
                     {item.label}
                   </Text>
                 )}
                 {index < breadcrumbs.length - 1 && (
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                 )}
               </Flex>
             ))}
@@ -127,18 +127,26 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
           {/* Notifications */}
           <Flex align="center" gap="4">
             <Box className="relative">
-              <Button variant="ghost" size="2" className="p-3 relative">
+              <Button
+                variant="ghost"
+                size="2"
+                className="p-3 relative hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all duration-200"
+              >
                 <MessageSquare className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </Button>
-              <Box className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
+              <Box className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-medium shadow-lg">
                 2
               </Box>
             </Box>
             <Box className="relative">
-              <Button variant="ghost" size="2" className="p-3 relative">
+              <Button
+                variant="ghost"
+                size="2"
+                className="p-3 relative hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all duration-200"
+              >
                 <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </Button>
-              <Box className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
+              <Box className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-medium shadow-lg">
                 5
               </Box>
             </Box>

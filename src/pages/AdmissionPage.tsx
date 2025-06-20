@@ -333,7 +333,7 @@ export function AdmissionPage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Admission Management"
+        title="Admission"
         description="Streamline application processing and student enrollment"
         actions={[
           {

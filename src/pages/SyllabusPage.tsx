@@ -284,7 +284,7 @@ export function SyllabusPage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Syllabus Management"
+        title="Syllabus"
         description="Create, manage, and share comprehensive course syllabi"
         actions={[
           {

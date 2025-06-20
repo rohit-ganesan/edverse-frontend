@@ -121,7 +121,7 @@ export function AcademicsPage(): JSX.Element {
         <Flex justify="between" align="center" className="mb-4">
           <Box>
             <Heading size="7" className="text-gray-900 mb-2">
-              Academic Management
+              Academic
             </Heading>
             <Text size="4" className="text-gray-600">
               Comprehensive academic program and curriculum management
