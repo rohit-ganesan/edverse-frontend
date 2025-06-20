@@ -3,6 +3,8 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import {
   FileText,
   BookOpen,
@@ -11,21 +13,13 @@ import {
   Target,
   Plus,
   Search,
-  Filter,
   Download,
   Upload,
   Eye,
   Edit,
   Share,
-  Star,
   CheckCircle,
-  AlertCircle,
-  User,
   Users,
-  BarChart3,
-  TrendingUp,
-  Globe,
-  Trash2,
 } from 'lucide-react';
 
 interface SyllabusItem {
@@ -289,100 +283,57 @@ export function SyllabusPage(): JSX.Element {
 
   return (
     <DashboardLayout>
-      {/* Header Section */}
-      <Box className="mb-8">
-        <Flex justify="between" align="center" className="mb-4">
-          <Box>
-            <Heading size="7" className="text-gray-900 mb-2">
-              Syllabus Management
-            </Heading>
-            <Text size="4" className="text-gray-600">
-              Create, manage, and share comprehensive course syllabi
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline" size="3">
-              <Download className="w-4 h-4 mr-2" />
-              Export All
-            </RadixButton>
-            <RadixButton variant="outline" size="3">
-              <Upload className="w-4 h-4 mr-2" />
-              Import Template
-            </RadixButton>
-            <RadixButton variant="solid" size="3">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Syllabus
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Syllabus Management"
+        description="Create, manage, and share comprehensive course syllabi"
+        actions={[
+          {
+            label: 'Export All',
+            icon: Download,
+            variant: 'outline',
+            onClick: () => console.log('Export all clicked'),
+          },
+          {
+            label: 'Create Syllabus',
+            icon: Plus,
+            isPrimary: true,
+            onClick: () => console.log('Create syllabus clicked'),
+          },
+        ]}
+      />
 
-        {/* Quick Stats */}
-        <Grid columns="4" gap="4" className="mb-6">
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-6 h-6 text-blue-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalSyllabi}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Total Syllabi
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {publishedSyllabi}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Published
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <Edit className="w-6 h-6 text-yellow-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {draftSyllabi}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Drafts
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-purple-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalCredits}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Total Credits
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-      </Box>
+      <StatsGrid
+        stats={[
+          {
+            title: 'Total Syllabi',
+            value: totalSyllabi.toString(),
+            icon: FileText,
+            iconColor: 'text-blue-600',
+            iconBgColor: 'bg-blue-100',
+          },
+          {
+            title: 'Published',
+            value: publishedSyllabi.toString(),
+            icon: CheckCircle,
+            iconColor: 'text-green-600',
+            iconBgColor: 'bg-green-100',
+          },
+          {
+            title: 'Drafts',
+            value: draftSyllabi.toString(),
+            icon: Edit,
+            iconColor: 'text-orange-600',
+            iconBgColor: 'bg-orange-100',
+          },
+          {
+            title: 'Total Credits',
+            value: totalCredits.toString(),
+            icon: Target,
+            iconColor: 'text-purple-600',
+            iconBgColor: 'bg-purple-100',
+          },
+        ]}
+      />
 
       {/* Tabs Navigation */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>

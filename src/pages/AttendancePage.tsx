@@ -3,13 +3,15 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
+import { ActionCard } from 'components/ui/ActionCard';
 import {
   Clock,
   UserCheck,
   UserX,
   Search,
   Download,
-  Upload,
   CheckCircle,
   XCircle,
   AlertCircle,
@@ -286,131 +288,80 @@ export function AttendancePage(): JSX.Element {
 
   return (
     <DashboardLayout>
-      {/* Header Section */}
-      <Box className="mb-8">
-        <Flex justify="between" align="center" className="mb-4">
-          <Box>
-            <Heading size="7" className="text-gray-900 mb-2">
-              Attendance Management
-            </Heading>
-            <Text size="4" className="text-gray-600">
-              Track, monitor, and analyze student attendance patterns
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline" size="3">
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </RadixButton>
-            <RadixButton variant="outline" size="3">
-              <Upload className="w-4 h-4 mr-2" />
-              Import Data
-            </RadixButton>
-            <RadixButton variant="solid" size="3">
-              <Camera className="w-4 h-4 mr-2" />
-              Start Session
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Attendance Management"
+        description="Track, monitor, and analyze student attendance patterns"
+        actions={[
+          {
+            label: 'Export Report',
+            icon: Download,
+            variant: 'outline',
+            onClick: () => console.log('Export report clicked'),
+          },
+          {
+            label: 'Start Session',
+            icon: Camera,
+            isPrimary: true,
+            onClick: () => console.log('Start session clicked'),
+          },
+        ]}
+      />
 
-        {/* Quick Stats */}
-        <Grid columns="4" gap="4" className="mb-6">
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-green-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalPresent}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Present Today
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
+      <StatsGrid
+        stats={[
+          {
+            title: 'Present Today',
+            value: totalPresent.toString(),
+            icon: UserCheck,
+            iconColor: 'text-green-600',
+            iconBgColor: 'bg-green-100',
+          },
+          {
+            title: 'Absent Today',
+            value: totalAbsent.toString(),
+            icon: UserX,
+            iconColor: 'text-red-600',
+            iconBgColor: 'bg-red-100',
+          },
+          {
+            title: 'Late Arrivals',
+            value: totalLate.toString(),
+            icon: AlertCircle,
+            iconColor: 'text-orange-600',
+            iconBgColor: 'bg-orange-100',
+          },
+          {
+            title: 'Attendance Rate',
+            value: `${attendanceRate}%`,
+            icon: TrendingUp,
+            iconColor: 'text-blue-600',
+            iconBgColor: 'bg-blue-100',
+          },
+        ]}
+      />
 
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <UserX className="w-6 h-6 text-red-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalAbsent}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Absent Today
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <AlertCircle className="w-6 h-6 text-yellow-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalLate}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Late Arrivals
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {attendanceRate}%
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Attendance Rate
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-
-        {/* Active Session Alert */}
-        {activeSession && (
-          <RadixCard className="p-4 bg-green-50 border-l-4 border-green-400 mb-6">
-            <Flex justify="between" align="center">
-              <Flex align="center" gap="3">
-                <Box className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <Wifi className="w-5 h-5 text-green-600" />
-                </Box>
-                <Box>
-                  <Text size="3" weight="bold" className="text-green-800">
-                    Active Session: {activeSession.className}
-                  </Text>
-                  <Text size="2" className="text-green-600">
-                    {activeSession.presentCount}/{activeSession.totalStudents}{' '}
-                    students checked in • {activeSession.location}
-                  </Text>
-                </Box>
-              </Flex>
-              <Flex gap="2">
-                <RadixButton variant="outline" size="2">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Monitor
-                </RadixButton>
-                <RadixButton variant="solid" size="2" className="bg-green-600">
-                  End Session
-                </RadixButton>
-              </Flex>
-            </Flex>
-          </RadixCard>
-        )}
-      </Box>
+      {/* Active Session Alert */}
+      {activeSession && (
+        <ActionCard
+          title={`Active Session: ${activeSession.className}`}
+          description={`${activeSession.presentCount}/${activeSession.totalStudents} students checked in • ${activeSession.location}`}
+          variant="success"
+          icon={Wifi}
+          actions={[
+            {
+              label: 'Monitor',
+              icon: Eye,
+              variant: 'outline',
+              onClick: () => console.log('Monitor session clicked'),
+            },
+            {
+              label: 'End Session',
+              onClick: () => console.log('End session clicked'),
+            },
+          ]}
+          className="mb-6"
+        />
+      )}
 
       {/* Tabs Navigation */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>

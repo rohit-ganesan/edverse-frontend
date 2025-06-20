@@ -3,6 +3,9 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
+import { ActionCardGrid } from 'components/ui/ActionCardGrid';
 import {
   CreditCard,
   DollarSign,
@@ -309,154 +312,92 @@ export function FeePage(): JSX.Element {
 
   return (
     <DashboardLayout>
-      {/* Header Section */}
-      <Box className="mb-8">
-        <Flex justify="between" align="center" className="mb-4">
-          <Box>
-            <Heading size="7" className="text-gray-900 mb-2">
-              Fee Management
-            </Heading>
-            <Text size="4" className="text-gray-600">
-              Comprehensive fee collection, tracking, and communication system
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline" size="3">
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </RadixButton>
-            <RadixButton variant="outline" size="3">
-              <Send className="w-4 h-4 mr-2" />
-              Send Reminder
-            </RadixButton>
-            <RadixButton variant="solid" size="3">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Fee Structure
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Fee Management"
+        description="Comprehensive fee collection, tracking, and communication system"
+        actions={[
+          {
+            label: 'Export Report',
+            icon: Download,
+            variant: 'outline',
+            onClick: () => console.log('Export report clicked'),
+          },
+          {
+            label: 'Add Fee Structure',
+            icon: Plus,
+            isPrimary: true,
+            onClick: () => console.log('Add fee structure clicked'),
+          },
+        ]}
+      />
 
-        {/* Financial Overview Cards */}
-        <Grid columns="4" gap="4" className="mb-6">
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-green-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  ${totalCollected.toLocaleString()}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Total Collected
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
+      <StatsGrid
+        stats={[
+          {
+            title: 'Total Collected',
+            value: `$${totalCollected.toLocaleString()}`,
+            icon: DollarSign,
+            iconColor: 'text-green-600',
+            iconBgColor: 'bg-green-100',
+          },
+          {
+            title: 'Pending Amount',
+            value: `$${totalPending.toLocaleString()}`,
+            icon: AlertTriangle,
+            iconColor: 'text-orange-600',
+            iconBgColor: 'bg-orange-100',
+          },
+          {
+            title: 'Collection Rate',
+            value: `${collectionRate}%`,
+            icon: TrendingUp,
+            iconColor: 'text-blue-600',
+            iconBgColor: 'bg-blue-100',
+          },
+          {
+            title: 'Overdue Payments',
+            value: overduePayments.toString(),
+            icon: XCircle,
+            iconColor: 'text-red-600',
+            iconBgColor: 'bg-red-100',
+          },
+        ]}
+      />
 
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  ${totalPending.toLocaleString()}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Pending Amount
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {collectionRate}%
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Collection Rate
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <XCircle className="w-6 h-6 text-orange-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {overduePayments}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Overdue Payments
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-
-        {/* Quick Actions */}
-        <Grid columns="3" gap="4" className="mb-6">
-          <RadixCard className="p-4 bg-blue-50 border-l-4 border-blue-400">
-            <Flex justify="between" align="center">
-              <Box>
-                <Text size="3" weight="bold" className="text-blue-800">
-                  Send Payment Reminders
-                </Text>
-                <Text size="2" className="text-blue-600">
-                  Notify students about upcoming due dates
-                </Text>
-              </Box>
-              <RadixButton variant="solid" size="2" className="bg-blue-600">
-                <Send className="w-4 h-4 mr-2" />
-                Send
-              </RadixButton>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4 bg-green-50 border-l-4 border-green-400">
-            <Flex justify="between" align="center">
-              <Box>
-                <Text size="3" weight="bold" className="text-green-800">
-                  Generate Fee Reports
-                </Text>
-                <Text size="2" className="text-green-600">
-                  Download detailed payment analytics
-                </Text>
-              </Box>
-              <RadixButton variant="solid" size="2" className="bg-green-600">
-                <Download className="w-4 h-4 mr-2" />
-                Generate
-              </RadixButton>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4 bg-purple-50 border-l-4 border-purple-400">
-            <Flex justify="between" align="center">
-              <Box>
-                <Text size="3" weight="bold" className="text-purple-800">
-                  Bulk Payment Processing
-                </Text>
-                <Text size="2" className="text-purple-600">
-                  Process multiple payments at once
-                </Text>
-              </Box>
-              <RadixButton variant="solid" size="2" className="bg-purple-600">
-                <Upload className="w-4 h-4 mr-2" />
-                Process
-              </RadixButton>
-            </Flex>
-          </RadixCard>
-        </Grid>
-      </Box>
+      <ActionCardGrid
+        cards={[
+          {
+            title: 'Send Payment Reminders',
+            description: 'Notify students about upcoming due dates',
+            variant: 'info',
+            action: {
+              label: 'Send',
+              icon: Send,
+              onClick: () => console.log('Send reminders clicked'),
+            },
+          },
+          {
+            title: 'Generate Fee Reports',
+            description: 'Download detailed payment analytics',
+            variant: 'success',
+            action: {
+              label: 'Generate',
+              icon: Download,
+              onClick: () => console.log('Generate reports clicked'),
+            },
+          },
+          {
+            title: 'Bulk Payment Processing',
+            description: 'Process multiple payments at once',
+            variant: 'primary',
+            action: {
+              label: 'Process',
+              icon: Upload,
+              onClick: () => console.log('Process payments clicked'),
+            },
+          },
+        ]}
+      />
 
       {/* Tabs Navigation */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>

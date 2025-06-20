@@ -3,6 +3,9 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
+import { ActionCardGrid } from 'components/ui/ActionCardGrid';
 import {
   UserPlus,
   Calendar,
@@ -12,7 +15,6 @@ import {
   Eye,
   Edit,
   Download,
-  Upload,
   Plus,
   Search,
   User,
@@ -330,154 +332,92 @@ export function AdmissionPage(): JSX.Element {
 
   return (
     <DashboardLayout>
-      {/* Header Section */}
-      <Box className="mb-8">
-        <Flex justify="between" align="center" className="mb-4">
-          <Box>
-            <Heading size="7" className="text-gray-900 mb-2">
-              Admission Management
-            </Heading>
-            <Text size="4" className="text-gray-600">
-              Streamline application processing and student enrollment
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline" size="3">
-              <Download className="w-4 h-4 mr-2" />
-              Export Applications
-            </RadixButton>
-            <RadixButton variant="outline" size="3">
-              <Upload className="w-4 h-4 mr-2" />
-              Bulk Import
-            </RadixButton>
-            <RadixButton variant="solid" size="3">
-              <Plus className="w-4 h-4 mr-2" />
-              New Application
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Admission Management"
+        description="Streamline application processing and student enrollment"
+        actions={[
+          {
+            label: 'Export Applications',
+            icon: Download,
+            variant: 'outline',
+            onClick: () => console.log('Export applications clicked'),
+          },
+          {
+            label: 'New Application',
+            icon: Plus,
+            isPrimary: true,
+            onClick: () => console.log('New application clicked'),
+          },
+        ]}
+      />
 
-        {/* Quick Stats */}
-        <Grid columns="4" gap="4" className="mb-6">
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <UserPlus className="w-6 h-6 text-blue-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalApplications}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Total Applications
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
+      <StatsGrid
+        stats={[
+          {
+            title: 'Total Applications',
+            value: totalApplications.toString(),
+            icon: UserPlus,
+            iconColor: 'text-blue-600',
+            iconBgColor: 'bg-blue-100',
+          },
+          {
+            title: 'Accepted',
+            value: acceptedApplications.toString(),
+            icon: CheckCircle,
+            iconColor: 'text-green-600',
+            iconBgColor: 'bg-green-100',
+          },
+          {
+            title: 'Under Review',
+            value: pendingReview.toString(),
+            icon: Clock,
+            iconColor: 'text-orange-600',
+            iconBgColor: 'bg-orange-100',
+          },
+          {
+            title: 'Acceptance Rate',
+            value: `${acceptanceRate}%`,
+            icon: TrendingUp,
+            iconColor: 'text-purple-600',
+            iconBgColor: 'bg-purple-100',
+          },
+        ]}
+      />
 
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {acceptedApplications}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Accepted
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-yellow-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {pendingReview}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Under Review
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {acceptanceRate}%
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Acceptance Rate
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-
-        {/* Urgent Actions */}
-        <Grid columns="3" gap="4" className="mb-6">
-          <RadixCard className="p-4 bg-red-50 border-l-4 border-red-400">
-            <Flex justify="between" align="center">
-              <Box>
-                <Text size="3" weight="bold" className="text-red-800">
-                  Application Deadline Approaching
-                </Text>
-                <Text size="2" className="text-red-600">
-                  Spring 2024 applications due in 5 days
-                </Text>
-              </Box>
-              <RadixButton variant="solid" size="2" className="bg-red-600">
-                <Calendar className="w-4 h-4 mr-2" />
-                Review
-              </RadixButton>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4 bg-blue-50 border-l-4 border-blue-400">
-            <Flex justify="between" align="center">
-              <Box>
-                <Text size="3" weight="bold" className="text-blue-800">
-                  Interviews Scheduled
-                </Text>
-                <Text size="2" className="text-blue-600">
-                  {interviewsScheduled} interviews this week
-                </Text>
-              </Box>
-              <RadixButton variant="solid" size="2" className="bg-blue-600">
-                <Eye className="w-4 h-4 mr-2" />
-                View
-              </RadixButton>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4 bg-green-50 border-l-4 border-green-400">
-            <Flex justify="between" align="center">
-              <Box>
-                <Text size="3" weight="bold" className="text-green-800">
-                  Admission Letters Ready
-                </Text>
-                <Text size="2" className="text-green-600">
-                  {acceptedApplications} acceptance letters to send
-                </Text>
-              </Box>
-              <RadixButton variant="solid" size="2" className="bg-green-600">
-                <Send className="w-4 h-4 mr-2" />
-                Send
-              </RadixButton>
-            </Flex>
-          </RadixCard>
-        </Grid>
-      </Box>
+      <ActionCardGrid
+        cards={[
+          {
+            title: 'Application Deadline Approaching',
+            description: 'Spring 2024 applications due in 5 days',
+            variant: 'error',
+            action: {
+              label: 'Review',
+              icon: Calendar,
+              onClick: () => console.log('Review deadline clicked'),
+            },
+          },
+          {
+            title: 'Interviews Scheduled',
+            description: `${interviewsScheduled} interviews this week`,
+            variant: 'info',
+            action: {
+              label: 'View',
+              icon: Eye,
+              onClick: () => console.log('View interviews clicked'),
+            },
+          },
+          {
+            title: 'Admission Letters Ready',
+            description: `${acceptedApplications} acceptance letters to send`,
+            variant: 'success',
+            action: {
+              label: 'Send',
+              icon: Send,
+              onClick: () => console.log('Send letters clicked'),
+            },
+          },
+        ]}
+      />
 
       {/* Tabs Navigation */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>

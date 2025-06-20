@@ -3,6 +3,8 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import {
   Bell,
   AlertTriangle,
@@ -19,7 +21,6 @@ import {
   Share,
   Pin,
   Archive,
-  Send,
   FileText,
   Image,
   Paperclip,
@@ -260,159 +261,116 @@ export function NoticePage(): JSX.Element {
 
   return (
     <DashboardLayout>
-      {/* Header Section */}
-      <Box className="mb-8">
-        <Flex justify="between" align="center" className="mb-4">
-          <Box>
-            <Heading size="7" className="text-gray-900 mb-2">
-              Notice Board
-            </Heading>
-            <Text size="4" className="text-gray-600">
-              Manage announcements, notifications, and important updates
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline" size="3">
-              <Download className="w-4 h-4 mr-2" />
-              Export Notices
-            </RadixButton>
-            <RadixButton variant="outline" size="3">
-              <Send className="w-4 h-4 mr-2" />
-              Send Notification
-            </RadixButton>
-            <RadixButton variant="solid" size="3">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Notice
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Notice Board"
+        description="Manage announcements, notifications, and important updates"
+        actions={[
+          {
+            label: 'Export Notices',
+            icon: Download,
+            variant: 'outline',
+            onClick: () => console.log('Export notices clicked'),
+          },
+          {
+            label: 'Create Notice',
+            icon: Plus,
+            isPrimary: true,
+            onClick: () => console.log('Create notice clicked'),
+          },
+        ]}
+      />
 
-        {/* Quick Stats */}
-        <Grid columns="4" gap="4" className="mb-6">
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Bell className="w-6 h-6 text-blue-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalNotices}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Total Notices
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
+      <StatsGrid
+        stats={[
+          {
+            title: 'Total Notices',
+            value: totalNotices.toString(),
+            icon: Bell,
+            iconColor: 'text-blue-600',
+            iconBgColor: 'bg-blue-100',
+          },
+          {
+            title: 'Published',
+            value: publishedNotices.toString(),
+            icon: CheckCircle,
+            iconColor: 'text-green-600',
+            iconBgColor: 'bg-green-100',
+          },
+          {
+            title: 'Urgent',
+            value: urgentNotices.toString(),
+            icon: AlertTriangle,
+            iconColor: 'text-red-600',
+            iconBgColor: 'bg-red-100',
+          },
+          {
+            title: 'Total Views',
+            value: totalViews.toLocaleString(),
+            icon: TrendingUp,
+            iconColor: 'text-purple-600',
+            iconBgColor: 'bg-purple-100',
+          },
+        ]}
+      />
 
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {publishedNotices}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Published
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {urgentNotices}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Urgent
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalViews.toLocaleString()}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Total Views
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-
-        {/* Pinned Notices */}
-        {pinnedNotices.length > 0 && (
-          <Box className="mb-6">
-            <Heading size="4" className="text-gray-900 mb-3">
-              📌 Pinned Notices
-            </Heading>
-            <Grid columns="2" gap="4">
-              {pinnedNotices.map((notice) => {
-                const PriorityIcon = getPriorityIcon(notice.priority);
-                return (
-                  <RadixCard
-                    key={notice.id}
-                    className="p-4 bg-yellow-50 border-l-4 border-yellow-400"
-                  >
-                    <Flex justify="between" align="start" className="mb-2">
-                      <Flex align="center" gap="2">
-                        <PriorityIcon
-                          className={`w-4 h-4 ${
-                            notice.priority === 'urgent'
-                              ? 'text-red-600'
-                              : notice.priority === 'high'
-                                ? 'text-orange-600'
-                                : notice.priority === 'medium'
-                                  ? 'text-yellow-600'
-                                  : 'text-blue-600'
-                          }`}
-                        />
-                        <Badge color={getPriorityColor(notice.priority)}>
-                          {notice.priority}
-                        </Badge>
-                      </Flex>
-                      <Pin className="w-4 h-4 text-yellow-600" />
+      {/* Pinned Notices */}
+      {pinnedNotices.length > 0 && (
+        <Box className="mb-6">
+          <Heading size="4" className="text-gray-900 mb-3">
+            📌 Pinned Notices
+          </Heading>
+          <Grid columns="2" gap="4">
+            {pinnedNotices.map((notice) => {
+              const PriorityIcon = getPriorityIcon(notice.priority);
+              return (
+                <RadixCard
+                  key={notice.id}
+                  className="p-4 bg-yellow-50 border-l-4 border-yellow-400"
+                >
+                  <Flex justify="between" align="start" className="mb-2">
+                    <Flex align="center" gap="2">
+                      <PriorityIcon
+                        className={`w-4 h-4 ${
+                          notice.priority === 'urgent'
+                            ? 'text-red-600'
+                            : notice.priority === 'high'
+                              ? 'text-orange-600'
+                              : notice.priority === 'medium'
+                                ? 'text-yellow-600'
+                                : 'text-blue-600'
+                        }`}
+                      />
+                      <Badge color={getPriorityColor(notice.priority)}>
+                        {notice.priority}
+                      </Badge>
                     </Flex>
-                    <Heading size="3" className="text-gray-900 mb-2">
-                      {notice.title}
-                    </Heading>
-                    <Text size="2" className="text-gray-600 mb-2 line-clamp-2">
-                      {notice.content}
+                    <Pin className="w-4 h-4 text-yellow-600" />
+                  </Flex>
+                  <Heading size="3" className="text-gray-900 mb-2">
+                    {notice.title}
+                  </Heading>
+                  <Text size="2" className="text-gray-600 mb-2 line-clamp-2">
+                    {notice.content}
+                  </Text>
+                  <Flex justify="between" align="center">
+                    <Text size="1" className="text-gray-500">
+                      {notice.author} •{' '}
+                      {new Date(notice.publishDate).toLocaleDateString()}
                     </Text>
-                    <Flex justify="between" align="center">
-                      <Text size="1" className="text-gray-500">
-                        {notice.author} •{' '}
-                        {new Date(notice.publishDate).toLocaleDateString()}
-                      </Text>
-                      <RadixButton
-                        variant="ghost"
-                        size="1"
-                        onClick={() => setSelectedNotice(notice)}
-                      >
-                        <Eye className="w-3 h-3" />
-                      </RadixButton>
-                    </Flex>
-                  </RadixCard>
-                );
-              })}
-            </Grid>
-          </Box>
-        )}
-      </Box>
+                    <RadixButton
+                      variant="ghost"
+                      size="1"
+                      onClick={() => setSelectedNotice(notice)}
+                    >
+                      <Eye className="w-3 h-3" />
+                    </RadixButton>
+                  </Flex>
+                </RadixCard>
+              );
+            })}
+          </Grid>
+        </Box>
+      )}
 
       {/* Tabs Navigation */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>

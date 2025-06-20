@@ -3,6 +3,8 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import {
   Calendar,
   Clock,
@@ -180,98 +182,61 @@ export function ClassesPage(): JSX.Element {
     0
   );
 
+  const headerActions = [
+    {
+      label: 'Export Schedule',
+      icon: Download,
+      variant: 'outline' as const,
+      onClick: () => console.log('Export schedule'),
+    },
+    {
+      label: 'Schedule Class',
+      icon: Plus,
+      isPrimary: true,
+      onClick: () => console.log('Schedule class'),
+    },
+  ];
+
+  const stats = [
+    {
+      title: "Today's Classes",
+      value: todayClasses.length,
+      icon: Calendar,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+    {
+      title: 'Ongoing Now',
+      value: ongoingClasses,
+      icon: CheckCircle,
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+    },
+    {
+      title: 'Total Attendees',
+      value: totalStudents,
+      icon: Users,
+      iconColor: 'text-purple-600',
+      iconBgColor: 'bg-purple-100',
+    },
+    {
+      title: 'Completed Today',
+      value: completedToday,
+      icon: BookOpen,
+      iconColor: 'text-orange-600',
+      iconBgColor: 'bg-orange-100',
+    },
+  ];
+
   return (
     <DashboardLayout>
-      {/* Header Section */}
-      <Box className="mb-8">
-        <Flex justify="between" align="center" className="mb-4">
-          <Box>
-            <Heading size="7" className="text-gray-900 mb-2">
-              Classes
-            </Heading>
-            <Text size="4" className="text-gray-600">
-              Manage class schedules, sessions, and attendance
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline" size="3">
-              <Download className="w-4 h-4 mr-2" />
-              Export Schedule
-            </RadixButton>
-            <RadixButton variant="solid" size="3">
-              <Plus className="w-4 h-4 mr-2" />
-              Schedule Class
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Classes"
+        description="Manage class schedules, sessions, and attendance"
+        actions={headerActions}
+      />
 
-        {/* Quick Stats */}
-        <Grid columns="4" gap="4" className="mb-6">
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-blue-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {todayClasses.length}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Today's Classes
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {ongoingClasses}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Ongoing Now
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-purple-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalStudents}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Total Attendees
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-orange-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {completedToday}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Completed Today
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-      </Box>
+      <StatsGrid stats={stats} />
 
       {/* Tabs Navigation */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>

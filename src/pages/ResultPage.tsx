@@ -3,6 +3,8 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import {
   Trophy,
   Award,
@@ -265,114 +267,63 @@ export function ResultPage(): JSX.Element {
     return matchesSearch && matchesSemester && matchesStatus;
   });
 
+  const headerActions = [
+    {
+      label: 'Export Results',
+      icon: Download,
+      variant: 'outline' as const,
+      onClick: () => console.log('Export results'),
+    },
+    {
+      label: 'Add Result',
+      icon: Plus,
+      isPrimary: true,
+      onClick: () => console.log('Add result'),
+    },
+  ];
+
+  const stats = [
+    {
+      title: 'Total Students',
+      value: mockAnalytics.totalStudents,
+      icon: Users,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+    {
+      title: 'Pass Rate',
+      value: `${mockAnalytics.passPercentage}%`,
+      icon: CheckCircle,
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+    },
+    {
+      title: 'Average GPA',
+      value: mockAnalytics.averageGPA,
+      icon: Star,
+      iconColor: 'text-purple-600',
+      iconBgColor: 'bg-purple-100',
+    },
+    {
+      title: 'Top Performers',
+      value: mockAnalytics.topPerformers.length,
+      icon: Trophy,
+      iconColor: 'text-orange-600',
+      iconBgColor: 'bg-orange-100',
+    },
+  ];
+
   return (
     <DashboardLayout>
-      <Box className="p-6 space-y-6">
-        {/* Header */}
-        <Flex justify="between" align="center">
-          <Box>
-            <Heading size="6" className="text-gray-900 dark:text-white">
-              Results Management
-            </Heading>
-            <Text className="text-gray-600 dark:text-gray-400 mt-1">
-              Manage student results, grades, and academic performance
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline">
-              <Download className="w-4 h-4 mr-2" />
-              Export Results
-            </RadixButton>
-            <RadixButton>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Result
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Results Management"
+        description="Manage student results, grades, and academic performance"
+        actions={headerActions}
+      />
 
-        {/* Stats Cards */}
-        <Grid columns="4" gap="4">
-          <RadixCard>
-            <Flex align="center" gap="3">
-              <Box className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </Box>
-              <Box>
-                <Text size="2" className="text-gray-600 dark:text-gray-400">
-                  Total Students
-                </Text>
-                <Text
-                  size="6"
-                  weight="bold"
-                  className="text-gray-900 dark:text-white"
-                >
-                  {mockAnalytics.totalStudents}
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
+      <StatsGrid stats={stats} />
 
-          <RadixCard>
-            <Flex align="center" gap="3">
-              <Box className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </Box>
-              <Box>
-                <Text size="2" className="text-gray-600 dark:text-gray-400">
-                  Pass Rate
-                </Text>
-                <Text
-                  size="6"
-                  weight="bold"
-                  className="text-gray-900 dark:text-white"
-                >
-                  {mockAnalytics.passPercentage}%
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard>
-            <Flex align="center" gap="3">
-              <Box className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                <Star className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </Box>
-              <Box>
-                <Text size="2" className="text-gray-600 dark:text-gray-400">
-                  Average GPA
-                </Text>
-                <Text
-                  size="6"
-                  weight="bold"
-                  className="text-gray-900 dark:text-white"
-                >
-                  {mockAnalytics.averageGPA}
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard>
-            <Flex align="center" gap="3">
-              <Box className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                <Trophy className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              </Box>
-              <Box>
-                <Text size="2" className="text-gray-600 dark:text-gray-400">
-                  Top Performers
-                </Text>
-                <Text
-                  size="6"
-                  weight="bold"
-                  className="text-gray-900 dark:text-white"
-                >
-                  {mockAnalytics.topPerformers.length}
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-
+      <Box className="space-y-6">
         {/* Main Content */}
         <Tabs.Root value={selectedTab} onValueChange={setSelectedTab}>
           <Tabs.List>

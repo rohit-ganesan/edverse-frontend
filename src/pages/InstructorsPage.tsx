@@ -1,8 +1,9 @@
-import { Box, Flex, Text, Heading, Grid, Table } from '@radix-ui/themes';
+import { Box, Flex, Text, Heading, Table } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
-import { StatsCard } from 'components/dashboard/StatsCard';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import { Users, UserPlus, Mail, Phone, Award } from 'lucide-react';
 
 export function InstructorsPage(): JSX.Element {
@@ -45,36 +46,56 @@ export function InstructorsPage(): JSX.Element {
     },
   ];
 
+  const headerActions = [
+    {
+      label: 'Add New Instructor',
+      icon: UserPlus,
+      isPrimary: true,
+      onClick: () => console.log('Add new instructor'),
+    },
+  ];
+
+  const stats = [
+    {
+      title: 'Total Instructors',
+      value: '51',
+      icon: Users,
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+      trend: { value: '4%', isPositive: true },
+    },
+    {
+      title: 'Active Instructors',
+      value: '48',
+      icon: Users,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+    {
+      title: 'On Leave',
+      value: '3',
+      icon: Users,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+    {
+      title: 'Avg Experience',
+      value: '8.5 years',
+      icon: Award,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+  ];
+
   return (
     <DashboardLayout>
-      {/* Header */}
-      <Flex justify="between" align="center" className="mb-6">
-        <Box>
-          <Heading size="6" className="text-gray-900 mb-2">
-            Instructors Management
-          </Heading>
-          <Text size="3" className="text-gray-600">
-            Manage faculty members and their information
-          </Text>
-        </Box>
-        <RadixButton size="3">
-          <UserPlus className="w-4 h-4 mr-2" />
-          Add New Instructor
-        </RadixButton>
-      </Flex>
+      <PageHeader
+        title="Instructors Management"
+        description="Manage faculty members and their information"
+        actions={headerActions}
+      />
 
-      {/* Stats Cards */}
-      <Grid columns="4" gap="6" className="mb-6">
-        <StatsCard
-          title="Total Instructors"
-          value="51"
-          icon={Users}
-          trend={{ value: 4, isPositive: true }}
-        />
-        <StatsCard title="Active Instructors" value="48" icon={Users} />
-        <StatsCard title="On Leave" value="3" icon={Users} />
-        <StatsCard title="Avg Experience" value="8.5 years" icon={Award} />
-      </Grid>
+      <StatsGrid stats={stats} />
 
       {/* Instructors Table */}
       <RadixCard size="2" className="p-6">

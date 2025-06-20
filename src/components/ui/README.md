@@ -1,405 +1,183 @@
-# UI Components Library
+# UI Components
 
-This directory contains reusable UI components built on top of Radix UI primitives with Tailwind CSS styling.
+This directory contains reusable UI components built on top of Radix UI primitives with consistent theming and styling.
 
-## 🎨 Design System
+## Core Components
 
-All components follow a consistent design system with:
+### Radix Wrappers
 
-- **Colors**: Brand colors defined in `tailwind.config.js`
-- **Typography**: Consistent font sizes and weights
-- **Spacing**: Standardized padding and margins
-- **Accessibility**: WCAG 2.1 AA compliance through Radix UI
-
-## 🧩 Available Components
-
-### Form Components
-
-#### `RadixTextField`
-
-Text input component with validation states and labels.
-
-```typescript
-interface RadixTextFieldProps {
-  label?: string;
-  placeholder?: string;
-  error?: string;
-  required?: boolean;
-  type?: 'text' | 'email' | 'password';
-  value?: string;
-  onChange?: (value: string) => void;
-}
-```
-
-**Usage**:
-
-```tsx
-<RadixTextField
-  label="Email Address"
-  type="email"
-  placeholder="Enter your email"
-  required
-  error={errors.email}
-  value={email}
-  onChange={setEmail}
-/>
-```
-
-#### `RadixButton`
-
-Customizable button component with multiple variants.
-
-```typescript
-interface RadixButtonProps {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  loading?: boolean;
-  disabled?: boolean;
-  children: React.ReactNode;
-  onClick?: () => void;
-}
-```
-
-**Usage**:
-
-```tsx
-<RadixButton
-  variant="primary"
-  size="lg"
-  loading={isSubmitting}
-  onClick={handleSubmit}
->
-  Sign In
-</RadixButton>
-```
-
-#### `RadixRadioGroup`
-
-Radio button group with descriptions and validation.
-
-```typescript
-interface RadixRadioGroupProps {
-  options: Array<{
-    value: string;
-    label: string;
-    description?: string;
-  }>;
-  value?: string;
-  onValueChange?: (value: string) => void;
-  error?: string;
-  required?: boolean;
-}
-```
-
-**Usage**:
-
-```tsx
-<RadixRadioGroup
-  options={[
-    {
-      value: 'Student',
-      label: 'Student',
-      description: 'Access courses and assignments',
-    },
-    {
-      value: 'Instructor',
-      label: 'Instructor',
-      description: 'Create and manage courses',
-    },
-  ]}
-  value={role}
-  onValueChange={setRole}
-  error={errors.role}
-  required
-/>
-```
+- `RadixButton.tsx` - Button component with consistent styling
+- `RadixCard.tsx` - Card container component
+- `RadixTextField.tsx` - Text input component
+- `RadixRadioGroup.tsx` - Radio button group component
+- `RadixSeparator.tsx` - Divider/separator component
 
 ### Layout Components
 
-#### `RadixCard`
+- `PageHeader.tsx` - Standardized page header with title, description, and actions
+- `StatsGrid.tsx` - Responsive grid for displaying statistics cards
+- `StatsCard.tsx` - Individual statistic display with icon and optional trend
+- `ActionCard.tsx` - Colored alert/action containers for important information ⭐ IMPROVED
+- `ActionCardGrid.tsx` - Grid layout for multiple action cards ⭐ IMPROVED
 
-Card container with consistent styling.
+### Form Components
 
-```typescript
-interface RadixCardProps {
-  children: React.ReactNode;
-  className?: string;
-  padding?: 'sm' | 'md' | 'lg';
-}
-```
-
-**Usage**:
-
-```tsx
-<RadixCard padding="lg">
-  <h2>Dashboard Stats</h2>
-  <p>Content goes here</p>
-</RadixCard>
-```
-
-#### `RadixSeparator`
-
-Visual separator line.
-
-```typescript
-interface RadixSeparatorProps {
-  orientation?: 'horizontal' | 'vertical';
-  className?: string;
-}
-```
+- `FormField.tsx` - Form field wrapper with label and validation
+- `Toast.tsx` - Toast notification component
 
 ### Utility Components
 
-#### `FormField`
+- `LineItem.tsx` - Simple line item display component
 
-Wrapper component for form fields with consistent spacing and error handling.
+## ActionCard Components ⭐ IMPROVED LAYOUT
 
-```typescript
-interface FormFieldProps {
-  label?: string;
-  error?: string;
-  required?: boolean;
-  children: React.ReactNode;
-  className?: string;
-}
-```
+### ActionCard
 
-**Usage**:
+Standardized colored containers for alerts, actions, and important information with enhanced layout and visual hierarchy.
 
-```tsx
-<FormField label="Password" error={errors.password} required>
-  <RadixTextField
-    type="password"
-    placeholder="Enter password"
-    value={password}
-    onChange={setPassword}
-  />
-</FormField>
-```
+**Latest Improvements:**
 
-#### `LineItem`
+- **Enhanced Spacing**: Increased padding from `p-4` to `p-6` for better breathing room
+- **Improved Alignment**: Changed from center to start alignment for better text flow
+- **Better Icon Sizing**: Larger icons (12x12) with improved background opacity
+- **Enhanced Typography**: Better text spacing with `leading-relaxed` and `mb-1` for titles
+- **Stronger Visual Hierarchy**: Darker text colors and more prominent borders
+- **Subtle Shadows**: Added `shadow-sm` for depth and professional appearance
+- **Responsive Layout**: Better flex layout with `flex-1` and `min-w-0` for text overflow handling
 
-Display component for key-value pairs.
-
-```typescript
-interface LineItemProps {
-  label: string;
-  value: string | number;
-  className?: string;
-}
-```
-
-#### `Toast`
-
-Notification component for user feedback.
-
-```typescript
-interface ToastProps {
-  title: string;
-  description?: string;
-  variant?: 'success' | 'error' | 'warning' | 'info';
-  duration?: number;
-}
-```
-
-## 🎯 Usage Guidelines
-
-### Component Composition
-
-Components are designed to be composed together:
+**Usage:**
 
 ```tsx
-function LoginForm() {
-  return (
-    <RadixCard padding="lg">
-      <form onSubmit={handleSubmit}>
-        <FormField label="Email" error={errors.email} required>
-          <RadixTextField type="email" value={email} onChange={setEmail} />
-        </FormField>
+import { ActionCard } from 'components/ui/ActionCard';
+import { Send, Calendar } from 'lucide-react';
 
-        <RadixSeparator />
+// Simple action card
+<ActionCard
+  title="Payment Reminder"
+  description="Send reminders to students with overdue payments"
+  variant="info"
+  action={{
+    label: "Send Reminders",
+    icon: Send,
+    onClick: () => handleSendReminders()
+  }}
+/>
 
-        <RadixButton variant="primary" loading={isSubmitting} type="submit">
-          Sign In
-        </RadixButton>
-      </form>
-    </RadixCard>
-  );
-}
-```
-
-### Styling Conventions
-
-- Use Tailwind utility classes exclusively
-- Extend base styles through `className` prop
-- Follow consistent spacing patterns
-- Maintain accessibility standards
-
-### Error Handling
-
-All form components support error states:
-
-```tsx
-<RadixTextField
-  error={errors.email}
-  // Component automatically shows error styling
+// Complex action card with multiple actions and icon
+<ActionCard
+  title="Active Session: Mathematics 101"
+  description="25/30 students checked in • Room A-101"
+  variant="success"
+  icon={Calendar}
+  actions={[
+    {
+      label: "Monitor",
+      icon: Eye,
+      variant: "outline",
+      onClick: () => handleMonitor()
+    },
+    {
+      label: "End Session",
+      onClick: () => handleEndSession()
+    }
+  ]}
 />
 ```
 
-## 🧪 Testing
+**Variants:**
 
-Components are tested with Jest and React Testing Library:
+- `info` - Blue theme for informational content
+- `success` - Green theme for positive actions/status
+- `warning` - Orange theme for cautionary alerts
+- `error` - Red theme for urgent/critical alerts
+- `primary` - Purple theme for primary actions
+- `secondary` - Gray theme for secondary actions
 
-```bash
-# Run UI component tests
-npm test src/components/ui
+### ActionCardGrid
 
-# Run with coverage
-npm test src/components/ui -- --coverage
-```
+Grid layout manager for multiple action cards with improved spacing.
 
-### Test Examples
-
-```typescript
-// RadixButton.test.tsx
-test('shows loading state', () => {
-  render(<RadixButton loading>Submit</RadixButton>);
-  expect(screen.getByRole('button')).toBeDisabled();
-  expect(screen.getByText('Loading...')).toBeInTheDocument();
-});
-
-// RadixTextField.test.tsx
-test('displays error message', () => {
-  render(
-    <RadixTextField
-      error="Email is required"
-      label="Email"
-    />
-  );
-  expect(screen.getByText('Email is required')).toBeInTheDocument();
-});
-```
-
-## 🎨 Theming
-
-Components use CSS custom properties for theming:
-
-```css
-/* In index.css */
-:root {
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-error: #ef4444;
-  --color-success: #10b981;
-}
-```
-
-### Dark Mode Support
-
-Components automatically adapt to dark mode through Tailwind's dark mode classes:
+**Usage:**
 
 ```tsx
-// Components use dark: variants
-className = 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100';
+import { ActionCardGrid } from 'components/ui/ActionCardGrid';
+
+<ActionCardGrid
+  cards={[
+    {
+      title: 'Send Notifications',
+      description: 'Notify students about upcoming events',
+      variant: 'info',
+      action: {
+        label: 'Send',
+        icon: Send,
+        onClick: () => handleSend(),
+      },
+    },
+    {
+      title: 'Generate Reports',
+      description: 'Download detailed analytics',
+      variant: 'success',
+      action: {
+        label: 'Generate',
+        icon: Download,
+        onClick: () => handleGenerate(),
+      },
+    },
+  ]}
+  columns="3"
+/>;
 ```
 
-## 🔧 Customization
+## Design Principles
 
-### Extending Components
+1. **Consistency** - All components follow the same design patterns and color schemes
+2. **Accessibility** - Proper ARIA labels, keyboard navigation, and screen reader support
+3. **Flexibility** - Components accept custom props while maintaining design consistency
+4. **Type Safety** - Full TypeScript support with proper interfaces
+5. **Performance** - Optimized for React rendering and bundle size
+6. **Visual Hierarchy** - Clear typography scale and color contrast ⭐ NEW
 
-Create custom variants by extending base components:
+## Color System
 
-```tsx
-// Custom primary button
-function PrimaryButton(props: RadixButtonProps) {
-  return (
-    <RadixButton
-      {...props}
-      variant="primary"
-      className={`custom-primary ${props.className}`}
-    />
-  );
-}
-```
+### Action Card Variants (Updated)
 
-### Adding New Components
+- **Blue (info)**: `bg-blue-50 border-blue-500 text-blue-900` with blue-700 descriptions
+- **Green (success)**: `bg-green-50 border-green-500 text-green-900` with green-700 descriptions
+- **Orange (warning)**: `bg-orange-50 border-orange-500 text-orange-900` with orange-700 descriptions
+- **Red (error)**: `bg-red-50 border-red-500 text-red-900` with red-700 descriptions
+- **Purple (primary)**: `bg-purple-50 border-purple-500 text-purple-900` with purple-700 descriptions
+- **Gray (secondary)**: `bg-gray-50 border-gray-500 text-gray-900` with gray-700 descriptions
 
-Follow this pattern when adding new UI components:
+### Layout Specifications
 
-1. **Create component file** in `src/components/ui/`
-2. **Use Radix UI primitive** as base
-3. **Apply Tailwind styling** consistently
-4. **Add TypeScript interfaces** for props
-5. **Include accessibility features**
-6. **Write comprehensive tests**
-7. **Update this documentation**
+- **Card Padding**: `p-6` (24px) for comfortable spacing
+- **Icon Size**: `w-12 h-12` (48px) with `w-6 h-6` (24px) inner icons
+- **Border Width**: `border-l-4` (4px) for strong visual accent
+- **Typography**: Title with `mb-1` spacing, description with `leading-relaxed`
+- **Shadow**: `shadow-sm` for subtle depth
+- **Flex Layout**: `justify-between align-start gap-4` for optimal spacing
 
-### Component Template
+## Usage Guidelines
 
-```tsx
-import React from 'react';
-import * as RadixPrimitive from '@radix-ui/react-primitive';
-import { cn } from '@/lib/utils'; // Utility for className merging
+1. **Import Path**: Always use absolute imports from `components/ui/`
+2. **Prop Consistency**: Use the standardized prop interfaces
+3. **Icon Usage**: Use Lucide React icons for consistency
+4. **Spacing**: Follow the established spacing patterns (mb-6, p-6, etc.)
+5. **Variants**: Choose appropriate variants based on the action/alert type
+6. **Layout**: Leverage the improved flex layout for responsive design ⭐ NEW
 
-interface MyComponentProps {
-  // Define props with proper types
-  children: React.ReactNode;
-  variant?: 'default' | 'alternate';
-  className?: string;
-}
+## Testing
 
-export function MyComponent({
-  children,
-  variant = 'default',
-  className,
-  ...props
-}: MyComponentProps): JSX.Element {
-  return (
-    <RadixPrimitive.Root
-      className={cn(
-        // Base styles
-        'base-styles',
-        // Variant styles
-        {
-          'variant-default': variant === 'default',
-          'variant-alternate': variant === 'alternate',
-        },
-        // Custom className
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </RadixPrimitive.Root>
-  );
-}
-```
+Components are tested using Jest and React Testing Library. Test files are located in the `__tests__` directory.
 
-## 📚 Resources
+## Contributing
 
-- [Radix UI Documentation](https://www.radix-ui.com/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+When adding new components:
 
-## 🚀 Development
-
-### Adding Icons
-
-Use a consistent icon library (e.g., Lucide React):
-
-```tsx
-import { ChevronDown, User, Settings } from 'lucide-react';
-
-// Use in components
-<ChevronDown className="w-4 h-4" />;
-```
-
-### Performance Considerations
-
-- Components are tree-shakeable
-- Use React.memo for expensive components
-- Minimize re-renders with proper prop design
-- Lazy load heavy components when possible
-
-For questions or contributions, refer to the project's contribution guidelines.
+1. Follow the existing naming conventions
+2. Add proper TypeScript interfaces
+3. Include comprehensive props documentation
+4. Add test coverage
+5. Update this README with usage examples
+6. Maintain the established visual hierarchy and spacing patterns ⭐ NEW

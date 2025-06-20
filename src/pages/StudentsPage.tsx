@@ -1,8 +1,9 @@
-import { Box, Flex, Text, Heading, Grid, Table } from '@radix-ui/themes';
+import { Box, Flex, Text, Heading, Table } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
-import { StatsCard } from 'components/dashboard/StatsCard';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import { GraduationCap, UserPlus, Calendar, BookOpen } from 'lucide-react';
 
 export function StudentsPage(): JSX.Element {
@@ -61,41 +62,57 @@ export function StudentsPage(): JSX.Element {
     return 'bg-gray-100 text-gray-700';
   };
 
+  const headerActions = [
+    {
+      label: 'Add New Student',
+      icon: UserPlus,
+      isPrimary: true,
+      onClick: () => console.log('Add new student'),
+    },
+  ];
+
+  const stats = [
+    {
+      title: 'Total Students',
+      value: '946',
+      icon: GraduationCap,
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+      trend: { value: '10%', isPositive: true },
+    },
+    {
+      title: 'Active Students',
+      value: '932',
+      icon: GraduationCap,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+    {
+      title: 'Avg Attendance',
+      value: '91.2%',
+      icon: Calendar,
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+      trend: { value: '2.5%', isPositive: true },
+    },
+    {
+      title: 'Classes',
+      value: '24',
+      icon: BookOpen,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+  ];
+
   return (
     <DashboardLayout>
-      {/* Header */}
-      <Flex justify="between" align="center" className="mb-6">
-        <Box>
-          <Heading size="6" className="text-gray-900 mb-2">
-            Students Management
-          </Heading>
-          <Text size="3" className="text-gray-600">
-            Manage student records and academic progress
-          </Text>
-        </Box>
-        <RadixButton size="3">
-          <UserPlus className="w-4 h-4 mr-2" />
-          Add New Student
-        </RadixButton>
-      </Flex>
+      <PageHeader
+        title="Students Management"
+        description="Manage student records and academic progress"
+        actions={headerActions}
+      />
 
-      {/* Stats Cards */}
-      <Grid columns="4" gap="6" className="mb-6">
-        <StatsCard
-          title="Total Students"
-          value="946"
-          icon={GraduationCap}
-          trend={{ value: 10, isPositive: true }}
-        />
-        <StatsCard title="Active Students" value="932" icon={GraduationCap} />
-        <StatsCard
-          title="Avg Attendance"
-          value="91.2%"
-          icon={Calendar}
-          trend={{ value: 2.5, isPositive: true }}
-        />
-        <StatsCard title="Classes" value="24" icon={BookOpen} />
-      </Grid>
+      <StatsGrid stats={stats} />
 
       {/* Students Table */}
       <RadixCard size="2" className="p-6">

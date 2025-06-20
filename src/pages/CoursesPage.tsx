@@ -3,6 +3,8 @@ import { Box, Flex, Text, Heading, Grid, Badge, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
+import { PageHeader } from 'components/ui/PageHeader';
+import { StatsGrid } from 'components/ui/StatsGrid';
 import {
   BookOpen,
   Users,
@@ -157,98 +159,61 @@ export function CoursesPage(): JSX.Element {
     enrolledCourses.reduce((sum, course) => sum + (course.progress || 0), 0) /
       enrolledCourses.length || 0;
 
+  const headerActions = [
+    {
+      label: 'Export Progress',
+      icon: Download,
+      variant: 'outline' as const,
+      onClick: () => console.log('Export progress'),
+    },
+    {
+      label: 'Create Course',
+      icon: Plus,
+      isPrimary: true,
+      onClick: () => console.log('Create course'),
+    },
+  ];
+
+  const stats = [
+    {
+      title: 'Enrolled Courses',
+      value: totalEnrolled,
+      icon: BookOpen,
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+    },
+    {
+      title: 'Completed',
+      value: totalCompleted,
+      icon: Award,
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+    },
+    {
+      title: 'Avg Progress',
+      value: `${Math.round(averageProgress)}%`,
+      icon: TrendingUp,
+      iconColor: 'text-purple-600',
+      iconBgColor: 'bg-purple-100',
+    },
+    {
+      title: 'Available Courses',
+      value: availableCourses.length,
+      icon: BarChart3,
+      iconColor: 'text-orange-600',
+      iconBgColor: 'bg-orange-100',
+    },
+  ];
+
   return (
     <DashboardLayout>
-      {/* Header Section */}
-      <Box className="mb-8">
-        <Flex justify="between" align="center" className="mb-4">
-          <Box>
-            <Heading size="7" className="text-gray-900 mb-2">
-              Courses
-            </Heading>
-            <Text size="4" className="text-gray-600">
-              Discover, enroll, and manage your learning journey
-            </Text>
-          </Box>
-          <Flex gap="3">
-            <RadixButton variant="outline" size="3">
-              <Download className="w-4 h-4 mr-2" />
-              Export Progress
-            </RadixButton>
-            <RadixButton variant="solid" size="3">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Course
-            </RadixButton>
-          </Flex>
-        </Flex>
+      <PageHeader
+        title="Courses"
+        description="Discover, enroll, and manage your learning journey"
+        actions={headerActions}
+      />
 
-        {/* Quick Stats */}
-        <Grid columns="4" gap="4" className="mb-6">
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-blue-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalEnrolled}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Enrolled Courses
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Award className="w-6 h-6 text-green-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {totalCompleted}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Completed
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {Math.round(averageProgress)}%
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Avg Progress
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-
-          <RadixCard className="p-4">
-            <Flex align="center" gap="3">
-              <Box className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-orange-600" />
-              </Box>
-              <Box>
-                <Text size="3" weight="bold" className="text-gray-900">
-                  {mockCourses.length}
-                </Text>
-                <Text size="2" className="text-gray-600">
-                  Available Courses
-                </Text>
-              </Box>
-            </Flex>
-          </RadixCard>
-        </Grid>
-      </Box>
+      <StatsGrid stats={stats} />
 
       {/* Tabs Navigation */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
