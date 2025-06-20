@@ -1,7 +1,7 @@
 // No React import needed with new JSX transform
 import { useState } from 'react';
 import { Container, Flex, Box, Heading, Text } from '@radix-ui/themes';
-import { Button } from 'components/ui/RadixButton';
+import { RadixButton } from 'components/ui/RadixButton';
 import { RadixCard } from 'components/ui/RadixCard';
 import { auth } from 'lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -118,14 +118,14 @@ export function DebugPage(): JSX.Element {
           <RadixCard size="3">
             <Flex direction="column" gap="4" className="p-6">
               <Heading size="5">Firebase Configuration Test</Heading>
-              <Button
+              <RadixButton
                 onClick={runFirebaseTests}
                 loading={loading}
                 disabled={loading}
                 size="3"
               >
                 Run Firebase Tests
-              </Button>
+              </RadixButton>
             </Flex>
           </RadixCard>
 

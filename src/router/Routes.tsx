@@ -5,6 +5,13 @@ import { SignUpPage } from 'pages/SignUpPage';
 import { DashboardPage } from 'pages/DashboardPage';
 import { CoursesPage } from 'pages/CoursesPage';
 import { AcademicsPage } from 'pages/AcademicsPage';
+import { ClassesPage } from 'pages/ClassesPage';
+import { SyllabusPage } from 'pages/SyllabusPage';
+import { NoticePage } from 'pages/NoticePage';
+import { AdmissionPage } from 'pages/AdmissionPage';
+import { AttendancePage } from 'pages/AttendancePage';
+import { FeePage } from 'pages/FeePage';
+import { ResultPage } from 'pages/ResultPage';
 import { InstructorsPage } from 'pages/InstructorsPage';
 import { StudentsPage } from 'pages/StudentsPage';
 import { ProfilePage } from 'pages/ProfilePage';
@@ -30,6 +37,14 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
+          path="/academics"
+          element={
+            <ProtectedRoute>
+              <AcademicsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/courses"
           element={
             <ProtectedRoute>
@@ -38,10 +53,58 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/academics"
+          path="/classes"
           element={
             <ProtectedRoute>
-              <AcademicsPage />
+              <ClassesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/syllabus"
+          element={
+            <ProtectedRoute>
+              <SyllabusPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notice"
+          element={
+            <ProtectedRoute>
+              <NoticePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admission"
+          element={
+            <ProtectedRoute>
+              <AdmissionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/attendance"
+          element={
+            <ProtectedRoute>
+              <AttendancePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fee"
+          element={
+            <ProtectedRoute>
+              <FeePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/result"
+          element={
+            <ProtectedRoute>
+              <ResultPage />
             </ProtectedRoute>
           }
         />

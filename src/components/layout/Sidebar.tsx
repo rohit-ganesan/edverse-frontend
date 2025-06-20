@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, Flex, Text, Heading, Separator } from '@radix-ui/themes';
+import { Box, Text, Heading, Separator } from '@radix-ui/themes';
 import {
   Home,
   BookOpen,
@@ -8,16 +7,16 @@ import {
   Users,
   GraduationCap,
   UserPlus,
-  Calendar,
   DollarSign,
-  BarChart3,
   Sparkles,
   Building,
   Shield,
   HelpCircle,
   Settings,
-  ChevronDown,
-  ChevronRight,
+  FileText,
+  CalendarDays,
+  UserCheck,
+  Award,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -25,7 +24,6 @@ interface MenuItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
-  children?: MenuItem[];
 }
 
 interface SidebarProps {
@@ -40,34 +38,38 @@ const menuItems: MenuItem[] = [
     path: '/dashboard',
   },
   {
-    id: 'academics',
-    label: 'Academics',
+    id: 'courses',
+    label: 'Courses',
     icon: BookOpen,
-    path: '/academics',
-    children: [
-      {
-        id: 'courses',
-        label: 'Courses',
-        icon: BookOpen,
-        path: '/courses',
-      },
-      {
-        id: 'classes',
-        label: 'Classes',
-        icon: Users,
-        path: '/academics/classes',
-      },
-      {
-        id: 'syllabus',
-        label: 'Syllabus',
-        icon: BookOpen,
-        path: '/academics/syllabus',
-      },
-    ],
+    path: '/courses',
+  },
+  {
+    id: 'classes',
+    label: 'Classes',
+    icon: CalendarDays,
+    path: '/classes',
+  },
+  {
+    id: 'syllabus',
+    label: 'Syllabus',
+    icon: FileText,
+    path: '/syllabus',
+  },
+  {
+    id: 'attendance',
+    label: 'Attendance',
+    icon: UserCheck,
+    path: '/attendance',
+  },
+  {
+    id: 'result',
+    label: 'Results',
+    icon: Award,
+    path: '/result',
   },
   {
     id: 'notice',
-    label: 'Notice',
+    label: 'Notice Board',
     icon: Bell,
     path: '/notice',
   },
@@ -90,22 +92,10 @@ const menuItems: MenuItem[] = [
     path: '/admission',
   },
   {
-    id: 'attendance',
-    label: 'Attendance',
-    icon: Calendar,
-    path: '/attendance',
-  },
-  {
     id: 'fee',
-    label: 'Fee',
+    label: 'Fee Management',
     icon: DollarSign,
     path: '/fee',
-  },
-  {
-    id: 'result',
-    label: 'Result',
-    icon: BarChart3,
-    path: '/result',
   },
 ];
 
@@ -150,15 +140,6 @@ const otherItems: MenuItem[] = [
 
 export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<string[]>(['academics']);
-
-  const toggleExpanded = (itemId: string): void => {
-    setExpandedItems((prev) =>
-      prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
 
   const isActive = (path: string): boolean => {
     return (
@@ -166,47 +147,23 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
     );
   };
 
-  const renderMenuItem = (item: MenuItem, level = 0): JSX.Element => {
-    const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedItems.includes(item.id);
+  const renderMenuItem = (item: MenuItem): JSX.Element => {
     const active = isActive(item.path);
 
     return (
       <Box key={item.id}>
-        <Box
+        <Link
+          to={item.path}
           className={`
-            flex items-center px-3 py-2 rounded-lg transition-colors
+            flex items-center px-3 py-2 rounded-lg transition-colors no-underline
             ${active ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}
-            ${level > 0 ? 'ml-6' : ''}
           `}
         >
-          <Link
-            to={item.path}
-            className="flex items-center flex-1 no-underline"
-          >
-            <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
-            <Text size="2" className="flex-1">
-              {item.label}
-            </Text>
-          </Link>
-          {hasChildren && (
-            <Box
-              className="ml-2 p-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-              onClick={() => toggleExpanded(item.id)}
-            >
-              {isExpanded ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
-            </Box>
-          )}
-        </Box>
-        {hasChildren && isExpanded && (
-          <Box className="mt-1">
-            {item.children?.map((child) => renderMenuItem(child, level + 1))}
-          </Box>
-        )}
+          <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
+          <Text size="2" className="flex-1">
+            {item.label}
+          </Text>
+        </Link>
       </Box>
     );
   };
@@ -214,54 +171,38 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
   return (
     <Box
       className={`
-        w-64 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col
-        ${className}
+        w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 
+        flex flex-col h-full ${className}
       `}
     >
-      {/* Logo Section */}
-      <Box className="px-4 py-6 border-b border-gray-200 dark:border-gray-700">
-        <Link to="/dashboard" className="no-underline">
-          <Flex align="center" gap="3">
-            <Box className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Text size="4" weight="bold" className="text-white">
-                E
-              </Text>
-            </Box>
-            <Heading size="5" className="text-gray-900 dark:text-gray-100">
-              EdVerse
-            </Heading>
-          </Flex>
-        </Link>
+      {/* Logo */}
+      <Box className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <Heading size="6" className="text-gray-900 dark:text-white">
+          EdVerse
+        </Heading>
+        <Text size="2" className="text-gray-600 dark:text-gray-400">
+          Student Management
+        </Text>
       </Box>
 
-      {/* Menu Section */}
-      <Box className="px-4 py-4">
-        <Text
-          size="1"
-          weight="medium"
-          className="text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
-        >
-          MENU
-        </Text>
-        <Flex direction="column" gap="1">
+      {/* Main Navigation */}
+      <Box className="flex-1 overflow-y-auto p-4">
+        <Box className="space-y-1">
           {menuItems.map((item) => renderMenuItem(item))}
-        </Flex>
-      </Box>
+        </Box>
 
-      <Separator className="mx-4" />
+        <Separator className="my-6" />
 
-      {/* Other Section */}
-      <Box className="px-4 py-4 flex-1">
-        <Text
-          size="1"
-          weight="medium"
-          className="text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
-        >
-          OTHER
-        </Text>
-        <Flex direction="column" gap="1">
+        {/* Other Items */}
+        <Box className="space-y-1">
+          <Text
+            size="1"
+            className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+          >
+            Other
+          </Text>
           {otherItems.map((item) => renderMenuItem(item))}
-        </Flex>
+        </Box>
       </Box>
     </Box>
   );

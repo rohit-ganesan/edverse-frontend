@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, Flex, Text, Heading, Grid } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
-import { Button } from 'components/ui/RadixButton';
+import { RadixButton } from 'components/ui/RadixButton';
 import { LineItem } from 'components/ui/LineItem';
 import { FormField } from 'components/ui/FormField';
 import { useAuth } from 'features/auth/AuthContext';
@@ -64,9 +64,9 @@ export function ProfilePage(): JSX.Element {
               Personal Information
             </Heading>
             {!isEditing && (
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
+              <RadixButton variant="outline" onClick={() => setIsEditing(true)}>
                 Edit Profile
-              </Button>
+              </RadixButton>
             )}
           </Flex>
 
@@ -138,12 +138,12 @@ export function ProfilePage(): JSX.Element {
 
             {isEditing && (
               <Flex gap="3" className="mt-4">
-                <Button onClick={handleSave} loading={loading}>
+                <RadixButton onClick={handleSave} loading={loading}>
                   Save Changes
-                </Button>
-                <Button variant="outline" onClick={handleCancel}>
+                </RadixButton>
+                <RadixButton variant="outline" onClick={handleCancel}>
                   Cancel
-                </Button>
+                </RadixButton>
               </Flex>
             )}
           </Flex>

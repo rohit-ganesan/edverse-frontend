@@ -1,7 +1,7 @@
 import { Box, Flex, Text, Heading, Grid, Table } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
-import { Button } from 'components/ui/RadixButton';
+import { RadixButton } from 'components/ui/RadixButton';
 import { StatsCard } from 'components/dashboard/StatsCard';
 import { GraduationCap, UserPlus, Calendar, BookOpen } from 'lucide-react';
 
@@ -73,10 +73,10 @@ export function StudentsPage(): JSX.Element {
             Manage student records and academic progress
           </Text>
         </Box>
-        <Button size="3">
+        <RadixButton size="3">
           <UserPlus className="w-4 h-4 mr-2" />
           Add New Student
-        </Button>
+        </RadixButton>
       </Flex>
 
       {/* Stats Cards */}
@@ -104,12 +104,12 @@ export function StudentsPage(): JSX.Element {
             Student Directory
           </Heading>
           <Flex gap="2">
-            <Button variant="outline" size="2">
+            <RadixButton variant="outline" size="2">
               Export
-            </Button>
-            <Button variant="outline" size="2">
+            </RadixButton>
+            <RadixButton variant="outline" size="2">
               Filter
-            </Button>
+            </RadixButton>
           </Flex>
         </Flex>
 
@@ -195,12 +195,12 @@ export function StudentsPage(): JSX.Element {
                 </Table.Cell>
                 <Table.Cell>
                   <Flex gap="2">
-                    <Button variant="ghost" size="1">
+                    <RadixButton variant="ghost" size="1">
                       View
-                    </Button>
-                    <Button variant="ghost" size="1">
+                    </RadixButton>
+                    <RadixButton variant="ghost" size="1">
                       Edit
-                    </Button>
+                    </RadixButton>
                   </Flex>
                 </Table.Cell>
               </Table.Row>

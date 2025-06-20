@@ -1,7 +1,7 @@
 import { Box, Flex, Text, Heading, Grid, Table } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
-import { Button } from 'components/ui/RadixButton';
+import { RadixButton } from 'components/ui/RadixButton';
 import { StatsCard } from 'components/dashboard/StatsCard';
 import { Users, UserPlus, Mail, Phone, Award } from 'lucide-react';
 
@@ -57,10 +57,10 @@ export function InstructorsPage(): JSX.Element {
             Manage faculty members and their information
           </Text>
         </Box>
-        <Button size="3">
+        <RadixButton size="3">
           <UserPlus className="w-4 h-4 mr-2" />
           Add New Instructor
-        </Button>
+        </RadixButton>
       </Flex>
 
       {/* Stats Cards */}
@@ -158,12 +158,12 @@ export function InstructorsPage(): JSX.Element {
                 </Table.Cell>
                 <Table.Cell>
                   <Flex gap="2">
-                    <Button variant="ghost" size="1">
+                    <RadixButton variant="ghost" size="1">
                       View
-                    </Button>
-                    <Button variant="ghost" size="1">
+                    </RadixButton>
+                    <RadixButton variant="ghost" size="1">
                       Edit
-                    </Button>
+                    </RadixButton>
                   </Flex>
                 </Table.Cell>
               </Table.Row>
