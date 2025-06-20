@@ -46,10 +46,10 @@ const menuItems: MenuItem[] = [
     path: '/academics',
     children: [
       {
-        id: 'subjects',
-        label: 'Subjects',
+        id: 'courses',
+        label: 'Courses',
         icon: BookOpen,
-        path: '/academics/subjects',
+        path: '/courses',
       },
       {
         id: 'classes',
@@ -72,44 +72,16 @@ const menuItems: MenuItem[] = [
     path: '/notice',
   },
   {
-    id: 'teachers',
-    label: 'Teachers',
+    id: 'instructors',
+    label: 'Instructors',
     icon: Users,
-    path: '/teachers',
-    children: [
-      {
-        id: 'all-teachers',
-        label: 'All Teachers',
-        icon: Users,
-        path: '/teachers/all',
-      },
-      {
-        id: 'add-teacher',
-        label: 'Add Teacher',
-        icon: UserPlus,
-        path: '/teachers/add',
-      },
-    ],
+    path: '/instructors',
   },
   {
     id: 'students',
     label: 'Students',
     icon: GraduationCap,
     path: '/students',
-    children: [
-      {
-        id: 'all-students',
-        label: 'All Students',
-        icon: GraduationCap,
-        path: '/students/all',
-      },
-      {
-        id: 'add-student',
-        label: 'Add Student',
-        icon: UserPlus,
-        path: '/students/add',
-      },
-    ],
   },
   {
     id: 'admission',
@@ -203,39 +175,32 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
       <Box key={item.id}>
         <Box
           className={`
-            flex items-center px-3 py-2 rounded-lg cursor-pointer transition-colors
+            flex items-center px-3 py-2 rounded-lg transition-colors
             ${active ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}
             ${level > 0 ? 'ml-6' : ''}
           `}
-          onClick={() => {
-            if (hasChildren) {
-              toggleExpanded(item.id);
-            }
-          }}
         >
           <Link
             to={item.path}
-            className="flex items-center w-full no-underline"
-            onClick={(e) => {
-              if (hasChildren) {
-                e.preventDefault();
-              }
-            }}
+            className="flex items-center flex-1 no-underline"
           >
             <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
             <Text size="2" className="flex-1">
               {item.label}
             </Text>
-            {hasChildren && (
-              <Box className="ml-2">
-                {isExpanded ? (
-                  <ChevronDown className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                )}
-              </Box>
-            )}
           </Link>
+          {hasChildren && (
+            <Box
+              className="ml-2 p-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+              onClick={() => toggleExpanded(item.id)}
+            >
+              {isExpanded ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronRight className="w-4 h-4" />
+              )}
+            </Box>
+          )}
         </Box>
         {hasChildren && isExpanded && (
           <Box className="mt-1">

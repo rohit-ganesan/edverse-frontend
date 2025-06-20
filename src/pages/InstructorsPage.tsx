@@ -5,8 +5,8 @@ import { Button } from 'components/ui/RadixButton';
 import { StatsCard } from 'components/dashboard/StatsCard';
 import { Users, UserPlus, Mail, Phone, Award } from 'lucide-react';
 
-export function TeachersPage(): JSX.Element {
-  const teachers = [
+export function InstructorsPage(): JSX.Element {
+  const instructors = [
     {
       id: 1,
       name: 'Dr. Sarah Johnson',
@@ -51,7 +51,7 @@ export function TeachersPage(): JSX.Element {
       <Flex justify="between" align="center" className="mb-6">
         <Box>
           <Heading size="6" className="text-gray-900 mb-2">
-            Teachers Management
+            Instructors Management
           </Heading>
           <Text size="3" className="text-gray-600">
             Manage faculty members and their information
@@ -59,24 +59,24 @@ export function TeachersPage(): JSX.Element {
         </Box>
         <Button size="3">
           <UserPlus className="w-4 h-4 mr-2" />
-          Add New Teacher
+          Add New Instructor
         </Button>
       </Flex>
 
       {/* Stats Cards */}
       <Grid columns="4" gap="6" className="mb-6">
         <StatsCard
-          title="Total Teachers"
+          title="Total Instructors"
           value="51"
           icon={Users}
           trend={{ value: 4, isPositive: true }}
         />
-        <StatsCard title="Active Teachers" value="48" icon={Users} />
+        <StatsCard title="Active Instructors" value="48" icon={Users} />
         <StatsCard title="On Leave" value="3" icon={Users} />
         <StatsCard title="Avg Experience" value="8.5 years" icon={Award} />
       </Grid>
 
-      {/* Teachers Table */}
+      {/* Instructors Table */}
       <RadixCard size="2" className="p-6">
         <Box className="mb-4">
           <Heading size="4" className="text-gray-900">
@@ -97,13 +97,13 @@ export function TeachersPage(): JSX.Element {
           </Table.Header>
 
           <Table.Body>
-            {teachers.map((teacher) => (
-              <Table.Row key={teacher.id}>
+            {instructors.map((instructor) => (
+              <Table.Row key={instructor.id}>
                 <Table.Cell>
                   <Flex align="center" gap="3">
                     <Box className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                       <Text size="2" weight="medium" className="text-blue-600">
-                        {teacher.name
+                        {instructor.name
                           .split(' ')
                           .map((n) => n[0])
                           .join('')}
@@ -111,14 +111,14 @@ export function TeachersPage(): JSX.Element {
                     </Box>
                     <Box>
                       <Text size="2" weight="medium" className="text-gray-900">
-                        {teacher.name}
+                        {instructor.name}
                       </Text>
                     </Box>
                   </Flex>
                 </Table.Cell>
                 <Table.Cell>
                   <Text size="2" className="text-gray-700">
-                    {teacher.subject}
+                    {instructor.subject}
                   </Text>
                 </Table.Cell>
                 <Table.Cell>
@@ -126,20 +126,20 @@ export function TeachersPage(): JSX.Element {
                     <Flex align="center" gap="2" className="mb-1">
                       <Mail className="w-3 h-3 text-gray-400" />
                       <Text size="1" className="text-gray-600">
-                        {teacher.email}
+                        {instructor.email}
                       </Text>
                     </Flex>
                     <Flex align="center" gap="2">
                       <Phone className="w-3 h-3 text-gray-400" />
                       <Text size="1" className="text-gray-600">
-                        {teacher.phone}
+                        {instructor.phone}
                       </Text>
                     </Flex>
                   </Box>
                 </Table.Cell>
                 <Table.Cell>
                   <Text size="2" className="text-gray-700">
-                    {teacher.experience}
+                    {instructor.experience}
                   </Text>
                 </Table.Cell>
                 <Table.Cell>
@@ -147,13 +147,13 @@ export function TeachersPage(): JSX.Element {
                     className={`
                       inline-flex px-2 py-1 rounded-full text-xs font-medium
                       ${
-                        teacher.status === 'Active'
+                        instructor.status === 'Active'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-yellow-100 text-yellow-700'
                       }
                     `}
                   >
-                    {teacher.status}
+                    {instructor.status}
                   </Box>
                 </Table.Cell>
                 <Table.Cell>

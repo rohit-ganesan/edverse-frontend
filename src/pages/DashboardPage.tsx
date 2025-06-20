@@ -51,7 +51,7 @@ export function DashboardPage(): JSX.Element {
   // Default values while loading or if there's an error
   const displayStats = stats || {
     totalAdmins: 0,
-    totalTeachers: 0,
+    totalInstructors: 0,
     totalStudents: 0,
     totalCourses: 0,
   };
@@ -77,8 +77,10 @@ export function DashboardPage(): JSX.Element {
           loading={statsLoading}
         />
         <StatsCard
-          title="Teachers"
-          value={statsLoading ? '...' : displayStats.totalTeachers.toString()}
+          title="Instructors"
+          value={
+            statsLoading ? '...' : displayStats.totalInstructors.toString()
+          }
           icon={Users}
           trend={{ value: 4, isPositive: true }}
           loading={statsLoading}

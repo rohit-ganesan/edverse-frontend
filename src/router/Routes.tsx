@@ -5,7 +5,7 @@ import { SignUpPage } from 'pages/SignUpPage';
 import { DashboardPage } from 'pages/DashboardPage';
 import { CoursesPage } from 'pages/CoursesPage';
 import { AcademicsPage } from 'pages/AcademicsPage';
-import { TeachersPage } from 'pages/TeachersPage';
+import { InstructorsPage } from 'pages/InstructorsPage';
 import { StudentsPage } from 'pages/StudentsPage';
 import { ProfilePage } from 'pages/ProfilePage';
 import { DebugPage } from 'pages/DebugPage';
@@ -46,10 +46,10 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/teachers"
+          path="/instructors"
           element={
             <ProtectedRoute>
-              <TeachersPage />
+              <InstructorsPage />
             </ProtectedRoute>
           }
         />

@@ -130,6 +130,17 @@ export function TestPage(): JSX.Element {
     }
   };
 
+  const testMigration = async () => {
+    setLoading(true);
+    try {
+      const result = await ApiService.runTeacherToInstructorMigration();
+      setTestResult(`Migration completed: ${result.message}`);
+    } catch (error) {
+      setTestResult(`Migration failed: ${error}`);
+    }
+    setLoading(false);
+  };
+
   return (
     <Box className="p-6">
       <Heading size="6" className="mb-6">
@@ -172,6 +183,9 @@ export function TestPage(): JSX.Element {
           </Button>
           <Button onClick={createSampleNotifications} disabled={loading}>
             Create Sample Notifications
+          </Button>
+          <Button onClick={testMigration} disabled={loading}>
+            Run Teacher → Instructor Migration
           </Button>
         </Flex>
 

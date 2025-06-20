@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'development') {
 // Types
 export interface DashboardStats {
   totalStudents: number;
-  totalTeachers: number;
+  totalInstructors: number;
   totalCourses: number;
   totalAdmins: number;
 }
@@ -29,8 +29,8 @@ export interface Course {
   id?: string;
   name: string;
   description: string;
-  teacherId: string;
-  teacherName: string;
+  instructorId: string;
+  instructorName: string;
   subject: string;
   grade: string;
   students: string[];
@@ -50,7 +50,7 @@ export interface Student {
   updatedAt: any;
 }
 
-export interface Teacher {
+export interface Instructor {
   id?: string;
   firstName: string;
   lastName: string;
@@ -100,8 +100,11 @@ const enrollStudentInCourseFn: HttpsCallable = httpsCallable(
   'enrollStudentInCourse'
 );
 
-// Teacher Management Functions
-const getTeachersFn: HttpsCallable = httpsCallable(functions, 'getTeachers');
+// Instructor Management Functions
+const getInstructorsFn: HttpsCallable = httpsCallable(
+  functions,
+  'getInstructors'
+);
 
 // Notification Functions
 const createNotificationFn: HttpsCallable = httpsCallable(
@@ -202,16 +205,37 @@ export class ApiService {
   }
 
   // =============================================================================
-  // Teacher Management
+  // Instructor Management
   // =============================================================================
 
-  static async getTeachers(): Promise<Teacher[]> {
+  static async getInstructors(): Promise<Instructor[]> {
     try {
-      const result = await getTeachersFn();
-      return (result.data as { teachers: Teacher[] }).teachers;
+      const result = await getInstructorsFn();
+      return (result.data as { instructors: Instructor[] }).instructors;
     } catch (error) {
-      console.error('Error getting teachers:', error);
-      throw new Error('Failed to get teachers');
+      console.error('Error getting instructors:', error);
+      throw new Error('Failed to get instructors');
+    }
+  }
+
+  // =============================================================================
+  // Migration Functions
+  // =============================================================================
+
+  static async runTeacherToInstructorMigration(): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    try {
+      const migrationFn: HttpsCallable = httpsCallable(
+        functions,
+        'runTeacherToInstructorMigration'
+      );
+      const result = await migrationFn();
+      return result.data as { success: boolean; message: string };
+    } catch (error) {
+      console.error('Error running migration:', error);
+      throw new Error('Failed to run migration');
     }
   }
 
