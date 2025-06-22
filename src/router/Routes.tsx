@@ -9,7 +9,7 @@ import { ClassesPage } from 'pages/ClassesPage';
 import { SyllabusPage } from 'pages/SyllabusPage';
 import { NoticePage } from 'pages/NoticePage';
 import { AdmissionPage } from 'pages/AdmissionPage';
-import { AttendancePage } from 'pages/AttendancePage';
+import { AttendancePage } from 'pages/Attendance/AttendancePage';
 import { FeePage } from 'pages/FeePage';
 import { ResultPage } from 'pages/ResultPage';
 import { InstructorsPage } from 'pages/InstructorsPage';
