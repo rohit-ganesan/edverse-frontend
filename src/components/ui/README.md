@@ -1,479 +1,294 @@
 # UI Components
 
-This directory contains reusable UI components built on top of Radix UI primitives with consistent theming and styling.
+This directory contains reusable UI components built on top of Radix UI primitives. All components follow consistent design patterns and provide comprehensive TypeScript interfaces.
 
-## Core Components
+## Component Overview
 
-### Attendance Components
+### Core Components
 
-#### AttendanceSessionCard
-
-A secure card component for displaying attendance session information.
-
-- **Props**: `session`, `onView`, `className`
-- **Features**: Data validation, null safety, status badges, attendance rates
-- **Security**: Input sanitization, safe event handling
-
-#### AttendanceActivityCard
-
-A component for displaying recent attendance activity records.
-
-- **Props**: `record`, `className`
-- **Features**: Status icons, method indicators, student information
-- **Security**: Data integrity checks, fallback values
-
-#### LiveAttendanceCard
-
-A real-time attendance tracking card with session controls.
-
-- **Props**: `session`, `onQRCode`, `onMobileCheckIn`, `onEndSession`, `className`
-- **Features**: Live stats, action buttons, session management
-- **Security**: Safe event handling, data validation
-
-#### StudentAttendanceRow
-
-Individual student attendance row with status controls.
-
-- **Props**: `student`, `record`, `onMarkAttendance`, `className`
-- **Features**: Status badges, attendance buttons, check-in times
-- **Security**: Input validation, secure state management
-
-#### EmptySessionState
-
-Empty state component for when no attendance session is active.
-
-- **Props**: `onStartSession`, `title`, `description`, `className`
-- **Features**: Call-to-action button, customizable messaging
-- **Security**: Safe event handling, data validation
-
-### Radix Wrappers
-
-- `RadixButton.tsx` - Button component with consistent styling
-- `RadixCard.tsx` - Card container component
-- `RadixTextField.tsx` - Text input component
-- `RadixRadioGroup.tsx` - Radio button group component
-- `RadixSeparator.tsx` - Divider/separator component
+- **RadixButton**: Styled button component with variants and sizes
+- **RadixCard**: Container component with header and content sections
+- **RadixTextField**: Input field with consistent styling
+- **RadixRadioGroup**: Radio button group component
+- **RadixSeparator**: Visual separator component
 
 ### Layout Components
 
-- `PageHeader.tsx` - Standardized page header with title, description, and actions
-- `StatsGrid.tsx` - Responsive grid for displaying statistics cards
-- `StatsCard.tsx` - Individual statistic display with icon and optional trend
-- `ActionCard.tsx` - Colored alert/action containers for important information ⭐ IMPROVED
-- `ActionCardGrid.tsx` - Grid layout for multiple action cards ⭐ IMPROVED
+- **PageHeader**: Consistent page header with title and actions
+- **TabContainer**: Reusable tab container with consistent styling
+- **StatsGrid**: Grid layout for statistics cards
+- **StatsCard**: Individual statistic display card
 
-### Form Components
+### Modern UI Components ⭐ REFACTORED
 
-- `FormField.tsx` - Form field wrapper with label and validation
-- `Toast.tsx` - Toast notification component
+All Modern UI components have been refactored to match the intended design pattern inspired by Attendance and Results pages:
 
-### Utility Components
+- **ModernCard**: Enhanced card component with RadixCard base, shadow-xl, gradient headers
+- **ModernStatsCard**: Modern statistics card with proper shadows, rings, and RadixCard base
+- **ModernStatsGrid**: Clean grid layout without gradient containers, proper animations
+- **ModernActivityItem**: Activity feed item with enhanced borders and shadows
+- **ModernProgressBar**: Progress visualization with RadixCard base and gradient headers
+- **ModernGradientContainer**: Gradient background container (legacy, use sparingly)
 
-- `LineItem.tsx` - Simple line item display component
+### Specialized Components
 
-## ActionCard Components ⭐ IMPROVED LAYOUT
+- **ImprovedNoticeCard**: Expandable notice card with progressive disclosure
+- **InstructorCard**: Detailed instructor information card
+- **StudentCard**: Student profile card with academic info
+- **DepartmentCard**: Department overview card
+- **PersonAvatar**: User avatar component
+- **StatusBadge**: Status indicator badge
+- **Toast**: Notification toast component
 
-### ActionCard
+## Design System - Modern UI Pattern
 
-Standardized colored containers for alerts, actions, and important information with enhanced layout and visual hierarchy.
+### Intended Look & Feel
 
-**Latest Improvements:**
+The Modern UI components now follow the consistent design pattern established in Attendance and Results pages:
 
-- **Enhanced Spacing**: Increased padding from `p-4` to `p-6` for better breathing room
-- **Improved Alignment**: Changed from center to start alignment for better text flow
-- **Better Icon Sizing**: Larger icons (12x12) with improved background opacity
-- **Enhanced Typography**: Better text spacing with `leading-relaxed` and `mb-1` for titles
-- **Stronger Visual Hierarchy**: Darker text colors and more prominent borders
-- **Subtle Shadows**: Added `shadow-sm` for depth and professional appearance
-- **Responsive Layout**: Better flex layout with `flex-1` and `min-w-0` for text overflow handling
-
-**Usage:**
+**RadixCard Base Structure:**
 
 ```tsx
-import { ActionCard } from 'components/ui/ActionCard';
-import { Send, Calendar } from 'lucide-react';
+<RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
+  {/* Optional Gradient Header */}
+  <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+    <Heading size="5">Title</Heading>
+    <Text size="3">Subtitle</Text>
+  </Box>
 
-// Simple action card
-<ActionCard
-  title="Payment Reminder"
-  description="Send reminders to students with overdue payments"
-  variant="info"
-  action={{
-    label: "Send Reminders",
-    icon: Send,
-    onClick: () => handleSendReminders()
-  }}
+  {/* Content */}
+  <Box className="p-6">Content goes here</Box>
+</RadixCard>
+```
+
+### Visual Design Principles
+
+**1. Shadows & Elevation:**
+
+- Base: `shadow-xl` for cards
+- Hover: `hover:shadow-2xl` for enhanced depth
+- Interactive: `hover:scale-[1.02]` for subtle scaling
+
+**2. Gradient Headers:**
+
+- Blue: `from-blue-50 to-indigo-50 border-b border-blue-100`
+- Green: `from-green-50 to-emerald-50 border-b border-green-100`
+- Orange: `from-orange-50 to-amber-50 border-b border-orange-100`
+- Purple: `from-purple-50 to-violet-50 border-b border-purple-100`
+- Gray: `from-gray-50 to-gray-100 border-b border-gray-200`
+
+**3. Typography Hierarchy:**
+
+- Card Titles: `Heading size="5"` (text-xl, 20px)
+- Card Subtitles: `Text size="3"` (text-base, 16px)
+- Stats Values: `Text size="4"` (text-lg, 18px) with `font-bold`
+- Stats Labels: `Text size="2"` (text-sm, 14px) with `font-medium`
+
+**4. Icon Treatment:**
+
+- Container: `w-12 h-12` with `rounded-xl`
+- Background: Color-specific (e.g., `bg-green-100`)
+- Ring: Matching color ring (e.g., `ring-green-200`)
+- Icon: 6x6 with matching text color (e.g., `text-green-600`)
+- Shadow: `shadow-sm` for subtle depth
+
+**5. Spacing & Padding:**
+
+- Card Headers: `p-6` for generous breathing room
+- Card Content: `p-6` for consistency
+- Icon Gaps: `gap-4` between icon and content
+- Grid Gaps: `gap-6` for medium spacing, `gap-8` for large
+
+### Component Examples
+
+#### ModernStatsCard
+
+```tsx
+<ModernStatsCard
+  icon={<Users />}
+  value="150"
+  label="Total Students"
+  iconColor="blue"
+  size="md"
 />
-
-// Complex action card with multiple actions and icon
-<ActionCard
-  title="Active Session: Mathematics 101"
-  description="25/30 students checked in • Room A-101"
-  variant="success"
-  icon={Calendar}
-  actions={[
-    {
-      label: "Monitor",
-      icon: Eye,
-      variant: "outline",
-      onClick: () => handleMonitor()
-    },
-    {
-      label: "End Session",
-      onClick: () => handleEndSession()
-    }
-  ]}
-/>
 ```
-
-**Variants:**
-
-- `info` - Blue theme for informational content
-- `success` - Green theme for positive actions/status
-- `warning` - Orange theme for cautionary alerts
-- `error` - Red theme for urgent/critical alerts
-- `primary` - Purple theme for primary actions
-- `secondary` - Gray theme for secondary actions
-
-### ActionCardGrid
-
-Grid layout manager for multiple action cards with improved spacing.
-
-**Usage:**
-
-```tsx
-import { ActionCardGrid } from 'components/ui/ActionCardGrid';
-
-<ActionCardGrid
-  cards={[
-    {
-      title: 'Send Notifications',
-      description: 'Notify students about upcoming events',
-      variant: 'info',
-      action: {
-        label: 'Send',
-        icon: Send,
-        onClick: () => handleSend(),
-      },
-    },
-    {
-      title: 'Generate Reports',
-      description: 'Download detailed analytics',
-      variant: 'success',
-      action: {
-        label: 'Generate',
-        icon: Download,
-        onClick: () => handleGenerate(),
-      },
-    },
-  ]}
-  columns="3"
-/>;
-```
-
-## Design Principles
-
-1. **Consistency** - All components follow the same design patterns and color schemes
-2. **Accessibility** - Proper ARIA labels, keyboard navigation, and screen reader support
-3. **Flexibility** - Components accept custom props while maintaining design consistency
-4. **Type Safety** - Full TypeScript support with proper interfaces
-5. **Performance** - Optimized for React rendering and bundle size
-6. **Visual Hierarchy** - Clear typography scale and color contrast ⭐ NEW
-
-## Color System
-
-### Action Card Variants (Updated)
-
-- **Blue (info)**: `bg-blue-50 border-blue-500 text-blue-900` with blue-700 descriptions
-- **Green (success)**: `bg-green-50 border-green-500 text-green-900` with green-700 descriptions
-- **Orange (warning)**: `bg-orange-50 border-orange-500 text-orange-900` with orange-700 descriptions
-- **Red (error)**: `bg-red-50 border-red-500 text-red-900` with red-700 descriptions
-- **Purple (primary)**: `bg-purple-50 border-purple-500 text-purple-900` with purple-700 descriptions
-- **Gray (secondary)**: `bg-gray-50 border-gray-500 text-gray-900` with gray-700 descriptions
-
-### Layout Specifications
-
-- **Card Padding**: `p-6` (24px) for comfortable spacing
-- **Icon Size**: `w-12 h-12` (48px) with `w-6 h-6` (24px) inner icons
-- **Border Width**: `border-l-4` (4px) for strong visual accent
-- **Typography**: Title with `mb-1` spacing, description with `leading-relaxed`
-- **Shadow**: `shadow-sm` for subtle depth
-- **Flex Layout**: `justify-between align-start gap-4` for optimal spacing
-
-## Usage Guidelines
-
-1. **Import Path**: Always use absolute imports from `components/ui/`
-2. **Prop Consistency**: Use the standardized prop interfaces
-3. **Icon Usage**: Use Lucide React icons for consistency
-4. **Spacing**: Follow the established spacing patterns (mb-6, p-6, etc.)
-5. **Variants**: Choose appropriate variants based on the action/alert type
-6. **Layout**: Leverage the improved flex layout for responsive design ⭐ NEW
-
-## Testing
-
-Components are tested using Jest and React Testing Library. Test files are located in the `__tests__` directory.
-
-## Contributing
-
-When adding new components:
-
-1. Follow the existing naming conventions
-2. Add proper TypeScript interfaces
-3. Include comprehensive props documentation
-4. Add test coverage
-5. Update this README with usage examples
-6. Maintain the established visual hierarchy and spacing patterns ⭐ NEW
-
-### NoticeItem
-
-The `NoticeItem` component provides a standardized way to display notices and notifications with proper null safety and date formatting.
-
-```tsx
-import { NoticeItem } from 'components/ui/NoticeItem';
-import { Info } from 'lucide-react';
-
-<NoticeItem
-  id="notice-1"
-  title="System Maintenance"
-  message="Scheduled maintenance will occur this weekend."
-  type="info"
-  createdAt={new Date()}
-  icon={Info}
-  onClick={() => console.log('Notice clicked')}
-/>;
-```
-
-**Props:**
-
-- `id` (required): Unique identifier for the notice
-- `title` (required): Notice title text
-- `message` (optional): Notice description/message
-- `type` (required): Notice type - 'success', 'info', 'warning', or 'error'
-- `createdAt` (required): Date/timestamp when notice was created (supports multiple formats)
-- `icon` (required): Lucide icon component to display
-- `onClick` (optional): Click handler function
-- `className` (optional): Additional CSS classes
 
 **Features:**
 
-- Robust date formatting with multiple timestamp format support
-- Proper null safety and error handling
-- Type-based color coding and icons
-- Responsive design with hover effects
+- RadixCard base with `shadow-xl`
+- Color-coded icon containers with rings
+- Proper text hierarchy and truncation
+- Hover effects with scaling
 
-## People/User Directory Components
-
-### PersonAvatar
-
-Standardized avatar component for displaying person initials with customizable colors and sizes.
+#### ModernCard
 
 ```tsx
-import { PersonAvatar } from 'components/ui/PersonAvatar';
-
-<PersonAvatar name="John Doe" colorScheme="blue" size="medium" />;
+<ModernCard
+  title="Today's Sessions"
+  subtitle="2 sessions scheduled"
+  headerGradient="blue"
+  statusIndicator={{ position: 'left', color: 'green' }}
+>
+  <Content />
+</ModernCard>
 ```
 
-**Props:**
+**Features:**
 
-- `name` (required): Full name for initial generation
-- `size` (optional): 'small' | 'medium' | 'large' (default: 'medium')
-- `colorScheme` (optional): 'blue' | 'purple' | 'green' | 'orange' | 'red' | 'gray' (default: 'blue')
-- `className` (optional): Additional CSS classes
+- Gradient headers with proper typography
+- Status indicators (left/top positioning)
+- Consistent padding and spacing
+- Enhanced hover effects
 
-### StatusBadge
-
-Standardized status badge with automatic color coding and variant detection.
+#### ModernProgressBar
 
 ```tsx
-import { StatusBadge } from 'components/ui/StatusBadge';
-
-<StatusBadge status="Active" />
-<StatusBadge status="A+" variant="grade" />
-<StatusBadge status="On Leave" variant="warning" />
-```
-
-**Props:**
-
-- `status` (required): Status text to display
-- `variant` (optional): 'default' | 'success' | 'warning' | 'error' | 'info' | 'grade'
-- `size` (optional): 'small' | 'medium' (default: 'medium')
-- `className` (optional): Additional CSS classes
-
-### AttendanceIndicator
-
-Color-coded attendance percentage indicator with dot visualization.
-
-```tsx
-import { AttendanceIndicator } from 'components/ui/AttendanceIndicator';
-
-<AttendanceIndicator percentage="95%" />
-<AttendanceIndicator percentage={85} showPercentage={false} />
-```
-
-**Props:**
-
-- `percentage` (required): Attendance percentage (string with % or number)
-- `showPercentage` (optional): Whether to show percentage text (default: true)
-- `size` (optional): 'small' | 'medium' (default: 'medium')
-- `className` (optional): Additional CSS classes
-
-### PersonTable
-
-Comprehensive table component for displaying people/user data with flexible configuration, pagination, and list count controls.
-
-```tsx
-import {
-  PersonTable,
-  TableColumn,
-  TableAction,
-} from 'components/ui/PersonTable';
-
-const columns: TableColumn<Student>[] = [
-  { key: 'name', label: 'Student' },
-  { key: 'class', label: 'Class' },
-  { key: 'attendance', label: 'Attendance' },
-  { key: 'grade', label: 'Grade' },
-  { key: 'status', label: 'Status' },
-];
-
-const actions: TableAction<Student>[] = [
-  {
-    label: 'View Profile',
-    icon: Eye,
-    onClick: (student) => console.log('View', student),
-  },
-  {
-    label: 'Edit Details',
-    icon: Edit3,
-    onClick: (student) => console.log('Edit', student),
-  },
-];
-
-<PersonTable
-  title="Student Directory"
-  data={students}
-  columns={columns}
-  actions={actions}
-  avatarColorScheme="purple"
-  headerActions={<Button>Export</Button>}
-  defaultPageSize={25}
-  pageSizeOptions={[10, 25, 50, 100]}
-  showPagination={true}
-/>;
-```
-
-**Props:**
-
-- `title` (required): Table title
-- `data` (required): Array of person objects
-- `columns` (required): Column configuration array
-- `actions` (optional): Action buttons configuration
-- `headerActions` (optional): React node for header actions
-- `loading` (optional): Loading state
-- `emptyMessage` (optional): Empty state message
-- `avatarColorScheme` (optional): Color scheme for avatars
-- `className` (optional): Additional CSS classes
-- `defaultPageSize` (optional): Default items per page (default: 10)
-- `pageSizeOptions` (optional): Available page size options (default: [10, 25, 50])
-- `showPagination` (optional): Enable pagination controls (default: true)
-
-**Built-in Column Renderers:**
-
-- `name`/`student`: Avatar + name display
-- `contact`: Email + phone with icons
-- `status`: Auto-colored status badge
-- `grade`: Grade-specific colored badge
-- `attendance`: Color-coded attendance indicator
-
-**Pagination Features:**
-
-- **Page Size Selector**: Dropdown in header to choose items per page (10, 25, 50)
-- **Smart Pagination**: Shows up to 5 page numbers with intelligent range
-- **Navigation Controls**: Previous/Next buttons with chevron icons
-- **Results Counter**: Shows "Showing X-Y of Z results" for context
-- **Auto-Reset**: Returns to page 1 when data changes or page size changes
-- **Responsive**: Pagination controls adapt to available space
-- **Accessibility**: Proper ARIA labels and keyboard navigation support
-
-### StatsCard
-
-Display statistical information with icons and optional trend indicators.
-
-```tsx
-import { StatsCard } from 'components/ui/StatsCard';
-import { Users } from 'lucide-react';
-
-<StatsCard
-  title="Total Users"
-  value="1,234"
-  icon={Users}
-  iconColor="text-blue-600"
-  iconBgColor="bg-blue-100"
-  trend={{ value: '5%', isPositive: true }}
-/>;
-```
-
-### PageHeader
-
-Standardized page header with title, description, and action buttons.
-
-```tsx
-import { PageHeader } from 'components/ui/PageHeader';
-import { Plus, Download } from 'lucide-react';
-
-<PageHeader
-  title="Dashboard"
-  description="Welcome to your dashboard"
-  actions={[
-    {
-      label: 'Export Data',
-      icon: Download,
-      onClick: () => console.log('Export clicked'),
-    },
-    {
-      label: 'Add New',
-      icon: Plus,
-      onClick: () => console.log('Add clicked'),
-      isPrimary: true,
-    },
+<ModernProgressBar
+  title="Attendance Progress"
+  subtitle="Today's check-in status"
+  segments={[
+    { value: 32, color: 'green', label: 'Present' },
+    { value: 2, color: 'orange', label: 'Late' },
+    { value: 1, color: 'red', label: 'Absent' },
   ]}
-/>;
+  total={35}
+  showPercentage={true}
+  animated={true}
+/>
 ```
 
-## Design Principles
+**Features:**
 
-1. **Consistency**: All components follow the same design patterns and use consistent spacing, colors, and typography
-2. **Accessibility**: Components include proper ARIA labels, keyboard navigation, and screen reader support
-3. **Null Safety**: All components include proper validation and error handling for props
-4. **Responsive**: Components work across different screen sizes
-5. **Theming**: Components support both light and dark themes through Tailwind CSS classes
-6. **Type Safety**: Full TypeScript support with proper interfaces and prop validation
+- RadixCard base with gradient header
+- Multi-segment progress visualization
+- Statistics display with proper spacing
+- Smooth animations
 
-## Styling
+## Text Overflow Handling
 
-Components use Tailwind CSS for styling with consistent design tokens:
+All Modern UI components include comprehensive text overflow protection:
 
-- **Colors**: Primary (blue), success (green), warning (orange), error (red)
-- **Spacing**: Consistent padding and margin using Tailwind scale
-- **Typography**: Radix UI Text and Heading components with size variants
-- **Shadows**: Subtle shadows for depth and hierarchy
-- **Borders**: Consistent border radius and colors
+### Overflow Prevention Features
 
-## Error Handling
+- **Truncation**: Long text is truncated with ellipsis using `truncate` class
+- **Line Clamping**: Multi-line text is limited using `line-clamp-2` and `line-clamp-3`
+- **Container Constraints**: Components use `min-w-0` and `flex-1` for proper flex behavior
+- **Word Breaking**: Long words are broken using `word-break-break-word`
+- **Responsive Layout**: Components adapt to different screen sizes gracefully
 
-All components include comprehensive error handling:
+### Implementation Details
 
-- Prop validation with helpful error messages
-- Graceful fallbacks for missing or invalid data
-- Console warnings for development debugging
-- Safe rendering that prevents crashes
+- **ModernActivityItem**: Names truncate, descriptions use 2-line clamp
+- **ModernStatsCard**: Values truncate, labels use 2-line clamp
+- **ModernCard**: Titles truncate, subtitles use 2-line clamp
+- **ModernProgressBar**: Headers truncate, statistics wrap responsively
+- **ModernStatsGrid**: Responsive column layout prevents overflow
 
-## Testing
+## Responsive Design
 
-Components should be tested for:
+### Grid Responsiveness
 
-- Proper rendering with valid props
-- Error handling with invalid props
-- Accessibility compliance
-- Responsive behavior
-- Theme switching (light/dark mode)
+```tsx
+// ModernStatsGrid responsive columns
+columns={{
+  initial: '1',    // Mobile: 1 column
+  xs: '2',         // Small: 2 columns
+  sm: '3',         // Medium: 3 columns (if total >= 3)
+  md: columns      // Large: specified columns
+}}
+```
+
+### Breakpoint Strategy
+
+- **Mobile First**: Single column layout for small screens
+- **Progressive Enhancement**: Add columns as screen size increases
+- **Content Aware**: Adjust columns based on content amount
+
+## Animation System
+
+### Staggered Animations
+
+```tsx
+// Grid items with staggered delays
+style={{ animationDelay: `${index * 100}ms` }}
+className="animate-in fade-in-0 slide-in-from-bottom-2 duration-700"
+```
+
+### Animation Classes
+
+- `animate-in fade-in-0 slide-in-from-bottom-4 duration-500` - Grid containers
+- `animate-in fade-in-0 slide-in-from-bottom-2 duration-700` - Individual items
+- `animate-in slide-in-from-right-1 duration-300` - Side panels
+- `hover:scale-[1.02]` - Interactive hover scaling
+
+## Usage Guidelines
+
+### Do's ✅
+
+- Use `ModernStatsCard` for statistics display
+- Apply gradient headers for visual hierarchy
+- Use consistent spacing (p-6 for headers/content)
+- Include proper hover effects and animations
+- Follow the established color system
+- Use RadixCard as the base for all card components
+
+### Don'ts ❌
+
+- Don't use `ModernGradientContainer` for new components
+- Don't mix different shadow levels within the same section
+- Don't use custom card styling - stick to the established pattern
+- Don't forget text overflow protection
+- Don't use inconsistent padding/spacing
+
+## Migration Guide
+
+### From Old Modern Components
+
+```tsx
+// OLD: ModernStatsGrid with gradient container
+<ModernStatsGrid
+  containerGradient="blue"
+  variant="glass"
+/>
+
+// NEW: Clean ModernStatsGrid
+<ModernStatsGrid
+  variant="default"
+  // Gradient removed, uses clean design
+/>
+```
+
+### Pattern Updates
+
+1. **Shadow System**: All cards now use `shadow-xl` as base
+2. **Typography**: Consistent Heading/Text sizes across components
+3. **Icons**: Standardized sizing and color treatment
+4. **Spacing**: Unified padding system (p-6 for main areas)
+5. **Gradients**: Only in headers, not full containers
+
+## Accessibility Features
+
+- **Keyboard Navigation**: All interactive components support keyboard navigation
+- **Screen Reader Support**: Proper ARIA labels and semantic HTML
+- **Focus Management**: Visible focus indicators and logical tab order
+- **Color Contrast**: All text meets WCAG AA contrast requirements
+- **Responsive Design**: Components work across all device sizes
+
+## Performance Optimizations
+
+- **Lazy Loading**: Large components support lazy loading
+- **Memoization**: Complex calculations are memoized
+- **Efficient Rendering**: Components avoid unnecessary re-renders
+- **Bundle Splitting**: Components can be imported individually
+- **Responsive Images**: Images are optimized for different screen sizes
+
+## Best Practices
+
+1. **Consistent Design**: Always use the Modern UI pattern for new features
+2. **Shadow Hierarchy**: Use `shadow-xl` for cards, `shadow-2xl` for hover states
+3. **Typography**: Follow the established Heading/Text size system
+4. **Color Usage**: Use the predefined color combinations for icons
+5. **Spacing**: Maintain consistent padding (p-6) and gaps (gap-6)
+6. **Animation**: Use staggered delays for multiple components (100ms intervals)
+7. **Text Overflow**: Always consider text overflow scenarios in layouts
+8. **Responsive**: Test components across different screen sizes
