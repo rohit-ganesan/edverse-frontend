@@ -736,7 +736,7 @@ export function AttendancePage(): JSX.Element {
                             className="group animate-in slide-in-from-bottom-1 duration-300"
                             style={{ animationDelay: `${index * 50}ms` }}
                           >
-                            <Box className="relative p-5 bg-gray-50/50 hover:bg-white border border-gray-200/50 hover:border-gray-300 hover:shadow-lg rounded-xl transition-all duration-300 group-hover:scale-[1.01]">
+                            <Box className="relative p-4 bg-gray-50/50 hover:bg-white border border-gray-200/50 hover:border-gray-300 hover:shadow-lg rounded-xl transition-all duration-300 group-hover:scale-[1.01]">
                               {/* Status Indicator Line */}
                               <Box
                                 className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl ${
@@ -751,11 +751,11 @@ export function AttendancePage(): JSX.Element {
                               />
 
                               <Flex justify="between" align="center">
-                                <Flex align="center" gap="4" className="flex-1">
+                                <Flex align="center" gap="3" className="flex-1">
                                   {/* Avatar with Status Ring */}
                                   <Box className="relative">
                                     <Box
-                                      className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                      className={`w-10 h-10 rounded-full flex items-center justify-center ${
                                         status === 'present'
                                           ? 'bg-green-100 ring-2 ring-green-200'
                                           : status === 'late'
@@ -766,7 +766,7 @@ export function AttendancePage(): JSX.Element {
                                       }`}
                                     >
                                       <User
-                                        className={`w-6 h-6 ${
+                                        className={`w-5 h-5 ${
                                           status === 'present'
                                             ? 'text-green-600'
                                             : status === 'late'
@@ -789,11 +789,11 @@ export function AttendancePage(): JSX.Element {
                                   <Box className="flex-1">
                                     <Flex
                                       align="center"
-                                      gap="3"
+                                      gap="2"
                                       className="mb-1"
                                     >
                                       <Text
-                                        size="3"
+                                        size="2"
                                         weight="bold"
                                         className="text-gray-900"
                                       >
@@ -814,38 +814,31 @@ export function AttendancePage(): JSX.Element {
                                       >
                                         {status}
                                       </Badge>
+                                      {checkInTime && (
+                                        <Text
+                                          size="1"
+                                          className="text-blue-600 font-medium bg-blue-50 px-1.5 py-0.5 rounded text-xs"
+                                        >
+                                          ✓ {checkInTime}
+                                        </Text>
+                                      )}
                                     </Flex>
-                                    <Text
-                                      size="2"
-                                      className="text-gray-600 mb-1"
-                                    >
+                                    <Text size="1" className="text-gray-600">
                                       {student.studentId} • {student.course}
                                     </Text>
-                                    {checkInTime ? (
-                                      <Text
-                                        size="2"
-                                        className="text-blue-600 font-medium"
-                                      >
-                                        ✓ Checked in at {checkInTime}
-                                      </Text>
-                                    ) : (
-                                      <Text size="2" className="text-gray-500">
-                                        No check-in recorded
-                                      </Text>
-                                    )}
                                   </Box>
                                 </Flex>
 
                                 {/* Action Buttons */}
                                 <Flex
                                   gap="2"
-                                  className="opacity-70 group-hover:opacity-100 transition-opacity"
+                                  className="opacity-80 group-hover:opacity-100 transition-opacity"
                                 >
                                   <RadixButton
                                     variant={
                                       status === 'present' ? 'solid' : 'soft'
                                     }
-                                    size="1"
+                                    size="2"
                                     onClick={() =>
                                       handleMarkAttendance &&
                                       handleMarkAttendance(
@@ -855,33 +848,33 @@ export function AttendancePage(): JSX.Element {
                                     }
                                     className={`${status === 'present' ? 'bg-green-600 hover:bg-green-700 text-white' : 'hover:bg-green-50 text-green-600'}`}
                                   >
-                                    <CheckCircle className="w-3 h-3" />
+                                    <CheckCircle className="w-4 h-4" />
                                   </RadixButton>
                                   <RadixButton
                                     variant={
                                       status === 'late' ? 'solid' : 'soft'
                                     }
-                                    size="1"
+                                    size="2"
                                     onClick={() =>
                                       handleMarkAttendance &&
                                       handleMarkAttendance(student.id, 'late')
                                     }
                                     className={`${status === 'late' ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'hover:bg-orange-50 text-orange-600'}`}
                                   >
-                                    <AlertCircle className="w-3 h-3" />
+                                    <AlertCircle className="w-4 h-4" />
                                   </RadixButton>
                                   <RadixButton
                                     variant={
                                       status === 'absent' ? 'solid' : 'soft'
                                     }
-                                    size="1"
+                                    size="2"
                                     onClick={() =>
                                       handleMarkAttendance &&
                                       handleMarkAttendance(student.id, 'absent')
                                     }
                                     className={`${status === 'absent' ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-red-50 text-red-600'}`}
                                   >
-                                    <XCircle className="w-3 h-3" />
+                                    <XCircle className="w-4 h-4" />
                                   </RadixButton>
                                 </Flex>
                               </Flex>
