@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import { StatsGrid } from 'components/ui/StatsGrid';
+import { TabContainer } from 'components/ui/TabContainer';
 import { UserCheck, UserX, AlertCircle, TrendingUp } from 'lucide-react';
 import { Overview } from './tabs/Overview';
 import { LiveTracking } from './tabs/LiveTracking';
@@ -55,35 +55,37 @@ export function AttendancePage(): JSX.Element {
         ]}
       />
 
-      <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
-        <Tabs.List size="2" className="mb-8">
-          <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
-          <Tabs.Trigger value="live-tracking">Live Tracking</Tabs.Trigger>
-          <Tabs.Trigger value="records">Records</Tabs.Trigger>
-          <Tabs.Trigger value="analytics">Analytics</Tabs.Trigger>
-          <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
-        </Tabs.List>
-
-        <Tabs.Content value="overview">
-          <Overview />
-        </Tabs.Content>
-
-        <Tabs.Content value="live-tracking">
-          <LiveTracking />
-        </Tabs.Content>
-
-        <Tabs.Content value="records">
-          <Records />
-        </Tabs.Content>
-
-        <Tabs.Content value="analytics">
-          <Analytics />
-        </Tabs.Content>
-
-        <Tabs.Content value="settings">
-          <Settings />
-        </Tabs.Content>
-      </Tabs.Root>
+      <TabContainer
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabs={[
+          {
+            value: 'overview',
+            label: 'Overview',
+            content: <Overview />,
+          },
+          {
+            value: 'live-tracking',
+            label: 'Live Tracking',
+            content: <LiveTracking />,
+          },
+          {
+            value: 'records',
+            label: 'Records',
+            content: <Records />,
+          },
+          {
+            value: 'analytics',
+            label: 'Analytics',
+            content: <Analytics />,
+          },
+          {
+            value: 'settings',
+            label: 'Settings',
+            content: <Settings />,
+          },
+        ]}
+      />
     </DashboardLayout>
   );
 }

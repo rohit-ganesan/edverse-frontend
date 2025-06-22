@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Box, Tabs } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import { StatsGrid } from 'components/ui/StatsGrid';
+import { TabContainer } from 'components/ui/TabContainer';
 import { Download, Plus, Users, CheckCircle, Star, Trophy } from 'lucide-react';
 import { useResultData } from './hooks/useResultData';
 import { useResultManagement } from './hooks/useResultManagement';
@@ -72,34 +72,32 @@ export function ResultPage(): JSX.Element {
 
       <StatsGrid stats={stats} />
 
-      <Box className="space-y-6">
-        <Tabs.Root value={selectedTab} onValueChange={setSelectedTab}>
-          <Tabs.List>
-            <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
-            <Tabs.Trigger value="results">Student Results</Tabs.Trigger>
-            <Tabs.Trigger value="analytics">Analytics</Tabs.Trigger>
-            <Tabs.Trigger value="publish">Publish Results</Tabs.Trigger>
-          </Tabs.List>
-
-          <Box className="mt-6">
-            <Tabs.Content value="overview">
-              <Overview />
-            </Tabs.Content>
-
-            <Tabs.Content value="results">
-              <StudentResults />
-            </Tabs.Content>
-
-            <Tabs.Content value="analytics">
-              <Analytics />
-            </Tabs.Content>
-
-            <Tabs.Content value="publish">
-              <PublishResults />
-            </Tabs.Content>
-          </Box>
-        </Tabs.Root>
-      </Box>
+      <TabContainer
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+        tabs={[
+          {
+            value: 'overview',
+            label: 'Overview',
+            content: <Overview />,
+          },
+          {
+            value: 'results',
+            label: 'Student Results',
+            content: <StudentResults />,
+          },
+          {
+            value: 'analytics',
+            label: 'Analytics',
+            content: <Analytics />,
+          },
+          {
+            value: 'publish',
+            label: 'Publish Results',
+            content: <PublishResults />,
+          },
+        ]}
+      />
     </DashboardLayout>
   );
 }
