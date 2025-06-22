@@ -567,46 +567,46 @@ export function AttendancePage(): JSX.Element {
         <Tabs.Content value="live">
           {activeSession ? (
             <Box className="space-y-8">
-              {/* Enhanced Live Tracking Header */}
-              <Box className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
-                <Flex justify="between" align="center" className="mb-6">
+              {/* Compact Live Tracking Header */}
+              <Box className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white shadow-xl">
+                <Flex justify="between" align="center" className="mb-4">
                   <Box>
-                    <Flex align="center" gap="3" className="mb-2">
-                      <Box className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></Box>
+                    <Flex align="center" gap="2" className="mb-2">
+                      <Box className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></Box>
                       <Text
-                        size="2"
+                        size="1"
                         className="text-blue-100 font-medium uppercase tracking-wide"
                       >
                         LIVE SESSION
                       </Text>
                     </Flex>
-                    <Heading size="6" className="text-white mb-2">
+                    <Heading size="5" className="text-white mb-1">
                       {activeSession.className}
                     </Heading>
-                    <Text size="4" className="text-blue-100">
+                    <Text size="2" className="text-blue-100">
                       {activeSession.location} • Started at {activeSession.time}
                     </Text>
                   </Box>
-                  <Flex gap="3">
+                  <Flex gap="2">
                     <RadixButton
                       variant="outline"
-                      size="3"
+                      size="2"
                       className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                     >
-                      <Camera className="w-4 h-4 mr-2" />
+                      <Camera className="w-4 h-4 mr-1" />
                       QR Code
                     </RadixButton>
                     <RadixButton
                       variant="outline"
-                      size="3"
+                      size="2"
                       className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                     >
-                      <Download className="w-4 h-4 mr-2" />
+                      <Download className="w-4 h-4 mr-1" />
                       Export
                     </RadixButton>
                     <RadixButton
                       variant="solid"
-                      size="3"
+                      size="2"
                       className="bg-red-500 hover:bg-red-600 border-red-500"
                     >
                       End Session
@@ -614,66 +614,82 @@ export function AttendancePage(): JSX.Element {
                   </Flex>
                 </Flex>
 
-                {/* Real-time Stats with Enhanced Design */}
-                <Grid columns="4" gap="6">
-                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <Flex align="center" gap="4">
-                      <Box className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                        <CheckCircle className="w-6 h-6 text-white" />
+                {/* Compact Real-time Stats */}
+                <Grid columns="4" gap="4">
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <Flex align="center" gap="3">
+                      <Box className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                        <CheckCircle className="w-5 h-5 text-white" />
                       </Box>
                       <Box>
-                        <Text size="5" weight="bold" className="text-white">
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-white block"
+                        >
                           {activeSession.presentCount}
                         </Text>
-                        <Text size="2" className="text-green-200">
+                        <Text size="1" className="text-green-200 block">
                           Present
                         </Text>
                       </Box>
                     </Flex>
                   </Box>
 
-                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <Flex align="center" gap="4">
-                      <Box className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
-                        <XCircle className="w-6 h-6 text-white" />
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <Flex align="center" gap="3">
+                      <Box className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
+                        <XCircle className="w-5 h-5 text-white" />
                       </Box>
                       <Box>
-                        <Text size="5" weight="bold" className="text-white">
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-white block"
+                        >
                           {activeSession.absentCount}
                         </Text>
-                        <Text size="2" className="text-red-200">
+                        <Text size="1" className="text-red-200 block">
                           Absent
                         </Text>
                       </Box>
                     </Flex>
                   </Box>
 
-                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <Flex align="center" gap="4">
-                      <Box className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
-                        <AlertCircle className="w-6 h-6 text-white" />
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <Flex align="center" gap="3">
+                      <Box className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                        <AlertCircle className="w-5 h-5 text-white" />
                       </Box>
                       <Box>
-                        <Text size="5" weight="bold" className="text-white">
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-white block"
+                        >
                           {activeSession.lateCount}
                         </Text>
-                        <Text size="2" className="text-orange-200">
+                        <Text size="1" className="text-orange-200 block">
                           Late
                         </Text>
                       </Box>
                     </Flex>
                   </Box>
 
-                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <Flex align="center" gap="4">
-                      <Box className="w-12 h-12 bg-blue-400 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-white" />
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <Flex align="center" gap="3">
+                      <Box className="w-10 h-10 bg-blue-400 rounded-lg flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-white" />
                       </Box>
                       <Box>
-                        <Text size="5" weight="bold" className="text-white">
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-white block"
+                        >
                           {activeSession.attendanceRate}%
                         </Text>
-                        <Text size="2" className="text-blue-200">
+                        <Text size="1" className="text-blue-200 block">
                           Rate
                         </Text>
                       </Box>
