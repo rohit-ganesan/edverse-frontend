@@ -6,6 +6,10 @@ import { RadixButton } from 'components/ui/RadixButton';
 import { PageHeader } from 'components/ui/PageHeader';
 import { StatsGrid } from 'components/ui/StatsGrid';
 import { ActionCard } from 'components/ui/ActionCard';
+import { AttendanceSessionCard } from 'components/ui/AttendanceSessionCard';
+import { AttendanceActivityCard } from 'components/ui/AttendanceActivityCard';
+import { StudentAttendanceRow } from 'components/ui/StudentAttendanceRow';
+import { EmptySessionState } from 'components/ui/EmptySessionState';
 import {
   Clock,
   UserCheck,
@@ -21,10 +25,9 @@ import {
   Edit,
   MoreHorizontal,
   Camera,
-  Smartphone,
-  Wifi,
   MapPin,
   User,
+  Wifi,
 } from 'lucide-react';
 
 interface Student {
@@ -213,21 +216,6 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'present':
-      return CheckCircle;
-    case 'absent':
-      return XCircle;
-    case 'late':
-      return AlertCircle;
-    case 'excused':
-      return Clock;
-    default:
-      return AlertCircle;
-  }
-};
-
 const getMethodIcon = (method: string) => {
   switch (method) {
     case 'qr':
@@ -375,290 +363,637 @@ export function AttendancePage(): JSX.Element {
 
         {/* Overview Tab */}
         <Tabs.Content value="overview">
-          <Grid columns="2" gap="6">
-            {/* Today's Sessions */}
-            <RadixCard className="p-6">
-              <Heading size="4" className="mb-4">
-                Today's Sessions
-              </Heading>
-              <Flex direction="column" gap="4">
-                {mockAttendanceSessions.map((session) => (
-                  <Box key={session.id} className="p-4 bg-gray-50 rounded-lg">
-                    <Flex justify="between" align="start" className="mb-2">
-                      <Box>
-                        <Text
-                          size="3"
-                          weight="medium"
-                          className="text-gray-900"
-                        >
-                          {session.className}
-                        </Text>
-                        <Text size="2" className="text-gray-600">
-                          {session.time} • {session.location}
-                        </Text>
-                      </Box>
-                      <Badge
-                        color={
-                          session.status === 'active'
-                            ? 'green'
-                            : session.status === 'completed'
-                              ? 'gray'
-                              : 'blue'
-                        }
-                      >
-                        {session.status}
-                      </Badge>
-                    </Flex>
-                    <Flex justify="between" align="center">
-                      <Text size="2" className="text-gray-600">
-                        {session.presentCount}/{session.totalStudents} present •{' '}
-                        {session.attendanceRate}% rate
-                      </Text>
-                      <RadixButton variant="ghost" size="1">
-                        <Eye className="w-4 h-4" />
-                      </RadixButton>
-                    </Flex>
+          <Grid columns="3" gap="8">
+            {/* Today's Sessions - Larger Column */}
+            <Box className="col-span-2">
+              <RadixCard className="p-8 shadow-lg border-0 bg-white">
+                <Flex justify="between" align="center" className="mb-8">
+                  <Box>
+                    <Heading size="5" className="text-gray-900 mb-2">
+                      Today's Sessions
+                    </Heading>
+                    <Text size="3" className="text-gray-600">
+                      {mockAttendanceSessions?.length || 0} sessions scheduled
+                    </Text>
                   </Box>
-                ))}
-              </Flex>
-            </RadixCard>
+                  <RadixButton variant="outline" size="2">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View All
+                  </RadixButton>
+                </Flex>
 
-            {/* Recent Activity */}
-            <RadixCard className="p-6">
-              <Heading size="4" className="mb-4">
-                Recent Activity
-              </Heading>
-              <Flex direction="column" gap="3">
-                {mockAttendanceRecords.slice(0, 5).map((record) => {
-                  const StatusIcon = getStatusIcon(record.status);
-                  const MethodIcon = getMethodIcon(record.method);
-                  return (
-                    <Flex
-                      key={record.id}
-                      justify="between"
-                      align="center"
-                      className="p-3 bg-gray-50 rounded-lg"
-                    >
-                      <Flex align="center" gap="3">
-                        <Box className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                          <User className="w-4 h-4 text-gray-600" />
+                <Flex direction="column" gap="4">
+                  {mockAttendanceSessions &&
+                  mockAttendanceSessions.length > 0 ? (
+                    mockAttendanceSessions.map((session) => (
+                      <Box key={session.id} className="group">
+                        <Box className="p-5 bg-white rounded-lg border border-gray-200 hover:shadow-sm hover:border-gray-300 transition-all duration-200">
+                          <Flex justify="between" align="start">
+                            <Box className="flex-1">
+                              <Text
+                                size="4"
+                                weight="bold"
+                                className="text-gray-900 mb-3"
+                              >
+                                {session.className}
+                              </Text>
+                              <Flex align="center" gap="6" className="mb-3">
+                                <Flex align="center" gap="2">
+                                  <Clock className="w-4 h-4 text-gray-500" />
+                                  <Text size="2" className="text-gray-600">
+                                    {session.time}
+                                  </Text>
+                                </Flex>
+                                <Flex align="center" gap="2">
+                                  <MapPin className="w-4 h-4 text-gray-500" />
+                                  <Text size="2" className="text-gray-600">
+                                    {session.location}
+                                  </Text>
+                                </Flex>
+                              </Flex>
+                              <Flex align="center" gap="4">
+                                <Text size="2" className="text-gray-700">
+                                  <Text
+                                    weight="medium"
+                                    className="text-gray-900"
+                                  >
+                                    {session.presentCount}/
+                                    {session.totalStudents}
+                                  </Text>{' '}
+                                  present
+                                </Text>
+                                <Text size="2" className="text-gray-700">
+                                  <Text
+                                    weight="medium"
+                                    className="text-gray-900"
+                                  >
+                                    {session.attendanceRate}%
+                                  </Text>{' '}
+                                  rate
+                                </Text>
+                              </Flex>
+                            </Box>
+                            <Flex align="center" gap="3">
+                              <Badge
+                                color={
+                                  session.status === 'active'
+                                    ? 'green'
+                                    : session.status === 'completed'
+                                      ? 'gray'
+                                      : 'blue'
+                                }
+                                size="2"
+                              >
+                                {session.status}
+                              </Badge>
+                              <RadixButton variant="ghost" size="2">
+                                <Eye className="w-4 h-4" />
+                              </RadixButton>
+                            </Flex>
+                          </Flex>
                         </Box>
-                        <Box>
-                          <Text size="2" weight="medium">
-                            {record.student.name}
-                          </Text>
-                          <Text size="1" className="text-gray-600">
-                            {record.className} •{' '}
-                            {record.checkInTime || 'No check-in'}
-                          </Text>
-                        </Box>
-                      </Flex>
-                      <Flex align="center" gap="2">
-                        <MethodIcon className="w-4 h-4 text-gray-400" />
-                        <StatusIcon
-                          className={`w-4 h-4 ${
-                            record.status === 'present'
-                              ? 'text-green-600'
-                              : record.status === 'absent'
-                                ? 'text-red-600'
-                                : record.status === 'late'
-                                  ? 'text-yellow-600'
-                                  : 'text-blue-600'
-                          }`}
-                        />
-                      </Flex>
-                    </Flex>
-                  );
-                })}
-              </Flex>
-            </RadixCard>
+                      </Box>
+                    ))
+                  ) : (
+                    <Box className="text-center py-16">
+                      <Box className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Camera className="w-8 h-8 text-gray-400" />
+                      </Box>
+                      <Text
+                        size="3"
+                        weight="medium"
+                        className="text-gray-900 mb-2"
+                      >
+                        No sessions scheduled
+                      </Text>
+                      <Text size="2" className="text-gray-500 mb-4">
+                        Create your first attendance session to get started
+                      </Text>
+                      <RadixButton variant="solid" size="3">
+                        <Camera className="w-4 h-4 mr-2" />
+                        Create Session
+                      </RadixButton>
+                    </Box>
+                  )}
+                </Flex>
+              </RadixCard>
+            </Box>
+
+            {/* Recent Activity - Sidebar */}
+            <Box>
+              <RadixCard className="p-6 shadow-lg border-0 bg-white h-fit">
+                <Flex justify="between" align="center" className="mb-6">
+                  <Box>
+                    <Heading size="4" className="text-gray-900 mb-1">
+                      Recent Activity
+                    </Heading>
+                    <Text size="2" className="text-gray-600">
+                      Latest check-ins
+                    </Text>
+                  </Box>
+                </Flex>
+
+                <Flex direction="column" gap="3">
+                  {mockAttendanceRecords && mockAttendanceRecords.length > 0 ? (
+                    mockAttendanceRecords.slice(0, 6).map((record) => (
+                      <Box key={record.id} className="group">
+                        <Flex
+                          align="center"
+                          gap="3"
+                          className="p-4 rounded-lg hover:bg-gray-50 transition-colors duration-150 border border-transparent hover:border-gray-200"
+                        >
+                          <Box className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <User className="w-4 h-4 text-gray-600" />
+                          </Box>
+                          <Box className="flex-1 min-w-0">
+                            <Text
+                              size="2"
+                              weight="medium"
+                              className="text-gray-900 mb-1 block"
+                            >
+                              {record.student.name}
+                            </Text>
+                            <Text size="1" className="text-gray-500 block">
+                              {record.className} •{' '}
+                              {record.checkInTime || 'No check-in'}
+                            </Text>
+                          </Box>
+                          <Box className="flex-shrink-0">
+                            <Badge
+                              color={
+                                record.status === 'present'
+                                  ? 'green'
+                                  : record.status === 'absent'
+                                    ? 'red'
+                                    : record.status === 'late'
+                                      ? 'orange'
+                                      : 'blue'
+                              }
+                              size="1"
+                              variant="soft"
+                            >
+                              {record.status}
+                            </Badge>
+                          </Box>
+                        </Flex>
+                      </Box>
+                    ))
+                  ) : (
+                    <Box className="text-center py-8">
+                      <Box className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <User className="w-6 h-6 text-gray-400" />
+                      </Box>
+                      <Text size="2" className="text-gray-500">
+                        No recent activity
+                      </Text>
+                    </Box>
+                  )}
+                </Flex>
+
+                {mockAttendanceRecords && mockAttendanceRecords.length > 6 && (
+                  <Box className="mt-6 pt-4 border-t border-gray-100">
+                    <RadixButton variant="ghost" size="2" className="w-full">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View All Activity
+                    </RadixButton>
+                  </Box>
+                )}
+              </RadixCard>
+            </Box>
           </Grid>
         </Tabs.Content>
 
         {/* Live Tracking Tab */}
         <Tabs.Content value="live">
           {activeSession ? (
-            <Box>
-              <RadixCard className="p-6 mb-6">
-                <Flex justify="between" align="center" className="mb-4">
+            <Box className="space-y-8">
+              {/* Enhanced Live Tracking Header */}
+              <Box className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
+                <Flex justify="between" align="center" className="mb-6">
                   <Box>
-                    <Heading size="5" className="text-gray-900">
+                    <Flex align="center" gap="3" className="mb-2">
+                      <Box className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></Box>
+                      <Text
+                        size="2"
+                        className="text-blue-100 font-medium uppercase tracking-wide"
+                      >
+                        LIVE SESSION
+                      </Text>
+                    </Flex>
+                    <Heading size="6" className="text-white mb-2">
                       {activeSession.className}
                     </Heading>
-                    <Text size="3" className="text-gray-600">
-                      Live attendance tracking • {activeSession.location}
+                    <Text size="4" className="text-blue-100">
+                      {activeSession.location} • Started at {activeSession.time}
                     </Text>
                   </Box>
                   <Flex gap="3">
-                    <RadixButton variant="outline" size="3">
+                    <RadixButton
+                      variant="outline"
+                      size="3"
+                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    >
                       <Camera className="w-4 h-4 mr-2" />
                       QR Code
                     </RadixButton>
-                    <RadixButton variant="outline" size="3">
-                      <Smartphone className="w-4 h-4 mr-2" />
-                      Mobile Check-in
+                    <RadixButton
+                      variant="outline"
+                      size="3"
+                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export
                     </RadixButton>
                     <RadixButton
                       variant="solid"
                       size="3"
-                      className="bg-red-600"
+                      className="bg-red-500 hover:bg-red-600 border-red-500"
                     >
                       End Session
                     </RadixButton>
                   </Flex>
                 </Flex>
 
-                {/* Real-time Stats */}
-                <Grid columns="4" gap="4" className="mb-6">
-                  <Box className="text-center p-4 bg-green-50 rounded-lg">
-                    <Text size="4" weight="bold" className="text-green-600">
-                      {activeSession.presentCount}
-                    </Text>
-                    <Text size="2" className="text-green-600">
-                      Present
-                    </Text>
+                {/* Real-time Stats with Enhanced Design */}
+                <Grid columns="4" gap="6">
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <Flex align="center" gap="4">
+                      <Box className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                        <CheckCircle className="w-6 h-6 text-white" />
+                      </Box>
+                      <Box>
+                        <Text size="5" weight="bold" className="text-white">
+                          {activeSession.presentCount}
+                        </Text>
+                        <Text size="2" className="text-green-200">
+                          Present
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="text-center p-4 bg-red-50 rounded-lg">
-                    <Text size="4" weight="bold" className="text-red-600">
-                      {activeSession.absentCount}
-                    </Text>
-                    <Text size="2" className="text-red-600">
-                      Absent
-                    </Text>
+
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <Flex align="center" gap="4">
+                      <Box className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
+                        <XCircle className="w-6 h-6 text-white" />
+                      </Box>
+                      <Box>
+                        <Text size="5" weight="bold" className="text-white">
+                          {activeSession.absentCount}
+                        </Text>
+                        <Text size="2" className="text-red-200">
+                          Absent
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="text-center p-4 bg-yellow-50 rounded-lg">
-                    <Text size="4" weight="bold" className="text-yellow-600">
-                      {activeSession.lateCount}
-                    </Text>
-                    <Text size="2" className="text-yellow-600">
-                      Late
-                    </Text>
+
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <Flex align="center" gap="4">
+                      <Box className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                        <AlertCircle className="w-6 h-6 text-white" />
+                      </Box>
+                      <Box>
+                        <Text size="5" weight="bold" className="text-white">
+                          {activeSession.lateCount}
+                        </Text>
+                        <Text size="2" className="text-orange-200">
+                          Late
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="text-center p-4 bg-blue-50 rounded-lg">
-                    <Text size="4" weight="bold" className="text-blue-600">
-                      {activeSession.attendanceRate}%
-                    </Text>
-                    <Text size="2" className="text-blue-600">
-                      Rate
-                    </Text>
+
+                  <Box className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <Flex align="center" gap="4">
+                      <Box className="w-12 h-12 bg-blue-400 rounded-xl flex items-center justify-center">
+                        <TrendingUp className="w-6 h-6 text-white" />
+                      </Box>
+                      <Box>
+                        <Text size="5" weight="bold" className="text-white">
+                          {activeSession.attendanceRate}%
+                        </Text>
+                        <Text size="2" className="text-blue-200">
+                          Rate
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
                 </Grid>
-              </RadixCard>
+              </Box>
 
-              {/* Student List for Live Tracking */}
-              <RadixCard className="p-6">
-                <Heading size="4" className="mb-4">
-                  Student Check-in Status
-                </Heading>
-                <Grid columns="1" gap="3">
-                  {mockStudents.map((student) => {
-                    const record = mockAttendanceRecords.find(
-                      (r) => r.studentId === student.id
-                    );
-                    const status = record?.status || 'absent';
-
-                    return (
-                      <Flex
-                        key={student.id}
-                        justify="between"
-                        align="center"
-                        className="p-4 border border-gray-200 rounded-lg"
+              {/* Elegant Student Check-in Status */}
+              <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
+                {/* Header Section */}
+                <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
+                  <Flex justify="between" align="center">
+                    <Box>
+                      <Heading size="5" className="text-gray-900 mb-1">
+                        Student Check-in Status
+                      </Heading>
+                      <Text size="3" className="text-gray-600">
+                        {mockStudents?.length || 0} students enrolled •{' '}
+                        <span className="text-green-600 font-medium">
+                          Real-time updates
+                        </span>
+                      </Text>
+                    </Box>
+                    <Flex gap="2">
+                      <RadixButton
+                        variant="soft"
+                        size="2"
+                        className="bg-white/70 hover:bg-white"
                       >
-                        <Flex align="center" gap="4">
-                          <Box className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-gray-600" />
-                          </Box>
-                          <Box>
-                            <Text
-                              size="3"
-                              weight="medium"
-                              className="text-gray-900"
-                            >
-                              {student.name}
-                            </Text>
-                            <Text size="2" className="text-gray-600">
-                              {student.studentId} • {student.course}
-                            </Text>
-                            {record?.checkInTime && (
-                              <Text size="2" className="text-blue-600">
-                                Checked in at {record.checkInTime}
-                              </Text>
-                            )}
-                          </Box>
-                        </Flex>
+                        <Search className="w-4 h-4 mr-1" />
+                        Search
+                      </RadixButton>
+                      <RadixButton
+                        variant="soft"
+                        size="2"
+                        className="bg-white/70 hover:bg-white"
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        Export
+                      </RadixButton>
+                    </Flex>
+                  </Flex>
+                </Box>
 
-                        <Flex align="center" gap="3">
-                          <Badge color={getStatusColor(status)}>{status}</Badge>
-                          <Flex gap="1">
-                            <RadixButton
-                              variant={
-                                status === 'present' ? 'solid' : 'outline'
-                              }
-                              size="2"
-                              onClick={() =>
-                                handleMarkAttendance(student.id, 'present')
-                              }
-                              className={
-                                status === 'present' ? 'bg-green-600' : ''
-                              }
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </RadixButton>
-                            <RadixButton
-                              variant={status === 'late' ? 'solid' : 'outline'}
-                              size="2"
-                              onClick={() =>
-                                handleMarkAttendance(student.id, 'late')
-                              }
-                              className={
-                                status === 'late' ? 'bg-yellow-600' : ''
-                              }
-                            >
-                              <AlertCircle className="w-4 h-4" />
-                            </RadixButton>
-                            <RadixButton
-                              variant={
-                                status === 'absent' ? 'solid' : 'outline'
-                              }
-                              size="2"
-                              onClick={() =>
-                                handleMarkAttendance(student.id, 'absent')
-                              }
-                              className={
-                                status === 'absent' ? 'bg-red-600' : ''
-                              }
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </RadixButton>
+                {/* Student List */}
+                <Box className="p-6">
+                  <Grid columns="1" gap="3">
+                    {mockStudents && mockStudents.length > 0 ? (
+                      mockStudents.map((student, index) => {
+                        const record = mockAttendanceRecords.find(
+                          (r) => r.studentId === student.id
+                        );
+                        const status = record?.status || 'absent';
+                        const checkInTime = record?.checkInTime;
+
+                        return (
+                          <Box
+                            key={student.id}
+                            className="group animate-in slide-in-from-bottom-1 duration-300"
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <Box className="relative p-5 bg-gray-50/50 hover:bg-white border border-gray-200/50 hover:border-gray-300 hover:shadow-lg rounded-xl transition-all duration-300 group-hover:scale-[1.01]">
+                              {/* Status Indicator Line */}
+                              <Box
+                                className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl ${
+                                  status === 'present'
+                                    ? 'bg-green-500'
+                                    : status === 'late'
+                                      ? 'bg-orange-500'
+                                      : status === 'absent'
+                                        ? 'bg-red-500'
+                                        : 'bg-gray-300'
+                                }`}
+                              />
+
+                              <Flex justify="between" align="center">
+                                <Flex align="center" gap="4" className="flex-1">
+                                  {/* Avatar with Status Ring */}
+                                  <Box className="relative">
+                                    <Box
+                                      className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                        status === 'present'
+                                          ? 'bg-green-100 ring-2 ring-green-200'
+                                          : status === 'late'
+                                            ? 'bg-orange-100 ring-2 ring-orange-200'
+                                            : status === 'absent'
+                                              ? 'bg-red-100 ring-2 ring-red-200'
+                                              : 'bg-gray-100'
+                                      }`}
+                                    >
+                                      <User
+                                        className={`w-6 h-6 ${
+                                          status === 'present'
+                                            ? 'text-green-600'
+                                            : status === 'late'
+                                              ? 'text-orange-600'
+                                              : status === 'absent'
+                                                ? 'text-red-600'
+                                                : 'text-gray-500'
+                                        }`}
+                                      />
+                                    </Box>
+                                    {/* Live Status Dot */}
+                                    {status === 'present' && (
+                                      <Box className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                                        <Box className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                      </Box>
+                                    )}
+                                  </Box>
+
+                                  {/* Student Info */}
+                                  <Box className="flex-1">
+                                    <Flex
+                                      align="center"
+                                      gap="3"
+                                      className="mb-1"
+                                    >
+                                      <Text
+                                        size="3"
+                                        weight="bold"
+                                        className="text-gray-900"
+                                      >
+                                        {student.name}
+                                      </Text>
+                                      <Badge
+                                        color={
+                                          status === 'present'
+                                            ? 'green'
+                                            : status === 'late'
+                                              ? 'orange'
+                                              : status === 'absent'
+                                                ? 'red'
+                                                : 'gray'
+                                        }
+                                        variant="soft"
+                                        size="1"
+                                      >
+                                        {status}
+                                      </Badge>
+                                    </Flex>
+                                    <Text
+                                      size="2"
+                                      className="text-gray-600 mb-1"
+                                    >
+                                      {student.studentId} • {student.course}
+                                    </Text>
+                                    {checkInTime ? (
+                                      <Text
+                                        size="2"
+                                        className="text-blue-600 font-medium"
+                                      >
+                                        ✓ Checked in at {checkInTime}
+                                      </Text>
+                                    ) : (
+                                      <Text size="2" className="text-gray-500">
+                                        No check-in recorded
+                                      </Text>
+                                    )}
+                                  </Box>
+                                </Flex>
+
+                                {/* Action Buttons */}
+                                <Flex
+                                  gap="2"
+                                  className="opacity-70 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <RadixButton
+                                    variant={
+                                      status === 'present' ? 'solid' : 'soft'
+                                    }
+                                    size="1"
+                                    onClick={() =>
+                                      handleMarkAttendance &&
+                                      handleMarkAttendance(
+                                        student.id,
+                                        'present'
+                                      )
+                                    }
+                                    className={`${status === 'present' ? 'bg-green-600 hover:bg-green-700 text-white' : 'hover:bg-green-50 text-green-600'}`}
+                                  >
+                                    <CheckCircle className="w-3 h-3" />
+                                  </RadixButton>
+                                  <RadixButton
+                                    variant={
+                                      status === 'late' ? 'solid' : 'soft'
+                                    }
+                                    size="1"
+                                    onClick={() =>
+                                      handleMarkAttendance &&
+                                      handleMarkAttendance(student.id, 'late')
+                                    }
+                                    className={`${status === 'late' ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'hover:bg-orange-50 text-orange-600'}`}
+                                  >
+                                    <AlertCircle className="w-3 h-3" />
+                                  </RadixButton>
+                                  <RadixButton
+                                    variant={
+                                      status === 'absent' ? 'solid' : 'soft'
+                                    }
+                                    size="1"
+                                    onClick={() =>
+                                      handleMarkAttendance &&
+                                      handleMarkAttendance(student.id, 'absent')
+                                    }
+                                    className={`${status === 'absent' ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-red-50 text-red-600'}`}
+                                  >
+                                    <XCircle className="w-3 h-3" />
+                                  </RadixButton>
+                                </Flex>
+                              </Flex>
+                            </Box>
+                          </Box>
+                        );
+                      })
+                    ) : (
+                      <Box className="text-center py-16">
+                        <Box className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <User className="w-10 h-10 text-gray-400" />
+                        </Box>
+                        <Text
+                          size="4"
+                          weight="medium"
+                          className="text-gray-900 mb-2"
+                        >
+                          No students enrolled
+                        </Text>
+                        <Text size="3" className="text-gray-500 mb-6">
+                          Add students to this session to start tracking
+                          attendance
+                        </Text>
+                        <RadixButton
+                          variant="solid"
+                          size="3"
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <User className="w-4 h-4 mr-2" />
+                          Add Students
+                        </RadixButton>
+                      </Box>
+                    )}
+                  </Grid>
+                </Box>
+
+                {/* Enhanced Progress Section */}
+                {mockStudents && mockStudents.length > 0 && (
+                  <Box className="px-6 pb-6">
+                    <Box className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-100">
+                      <Flex justify="between" align="center" className="mb-3">
+                        <Text size="3" weight="bold" className="text-gray-800">
+                          Check-in Progress
+                        </Text>
+                        <Text size="2" className="text-gray-600 font-medium">
+                          {activeSession.presentCount + activeSession.lateCount}{' '}
+                          of {activeSession.totalStudents} students
+                        </Text>
+                      </Flex>
+
+                      {/* Multi-segment Progress Bar */}
+                      <Box className="relative w-full bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+                        <Box
+                          className="absolute left-0 top-0 h-full bg-green-500 transition-all duration-700 ease-out"
+                          style={{
+                            width: `${(activeSession.presentCount / activeSession.totalStudents) * 100}%`,
+                          }}
+                        />
+                        <Box
+                          className="absolute top-0 h-full bg-orange-400 transition-all duration-700 ease-out"
+                          style={{
+                            left: `${(activeSession.presentCount / activeSession.totalStudents) * 100}%`,
+                            width: `${(activeSession.lateCount / activeSession.totalStudents) * 100}%`,
+                          }}
+                        />
+                      </Box>
+
+                      {/* Progress Stats */}
+                      <Flex justify="between" align="center">
+                        <Flex gap="4">
+                          <Flex align="center" gap="2">
+                            <Box className="w-3 h-3 bg-green-500 rounded-full" />
+                            <Text size="1" className="text-gray-600">
+                              {activeSession.presentCount} Present
+                            </Text>
+                          </Flex>
+                          <Flex align="center" gap="2">
+                            <Box className="w-3 h-3 bg-orange-400 rounded-full" />
+                            <Text size="1" className="text-gray-600">
+                              {activeSession.lateCount} Late
+                            </Text>
+                          </Flex>
+                          <Flex align="center" gap="2">
+                            <Box className="w-3 h-3 bg-gray-300 rounded-full" />
+                            <Text size="1" className="text-gray-600">
+                              {activeSession.absentCount} Absent
+                            </Text>
                           </Flex>
                         </Flex>
+                        <Text size="2" weight="bold" className="text-green-600">
+                          {Math.round(
+                            ((activeSession.presentCount +
+                              activeSession.lateCount) /
+                              activeSession.totalStudents) *
+                              100
+                          )}
+                          % Attended
+                        </Text>
                       </Flex>
-                    );
-                  })}
-                </Grid>
+                    </Box>
+                  </Box>
+                )}
               </RadixCard>
             </Box>
           ) : (
-            <RadixCard className="p-12 text-center">
-              <Flex direction="column" align="center" gap="4">
-                <Box className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                  <Camera className="w-8 h-8 text-gray-400" />
-                </Box>
-                <Box>
-                  <Heading size="4" className="text-gray-900 mb-2">
-                    No Active Session
-                  </Heading>
-                  <Text size="3" className="text-gray-600 mb-4">
-                    Start an attendance session to track student check-ins in
-                    real-time
-                  </Text>
-                  <RadixButton variant="solid" size="3">
-                    <Camera className="w-4 h-4 mr-2" />
-                    Start New Session
-                  </RadixButton>
-                </Box>
-              </Flex>
-            </RadixCard>
+            <Box className="min-h-[60vh] flex items-center justify-center">
+              <EmptySessionState
+                onStartSession={() => console.log('Start new session clicked')}
+                title="Ready to Track Attendance?"
+                description="Start a new session to monitor student check-ins in real-time with advanced tracking features"
+              />
+            </Box>
           )}
         </Tabs.Content>
 

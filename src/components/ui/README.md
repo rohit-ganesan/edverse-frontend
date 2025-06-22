@@ -4,6 +4,48 @@ This directory contains reusable UI components built on top of Radix UI primitiv
 
 ## Core Components
 
+### Attendance Components
+
+#### AttendanceSessionCard
+
+A secure card component for displaying attendance session information.
+
+- **Props**: `session`, `onView`, `className`
+- **Features**: Data validation, null safety, status badges, attendance rates
+- **Security**: Input sanitization, safe event handling
+
+#### AttendanceActivityCard
+
+A component for displaying recent attendance activity records.
+
+- **Props**: `record`, `className`
+- **Features**: Status icons, method indicators, student information
+- **Security**: Data integrity checks, fallback values
+
+#### LiveAttendanceCard
+
+A real-time attendance tracking card with session controls.
+
+- **Props**: `session`, `onQRCode`, `onMobileCheckIn`, `onEndSession`, `className`
+- **Features**: Live stats, action buttons, session management
+- **Security**: Safe event handling, data validation
+
+#### StudentAttendanceRow
+
+Individual student attendance row with status controls.
+
+- **Props**: `student`, `record`, `onMarkAttendance`, `className`
+- **Features**: Status badges, attendance buttons, check-in times
+- **Security**: Input validation, secure state management
+
+#### EmptySessionState
+
+Empty state component for when no attendance session is active.
+
+- **Props**: `onStartSession`, `title`, `description`, `className`
+- **Features**: Call-to-action button, customizable messaging
+- **Security**: Safe event handling, data validation
+
 ### Radix Wrappers
 
 - `RadixButton.tsx` - Button component with consistent styling
