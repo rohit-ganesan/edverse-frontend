@@ -218,7 +218,140 @@ import { Info } from 'lucide-react';
 - Proper null safety and error handling
 - Type-based color coding and icons
 - Responsive design with hover effects
-- Accessibility support
+
+## People/User Directory Components
+
+### PersonAvatar
+
+Standardized avatar component for displaying person initials with customizable colors and sizes.
+
+```tsx
+import { PersonAvatar } from 'components/ui/PersonAvatar';
+
+<PersonAvatar name="John Doe" colorScheme="blue" size="medium" />;
+```
+
+**Props:**
+
+- `name` (required): Full name for initial generation
+- `size` (optional): 'small' | 'medium' | 'large' (default: 'medium')
+- `colorScheme` (optional): 'blue' | 'purple' | 'green' | 'orange' | 'red' | 'gray' (default: 'blue')
+- `className` (optional): Additional CSS classes
+
+### StatusBadge
+
+Standardized status badge with automatic color coding and variant detection.
+
+```tsx
+import { StatusBadge } from 'components/ui/StatusBadge';
+
+<StatusBadge status="Active" />
+<StatusBadge status="A+" variant="grade" />
+<StatusBadge status="On Leave" variant="warning" />
+```
+
+**Props:**
+
+- `status` (required): Status text to display
+- `variant` (optional): 'default' | 'success' | 'warning' | 'error' | 'info' | 'grade'
+- `size` (optional): 'small' | 'medium' (default: 'medium')
+- `className` (optional): Additional CSS classes
+
+### AttendanceIndicator
+
+Color-coded attendance percentage indicator with dot visualization.
+
+```tsx
+import { AttendanceIndicator } from 'components/ui/AttendanceIndicator';
+
+<AttendanceIndicator percentage="95%" />
+<AttendanceIndicator percentage={85} showPercentage={false} />
+```
+
+**Props:**
+
+- `percentage` (required): Attendance percentage (string with % or number)
+- `showPercentage` (optional): Whether to show percentage text (default: true)
+- `size` (optional): 'small' | 'medium' (default: 'medium')
+- `className` (optional): Additional CSS classes
+
+### PersonTable
+
+Comprehensive table component for displaying people/user data with flexible configuration, pagination, and list count controls.
+
+```tsx
+import {
+  PersonTable,
+  TableColumn,
+  TableAction,
+} from 'components/ui/PersonTable';
+
+const columns: TableColumn<Student>[] = [
+  { key: 'name', label: 'Student' },
+  { key: 'class', label: 'Class' },
+  { key: 'attendance', label: 'Attendance' },
+  { key: 'grade', label: 'Grade' },
+  { key: 'status', label: 'Status' },
+];
+
+const actions: TableAction<Student>[] = [
+  {
+    label: 'View Profile',
+    icon: Eye,
+    onClick: (student) => console.log('View', student),
+  },
+  {
+    label: 'Edit Details',
+    icon: Edit3,
+    onClick: (student) => console.log('Edit', student),
+  },
+];
+
+<PersonTable
+  title="Student Directory"
+  data={students}
+  columns={columns}
+  actions={actions}
+  avatarColorScheme="purple"
+  headerActions={<Button>Export</Button>}
+  defaultPageSize={25}
+  pageSizeOptions={[10, 25, 50, 100]}
+  showPagination={true}
+/>;
+```
+
+**Props:**
+
+- `title` (required): Table title
+- `data` (required): Array of person objects
+- `columns` (required): Column configuration array
+- `actions` (optional): Action buttons configuration
+- `headerActions` (optional): React node for header actions
+- `loading` (optional): Loading state
+- `emptyMessage` (optional): Empty state message
+- `avatarColorScheme` (optional): Color scheme for avatars
+- `className` (optional): Additional CSS classes
+- `defaultPageSize` (optional): Default items per page (default: 10)
+- `pageSizeOptions` (optional): Available page size options (default: [10, 25, 50])
+- `showPagination` (optional): Enable pagination controls (default: true)
+
+**Built-in Column Renderers:**
+
+- `name`/`student`: Avatar + name display
+- `contact`: Email + phone with icons
+- `status`: Auto-colored status badge
+- `grade`: Grade-specific colored badge
+- `attendance`: Color-coded attendance indicator
+
+**Pagination Features:**
+
+- **Page Size Selector**: Dropdown in header to choose items per page (10, 25, 50)
+- **Smart Pagination**: Shows up to 5 page numbers with intelligent range
+- **Navigation Controls**: Previous/Next buttons with chevron icons
+- **Results Counter**: Shows "Showing X-Y of Z results" for context
+- **Auto-Reset**: Returns to page 1 when data changes or page size changes
+- **Responsive**: Pagination controls adapt to available space
+- **Accessibility**: Proper ARIA labels and keyboard navigation support
 
 ### StatsCard
 

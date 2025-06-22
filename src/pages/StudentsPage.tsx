@@ -1,13 +1,81 @@
-import { Box, Flex, Text, Heading, Table } from '@radix-ui/themes';
+import { Flex } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
-import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
 import { PageHeader } from 'components/ui/PageHeader';
 import { StatsGrid } from 'components/ui/StatsGrid';
-import { GraduationCap, UserPlus, Calendar, BookOpen } from 'lucide-react';
+import {
+  PersonTable,
+  TableColumn,
+  TableAction,
+  BasePerson,
+} from 'components/ui/PersonTable';
+import {
+  GraduationCap,
+  UserPlus,
+  Calendar,
+  BookOpen,
+  Eye,
+  Download,
+  Filter,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+// Define student interface extending BasePerson
+interface Student extends BasePerson {
+  class: string;
+  rollNumber: string;
+  attendance: string;
+  grade: string;
+}
 
 export function StudentsPage(): JSX.Element {
-  const students = [
+  const navigate = useNavigate();
+
+  // Handler functions for export and filter
+  const handleExport = () => {
+    try {
+      // Convert students data to CSV format
+      const headers = ['Name', 'Class', 'Attendance', 'Grade', 'Status'];
+      const csvContent = [
+        headers.join(','),
+        ...students.map((student) =>
+          [
+            `"${student.name}"`,
+            `"${student.class}"`,
+            `"${student.attendance}"`,
+            `"${student.grade}"`,
+            `"${student.status}"`,
+          ].join(',')
+        ),
+      ].join('\n');
+
+      // Create and download the file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute(
+        'download',
+        `student-directory-${new Date().toISOString().split('T')[0]}.csv`
+      );
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log('Student directory exported successfully');
+    } catch (error) {
+      console.error('Error exporting student directory:', error);
+    }
+  };
+
+  const handleFilter = () => {
+    // TODO: Implement filter functionality
+    // This could open a filter modal or sidebar
+    console.log('Filter student directory');
+  };
+
+  const students: Student[] = [
     {
       id: 1,
       name: 'Alex Thompson',
@@ -55,19 +123,34 @@ export function StudentsPage(): JSX.Element {
     },
   ];
 
-  const getGradeColor = (grade: string): string => {
-    if (grade.startsWith('A')) return 'bg-green-100 text-green-700';
-    if (grade.startsWith('B')) return 'bg-blue-100 text-blue-700';
-    if (grade.startsWith('C')) return 'bg-yellow-100 text-yellow-700';
-    return 'bg-gray-100 text-gray-700';
-  };
+  // Column configuration for students table
+  const columns: TableColumn<Student>[] = [
+    { key: 'name', label: 'Student' },
+    { key: 'class', label: 'Class' },
+    { key: 'attendance', label: 'Attendance' },
+    { key: 'grade', label: 'Grade' },
+    { key: 'status', label: 'Status' },
+  ];
+
+  // Action buttons configuration
+  const actions: TableAction<Student>[] = [
+    {
+      label: 'View Profile',
+      icon: Eye,
+      variant: 'ghost',
+      onClick: (student) =>
+        navigate('/students/view', {
+          state: { studentData: student },
+        }),
+    },
+  ];
 
   const headerActions = [
     {
       label: 'Add New Student',
       icon: UserPlus,
       isPrimary: true,
-      onClick: () => console.log('Add new student'),
+      onClick: () => navigate('/students/add'),
     },
   ];
 
@@ -104,6 +187,30 @@ export function StudentsPage(): JSX.Element {
     },
   ];
 
+  // Header actions for the table
+  const tableHeaderActions = (
+    <Flex gap="2" align="center">
+      <RadixButton
+        variant="outline"
+        size="2"
+        onClick={handleFilter}
+        className="flex items-center gap-2"
+      >
+        <Filter className="w-4 h-4" />
+        Filter
+      </RadixButton>
+      <RadixButton
+        variant="outline"
+        size="2"
+        onClick={handleExport}
+        className="flex items-center gap-2"
+      >
+        <Download className="w-4 h-4" />
+        Export
+      </RadixButton>
+    </Flex>
+  );
+
   return (
     <DashboardLayout>
       <PageHeader
@@ -114,117 +221,16 @@ export function StudentsPage(): JSX.Element {
 
       <StatsGrid stats={stats} />
 
-      {/* Students Table */}
-      <RadixCard size="2" className="p-6">
-        <Flex justify="between" align="center" className="mb-4">
-          <Heading size="4" className="text-gray-900">
-            Student Directory
-          </Heading>
-          <Flex gap="2">
-            <RadixButton variant="outline" size="2">
-              Export
-            </RadixButton>
-            <RadixButton variant="outline" size="2">
-              Filter
-            </RadixButton>
-          </Flex>
-        </Flex>
-
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>Student</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Class</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Roll Number</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Attendance</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Grade</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {students.map((student) => (
-              <Table.Row key={student.id}>
-                <Table.Cell>
-                  <Flex align="center" gap="3">
-                    <Box className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                      <Text
-                        size="2"
-                        weight="medium"
-                        className="text-purple-600"
-                      >
-                        {student.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')}
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Text size="2" weight="medium" className="text-gray-900">
-                        {student.name}
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Table.Cell>
-                <Table.Cell>
-                  <Text size="2" className="text-gray-700">
-                    {student.class}
-                  </Text>
-                </Table.Cell>
-                <Table.Cell>
-                  <Text size="2" weight="medium" className="text-gray-900">
-                    {student.rollNumber}
-                  </Text>
-                </Table.Cell>
-                <Table.Cell>
-                  <Box className="flex items-center gap-2">
-                    <Box
-                      className="w-2 h-2 rounded-full"
-                      style={{
-                        backgroundColor:
-                          parseInt(student.attendance) >= 90
-                            ? '#10b981'
-                            : parseInt(student.attendance) >= 80
-                              ? '#f59e0b'
-                              : '#ef4444',
-                      }}
-                    />
-                    <Text size="2" className="text-gray-700">
-                      {student.attendance}
-                    </Text>
-                  </Box>
-                </Table.Cell>
-                <Table.Cell>
-                  <Box
-                    className={`
-                      inline-flex px-2 py-1 rounded-full text-xs font-medium
-                      ${getGradeColor(student.grade)}
-                    `}
-                  >
-                    {student.grade}
-                  </Box>
-                </Table.Cell>
-                <Table.Cell>
-                  <Box className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                    {student.status}
-                  </Box>
-                </Table.Cell>
-                <Table.Cell>
-                  <Flex gap="2">
-                    <RadixButton variant="ghost" size="1">
-                      View
-                    </RadixButton>
-                    <RadixButton variant="ghost" size="1">
-                      Edit
-                    </RadixButton>
-                  </Flex>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Root>
-      </RadixCard>
+      {/* Students Table using standardized PersonTable */}
+      <PersonTable
+        title="Student Directory"
+        data={students}
+        columns={columns}
+        actions={actions}
+        avatarColorScheme="purple"
+        headerActions={tableHeaderActions}
+        emptyMessage="No students found"
+      />
     </DashboardLayout>
   );
 }

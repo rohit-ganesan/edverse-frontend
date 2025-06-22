@@ -14,6 +14,12 @@ import { FeePage } from 'pages/FeePage';
 import { ResultPage } from 'pages/ResultPage';
 import { InstructorsPage } from 'pages/InstructorsPage';
 import { StudentsPage } from 'pages/StudentsPage';
+import { AddInstructorPage } from 'pages/AddInstructorPage';
+import { AddStudentPage } from 'pages/AddStudentPage';
+import { ViewInstructorPage } from 'pages/ViewInstructorPage';
+import { ViewStudentPage } from 'pages/ViewStudentPage';
+import { EditInstructorPage } from 'pages/EditInstructorPage';
+import { EditStudentPage } from 'pages/EditStudentPage';
 import { ProfilePage } from 'pages/ProfilePage';
 import { DebugPage } from 'pages/DebugPage';
 import { TestPage } from 'pages/TestPage';
@@ -117,10 +123,58 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
+          path="/instructors/add"
+          element={
+            <ProtectedRoute>
+              <AddInstructorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructors/view"
+          element={
+            <ProtectedRoute>
+              <ViewInstructorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructors/edit"
+          element={
+            <ProtectedRoute>
+              <EditInstructorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/students"
           element={
             <ProtectedRoute>
               <StudentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/add"
+          element={
+            <ProtectedRoute>
+              <AddStudentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/view"
+          element={
+            <ProtectedRoute>
+              <ViewStudentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/edit"
+          element={
+            <ProtectedRoute>
+              <EditStudentPage />
             </ProtectedRoute>
           }
         />

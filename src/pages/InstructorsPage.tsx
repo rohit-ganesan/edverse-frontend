@@ -1,13 +1,81 @@
-import { Box, Flex, Text, Heading, Table } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
-import { RadixCard } from 'components/ui/RadixCard';
-import { RadixButton } from 'components/ui/RadixButton';
 import { PageHeader } from 'components/ui/PageHeader';
 import { StatsGrid } from 'components/ui/StatsGrid';
-import { Users, UserPlus, Mail, Phone, Award } from 'lucide-react';
+import {
+  PersonTable,
+  TableColumn,
+  TableAction,
+  BasePerson,
+} from 'components/ui/PersonTable';
+import { Users, UserPlus, Award, Eye, Download, Filter } from 'lucide-react';
+import { RadixButton } from 'components/ui/RadixButton';
+import { Flex } from '@radix-ui/themes';
+import { useNavigate } from 'react-router-dom';
+
+// Define instructor interface extending BasePerson
+interface Instructor extends BasePerson {
+  subject: string;
+  email: string;
+  phone: string;
+  experience: string;
+}
 
 export function InstructorsPage(): JSX.Element {
-  const instructors = [
+  const navigate = useNavigate();
+
+  // Handler functions for export and filter
+  const handleExport = () => {
+    try {
+      // Convert instructors data to CSV format
+      const headers = [
+        'Name',
+        'Subject',
+        'Email',
+        'Phone',
+        'Experience',
+        'Status',
+      ];
+      const csvContent = [
+        headers.join(','),
+        ...instructors.map((instructor) =>
+          [
+            `"${instructor.name}"`,
+            `"${instructor.subject}"`,
+            `"${instructor.email}"`,
+            `"${instructor.phone}"`,
+            `"${instructor.experience}"`,
+            `"${instructor.status}"`,
+          ].join(',')
+        ),
+      ].join('\n');
+
+      // Create and download the file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute(
+        'download',
+        `faculty-directory-${new Date().toISOString().split('T')[0]}.csv`
+      );
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log('Faculty directory exported successfully');
+    } catch (error) {
+      console.error('Error exporting faculty directory:', error);
+    }
+  };
+
+  const handleFilter = () => {
+    // TODO: Implement filter functionality
+    // This could open a filter modal or sidebar
+    console.log('Filter faculty directory');
+  };
+
+  const instructors: Instructor[] = [
     {
       id: 1,
       name: 'Dr. Sarah Johnson',
@@ -46,12 +114,34 @@ export function InstructorsPage(): JSX.Element {
     },
   ];
 
+  // Column configuration for instructors table
+  const columns: TableColumn<Instructor>[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'subject', label: 'Subject' },
+    { key: 'contact', label: 'Contact' },
+    { key: 'experience', label: 'Experience' },
+    { key: 'status', label: 'Status' },
+  ];
+
+  // Action buttons configuration
+  const actions: TableAction<Instructor>[] = [
+    {
+      label: 'View Profile',
+      icon: Eye,
+      variant: 'ghost',
+      onClick: (instructor) =>
+        navigate('/instructors/view', {
+          state: { instructorData: instructor },
+        }),
+    },
+  ];
+
   const headerActions = [
     {
       label: 'Add New Instructor',
       icon: UserPlus,
       isPrimary: true,
-      onClick: () => console.log('Add new instructor'),
+      onClick: () => navigate('/instructors/add'),
     },
   ];
 
@@ -97,101 +187,37 @@ export function InstructorsPage(): JSX.Element {
 
       <StatsGrid stats={stats} />
 
-      {/* Instructors Table */}
-      <RadixCard size="2" className="p-6">
-        <Box className="mb-4">
-          <Heading size="4" className="text-gray-900">
-            Faculty Directory
-          </Heading>
-        </Box>
-
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Subject</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Contact</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Experience</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {instructors.map((instructor) => (
-              <Table.Row key={instructor.id}>
-                <Table.Cell>
-                  <Flex align="center" gap="3">
-                    <Box className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Text size="2" weight="medium" className="text-blue-600">
-                        {instructor.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')}
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Text size="2" weight="medium" className="text-gray-900">
-                        {instructor.name}
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Table.Cell>
-                <Table.Cell>
-                  <Text size="2" className="text-gray-700">
-                    {instructor.subject}
-                  </Text>
-                </Table.Cell>
-                <Table.Cell>
-                  <Box>
-                    <Flex align="center" gap="2" className="mb-1">
-                      <Mail className="w-3 h-3 text-gray-400" />
-                      <Text size="1" className="text-gray-600">
-                        {instructor.email}
-                      </Text>
-                    </Flex>
-                    <Flex align="center" gap="2">
-                      <Phone className="w-3 h-3 text-gray-400" />
-                      <Text size="1" className="text-gray-600">
-                        {instructor.phone}
-                      </Text>
-                    </Flex>
-                  </Box>
-                </Table.Cell>
-                <Table.Cell>
-                  <Text size="2" className="text-gray-700">
-                    {instructor.experience}
-                  </Text>
-                </Table.Cell>
-                <Table.Cell>
-                  <Box
-                    className={`
-                      inline-flex px-2 py-1 rounded-full text-xs font-medium
-                      ${
-                        instructor.status === 'Active'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }
-                    `}
-                  >
-                    {instructor.status}
-                  </Box>
-                </Table.Cell>
-                <Table.Cell>
-                  <Flex gap="2">
-                    <RadixButton variant="ghost" size="1">
-                      View
-                    </RadixButton>
-                    <RadixButton variant="ghost" size="1">
-                      Edit
-                    </RadixButton>
-                  </Flex>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Root>
-      </RadixCard>
+      {/* Instructors Table using standardized PersonTable */}
+      <PersonTable
+        title="Faculty Directory"
+        data={instructors}
+        columns={columns}
+        actions={actions}
+        avatarColorScheme="blue"
+        emptyMessage="No instructors found"
+        headerActions={
+          <Flex gap="2" align="center">
+            <RadixButton
+              variant="outline"
+              size="2"
+              onClick={handleFilter}
+              className="flex items-center gap-2"
+            >
+              <Filter className="w-4 h-4" />
+              Filter
+            </RadixButton>
+            <RadixButton
+              variant="outline"
+              size="2"
+              onClick={handleExport}
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export
+            </RadixButton>
+          </Flex>
+        }
+      />
     </DashboardLayout>
   );
 }
