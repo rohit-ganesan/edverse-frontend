@@ -1,381 +1,248 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
+import { Box, Flex, Text, Badge } from '@radix-ui/themes';
 import {
-  Search,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Plus,
-} from 'lucide-react';
-import { RadixTextField } from 'components/ui/RadixTextField';
-import { RadixButton } from 'components/ui/RadixButton';
-import { InstructorCard } from '../components/InstructorCard';
+  DataTable,
+  DataTableColumn,
+  DataTableAction,
+} from 'components/ui/DataTable';
+import { Users, Eye, User } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import { useInstructorManagement } from '../hooks/useInstructorManagement';
+import type { Instructor } from '../types';
 
 export function AllInstructors(): JSX.Element {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [experienceRange, setExperienceRange] = useState({ min: 0, max: 50 });
-  const [performanceRange, setPerformanceRange] = useState({ min: 0, max: 5 });
-  const [showFilters, setShowFilters] = useState(false);
-
   const { instructors, isLoading, error } = useInstructorData();
-  const {
-    handleViewInstructor: handleViewDetails,
-    handleEditInstructor: handleEdit,
-    handleContactInstructor: handleContact,
-    handleScheduleReview,
-    handleExportInstructors: handleExport,
-  } = useInstructorManagement();
-
-  const itemsPerPage = 10;
+  const { handleAddInstructor, handleViewDetails } = useInstructorManagement();
 
   // Get unique departments for filter
   const departments = useMemo(() => {
-    const deptSet = new Set(
-      instructors.map((instructor) => instructor.department)
+    const uniqueDepts = Array.from(
+      new Set(instructors.map((i) => i.department))
     );
-    const depts = Array.from(deptSet);
-    return depts.sort();
+    return uniqueDepts.map((dept) => ({
+      value: dept.toLowerCase(),
+      label: dept,
+    }));
   }, [instructors]);
 
-  // Filter instructors
-  const filteredInstructors = useMemo(() => {
-    return instructors.filter((instructor) => {
-      const matchesSearch =
-        instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instructor.employeeId
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instructor.subjects.some((subject) =>
-          subject.toLowerCase().includes(searchTerm.toLowerCase())
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'green';
+      case 'on leave':
+        return 'yellow';
+      case 'inactive':
+        return 'gray';
+      case 'retired':
+        return 'red';
+      default:
+        return 'gray';
+    }
+  };
+
+  const getPerformanceColor = (rating: number) => {
+    if (rating >= 4.5) return 'green';
+    if (rating >= 4.0) return 'blue';
+    if (rating >= 3.5) return 'yellow';
+    return 'red';
+  };
+
+  const getExperienceLevel = (years: number) => {
+    if (years >= 15) return { level: 'Expert', color: 'purple' as const };
+    if (years >= 10) return { level: 'Senior', color: 'blue' as const };
+    if (years >= 5) return { level: 'Mid-level', color: 'green' as const };
+    return { level: 'Junior', color: 'orange' as const };
+  };
+
+  const columns: DataTableColumn<Instructor>[] = [
+    {
+      key: 'instructor',
+      label: 'Instructor',
+      icon: <Users className="w-4 h-4 text-gray-500" />,
+      render: (instructor) => (
+        <Flex align="center" gap="3">
+          <Box className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <Text size="1" weight="bold" className="text-purple-600">
+              {instructor.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .slice(0, 2)}
+            </Text>
+          </Box>
+          <Box>
+            <Text size="2" weight="medium" className="text-gray-900 block">
+              {instructor.name}
+            </Text>
+            <Text size="1" className="text-gray-500 block">
+              {instructor.employeeId}
+            </Text>
+          </Box>
+        </Flex>
+      ),
+    },
+    {
+      key: 'department',
+      label: 'Department',
+      render: (instructor) => (
+        <Box>
+          <Text size="2" className="text-gray-700 block">
+            {instructor.department}
+          </Text>
+          <Text size="1" className="text-gray-500">
+            {instructor.designation}
+          </Text>
+        </Box>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (instructor) => (
+        <Badge
+          color={getStatusColor(instructor.status || 'active')}
+          variant="soft"
+          size="1"
+        >
+          {instructor.status || 'active'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'experience',
+      label: 'Experience',
+      render: (instructor) => {
+        const experienceInfo = getExperienceLevel(instructor.experience.years);
+        return (
+          <Box>
+            <Text size="2" className="text-gray-700 block font-medium">
+              {instructor.experience.years}y
+            </Text>
+            <Badge color={experienceInfo.color} variant="soft" size="1">
+              {experienceInfo.level}
+            </Badge>
+          </Box>
         );
+      },
+    },
+    {
+      key: 'rating',
+      label: 'Rating',
+      render: (instructor) => (
+        <Badge
+          color={getPerformanceColor(instructor.performance.rating)}
+          variant="soft"
+          size="1"
+        >
+          {instructor.performance.rating.toFixed(1)}/5.0
+        </Badge>
+      ),
+    },
+    {
+      key: 'contact',
+      label: 'Contact',
+      render: (instructor) => (
+        <Box>
+          <Text size="1" className="text-gray-700 block">
+            {instructor.email}
+          </Text>
+          <Text size="1" className="text-gray-500">
+            {instructor.phone}
+          </Text>
+        </Box>
+      ),
+    },
+  ];
 
-      const matchesDepartment =
-        selectedDepartment === 'all' ||
-        instructor.department === selectedDepartment;
-      const matchesStatus =
-        selectedStatus === 'all' || instructor.status === selectedStatus;
-      const matchesExperience =
-        instructor.experience.years >= experienceRange.min &&
-        instructor.experience.years <= experienceRange.max;
-      const matchesPerformance =
-        instructor.performance.rating >= performanceRange.min &&
-        instructor.performance.rating <= performanceRange.max;
+  const actions: DataTableAction<Instructor>[] = [
+    {
+      icon: <Eye className="w-5 h-5" />,
+      label: 'View Details',
+      onClick: handleViewDetails,
+    },
+  ];
 
-      return (
-        matchesSearch &&
-        matchesDepartment &&
-        matchesStatus &&
-        matchesExperience &&
-        matchesPerformance
-      );
+  const handleSort = (sortBy: string, data: Instructor[]) => {
+    return [...data].sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'department':
+          return a.department.localeCompare(b.department);
+        case 'experience':
+          return b.experience.years - a.experience.years;
+        case 'rating':
+          return b.performance.rating - a.performance.rating;
+        default:
+          return 0;
+      }
     });
-  }, [
-    instructors,
-    searchTerm,
-    selectedDepartment,
-    selectedStatus,
-    experienceRange,
-    performanceRange,
-  ]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedInstructors = filteredInstructors.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
   };
 
-  const handleClearFilters = () => {
-    setSearchTerm('');
-    setSelectedDepartment('all');
-    setSelectedStatus('all');
-    setExperienceRange({ min: 0, max: 50 });
-    setPerformanceRange({ min: 0, max: 5 });
-    setCurrentPage(1);
+  const handleFilter = (
+    filters: Record<string, string>,
+    data: Instructor[]
+  ) => {
+    return data.filter((instructor) => {
+      const departmentMatch =
+        !filters.department ||
+        filters.department === 'all' ||
+        instructor.department.toLowerCase() === filters.department;
+      const statusMatch =
+        !filters.status ||
+        filters.status === 'all' ||
+        (instructor.status || 'active').toLowerCase() === filters.status;
+      return departmentMatch && statusMatch;
+    });
   };
-
-  const handleAddInstructor = () => {
-    // Navigate to add instructor page
-    console.log('Navigate to add instructor');
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading instructors...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-red-500">Error loading instructors: {error}</div>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            All Instructors
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {filteredInstructors.length} of {instructors.length} instructors
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <RadixButton
-            variant="outline"
-            size="2"
-            onClick={() => handleExport(filteredInstructors)}
-          >
-            <Download className="w-4 h-4" />
-            Export
-          </RadixButton>
-          <RadixButton variant="solid" size="2" onClick={handleAddInstructor}>
-            <Plus className="w-4 h-4" />
-            Add Instructor
-          </RadixButton>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <RadixTextField
-                placeholder="Search by name, ID, email, or subjects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <RadixButton
-            variant="outline"
-            size="2"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="w-4 h-4" />
-            Filters
-          </RadixButton>
-        </div>
-
-        {/* Advanced Filters */}
-        {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Department
-              </label>
-              <select
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">All Departments</option>
-                {departments.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">All Status</option>
-                <option value="Active">Active</option>
-                <option value="On Leave">On Leave</option>
-                <option value="Inactive">Inactive</option>
-                <option value="Suspended">Suspended</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Experience (Years)
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="50"
-                  value={experienceRange.min}
-                  onChange={(e) =>
-                    setExperienceRange((prev) => ({
-                      ...prev,
-                      min: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-                <span className="text-gray-500">to</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="50"
-                  value={experienceRange.max}
-                  onChange={(e) =>
-                    setExperienceRange((prev) => ({
-                      ...prev,
-                      max: parseInt(e.target.value) || 50,
-                    }))
-                  }
-                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Performance Rating
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  value={performanceRange.min}
-                  onChange={(e) =>
-                    setPerformanceRange((prev) => ({
-                      ...prev,
-                      min: parseFloat(e.target.value) || 0,
-                    }))
-                  }
-                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-                <span className="text-gray-500">to</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  value={performanceRange.max}
-                  onChange={(e) =>
-                    setPerformanceRange((prev) => ({
-                      ...prev,
-                      max: parseFloat(e.target.value) || 5,
-                    }))
-                  }
-                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-              </div>
-            </div>
-
-            <div className="md:col-span-2 lg:col-span-4 flex justify-end">
-              <RadixButton
-                variant="ghost"
-                size="1"
-                onClick={handleClearFilters}
-              >
-                Clear Filters
-              </RadixButton>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Instructors List */}
-      <div className="space-y-4 max-h-[600px] overflow-y-auto">
-        {paginatedInstructors.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-500 mb-2">No instructors found</div>
-            <p className="text-sm text-gray-400">
-              Try adjusting your search terms or filters
-            </p>
-          </div>
-        ) : (
-          paginatedInstructors.map((instructor) => (
-            <InstructorCard
-              key={instructor.id}
-              instructor={instructor}
-              onViewDetails={handleViewDetails}
-              onEdit={handleEdit}
-              onContact={handleContact}
-              onScheduleReview={handleScheduleReview}
-            />
-          ))
-        )}
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 border border-gray-200 rounded-lg">
-          <div className="text-sm text-gray-700">
-            Showing {startIndex + 1} to{' '}
-            {Math.min(startIndex + itemsPerPage, filteredInstructors.length)} of{' '}
-            {filteredInstructors.length} results
-          </div>
-          <div className="flex items-center gap-2">
-            <RadixButton
-              variant="outline"
-              size="1"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </RadixButton>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const page = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
-                if (page > totalPages) return null;
-
-                return (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                      page === currentPage
-                        ? 'bg-blue-100 text-blue-700 font-medium'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                );
-              })}
-            </div>
-
-            <RadixButton
-              variant="outline"
-              size="1"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-              <ChevronRight className="w-4 h-4" />
-            </RadixButton>
-          </div>
-        </div>
-      )}
-    </div>
+    <DataTable
+      data={instructors}
+      columns={columns}
+      actions={actions}
+      title="Instructor Records"
+      icon={<Users className="w-5 h-5 text-purple-600" />}
+      searchPlaceholder="Search by name, ID, email, or subjects..."
+      searchFields={['name', 'employeeId', 'email', 'subjects']}
+      filters={[
+        {
+          key: 'department',
+          label: 'Departments',
+          options: departments,
+        },
+        {
+          key: 'status',
+          label: 'Status',
+          options: [
+            { value: 'active', label: 'Active' },
+            { value: 'on leave', label: 'On Leave' },
+            { value: 'inactive', label: 'Inactive' },
+            { value: 'retired', label: 'Retired' },
+          ],
+        },
+      ]}
+      sortOptions={[
+        { value: 'name', label: 'Sort by Name' },
+        { value: 'department', label: 'Sort by Department' },
+        { value: 'experience', label: 'Sort by Experience' },
+        { value: 'rating', label: 'Sort by Rating' },
+      ]}
+      headerActions={[
+        {
+          label: 'Add Instructor',
+          icon: <User className="w-4 h-4 mr-1" />,
+          onClick: handleAddInstructor,
+        },
+      ]}
+      onSort={handleSort}
+      onFilter={handleFilter}
+      getRowKey={(instructor, index) => instructor.id.toString()}
+      isLoading={isLoading}
+      error={error}
+      emptyStateIcon={<Users className="w-12 h-12" />}
+      emptyStateTitle="No instructors found"
+      emptyStateSubtitle="Add instructors to get started"
+    />
   );
 }

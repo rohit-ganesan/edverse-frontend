@@ -3,9 +3,9 @@ import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import { StatsGrid } from 'components/ui/StatsGrid';
 import { TabContainer } from 'components/ui/TabContainer';
-import { Users, UserPlus, Calendar, Award, Star, BookOpen } from 'lucide-react';
+import { Users, Calendar, Award } from 'lucide-react';
 import { useInstructorData } from './hooks/useInstructorData';
-import { useInstructorManagement } from './hooks/useInstructorManagement';
+// Removed useInstructorManagement import since it's no longer needed
 import { AllInstructors } from './tabs/AllInstructors';
 import { Departments } from './tabs/Departments';
 import { Analytics } from './tabs/Analytics';
@@ -13,16 +13,14 @@ import { Reports } from './tabs/Reports';
 
 export function InstructorsPage(): JSX.Element {
   const { stats } = useInstructorData();
-  const { handleAddInstructor } = useInstructorManagement();
+  // Removed handleAddInstructor since it's now handled in AllInstructors tab
 
-  const headerActions = [
-    {
-      label: 'Add New Instructor',
-      icon: UserPlus,
-      isPrimary: true,
-      onClick: handleAddInstructor,
-    },
-  ];
+  const headerActions: Array<{
+    label: string;
+    icon: any;
+    isPrimary: boolean;
+    onClick: () => void;
+  }> = [];
 
   const statsData = [
     {

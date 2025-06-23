@@ -1,4 +1,7 @@
 export { InstructorsPage } from './InstructorsPage';
+export { AddInstructorPage } from './AddInstructorPage';
+export { ViewInstructorPage } from './ViewInstructorPage';
+export { EditInstructorPage } from './EditInstructorPage';
 export type { Instructor, Department } from './types';
 export { useInstructorData } from './hooks/useInstructorData';
 export { useInstructorManagement } from './hooks/useInstructorManagement';

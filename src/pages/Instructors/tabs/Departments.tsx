@@ -1,18 +1,15 @@
-import { useState, useMemo } from 'react';
-import { Search, Plus, TrendingUp, Users, BookOpen, Award } from 'lucide-react';
-import { RadixTextField } from 'components/ui/RadixTextField';
-import { RadixButton } from 'components/ui/RadixButton';
-import { ModernStatsGrid } from 'components/ui/ModernStatsGrid';
-import { DepartmentCard } from '../components/DepartmentCard';
+import { useMemo } from 'react';
+import { Box, Flex, Text, Badge } from '@radix-ui/themes';
+import {
+  DataTable,
+  DataTableColumn,
+  DataTableAction,
+} from 'components/ui/DataTable';
+import { Building, Users, BookOpen, Eye } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import type { Department } from '../types';
 
 export function Departments(): JSX.Element {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
-    null
-  );
-
   const { instructors, isLoading, error } = useInstructorData();
 
   // Generate department data from instructors
@@ -65,247 +62,160 @@ export function Departments(): JSX.Element {
     );
   }, [instructors]);
 
-  // Filter departments
-  const filteredDepartments = useMemo(() => {
-    if (!searchTerm) return departments;
-
-    return departments.filter(
-      (dept) =>
-        dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dept.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dept.head.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dept.subjects.some((subject) =>
-          subject.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    );
-  }, [departments, searchTerm]);
-
-  // Calculate statistics
-  const stats = useMemo(() => {
-    const totalInstructors = instructors.length;
-    const totalDepartments = departments.length;
-    const avgPerformance =
-      departments.reduce((sum, dept) => sum + dept.avgPerformance, 0) /
-        departments.length || 0;
-    const totalStudents = departments.reduce(
-      (sum, dept) => sum + dept.totalStudents,
-      0
-    );
-
-    return [
-      {
-        icon: <Users />,
-        label: 'Total Departments',
-        value: totalDepartments.toString(),
-        iconColor: 'blue' as const,
-      },
-      {
-        icon: <BookOpen />,
-        label: 'Total Instructors',
-        value: totalInstructors.toString(),
-        iconColor: 'green' as const,
-      },
-      {
-        icon: <Award />,
-        label: 'Avg Performance',
-        value: `${avgPerformance.toFixed(1)}/5.0`,
-        iconColor: 'purple' as const,
-      },
-      {
-        icon: <TrendingUp />,
-        label: 'Total Students',
-        value: totalStudents.toLocaleString(),
-        iconColor: 'orange' as const,
-      },
-    ];
-  }, [departments, instructors]);
-
-  const handleDepartmentClick = (deptId: string) => {
-    setSelectedDepartment(deptId === selectedDepartment ? null : deptId);
+  const getPerformanceColor = (rating: number) => {
+    if (rating >= 4.5) return 'green';
+    if (rating >= 4.0) return 'blue';
+    if (rating >= 3.5) return 'yellow';
+    return 'red';
   };
 
   const handleAddDepartment = () => {
     console.log('Add new department');
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading departments...</div>
-      </div>
-    );
-  }
+  const handleViewDepartment = (department: Department) => {
+    console.log('View department:', department);
+  };
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-red-500">Error loading departments: {error}</div>
-      </div>
-    );
-  }
+  const columns: DataTableColumn<Department>[] = [
+    {
+      key: 'department',
+      label: 'Department',
+      icon: <Building className="w-4 h-4 text-gray-500" />,
+      render: (department) => (
+        <Flex align="center" gap="3">
+          <Box className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <Text size="1" weight="bold" className="text-blue-600">
+              {department.code}
+            </Text>
+          </Box>
+          <Box>
+            <Text size="2" weight="medium" className="text-gray-900 block">
+              {department.name}
+            </Text>
+            <Text size="1" className="text-gray-500 block">
+              {department.subjects.slice(0, 2).join(', ')}
+              {department.subjects.length > 2 &&
+                ` +${department.subjects.length - 2} more`}
+            </Text>
+          </Box>
+        </Flex>
+      ),
+    },
+    {
+      key: 'head',
+      label: 'Head',
+      render: (department) => (
+        <Box>
+          <Text size="2" className="text-gray-700 block">
+            {department.head}
+          </Text>
+          <Text size="1" className="text-gray-500">
+            Department Head
+          </Text>
+        </Box>
+      ),
+    },
+    {
+      key: 'instructors',
+      label: 'Instructors',
+      render: (department) => (
+        <Flex align="center" gap="2">
+          <Users className="w-4 h-4 text-gray-400" />
+          <Text size="2" className="text-gray-700 font-medium">
+            {department.instructorCount}
+          </Text>
+        </Flex>
+      ),
+    },
+    {
+      key: 'students',
+      label: 'Students',
+      render: (department) => (
+        <Text size="2" className="text-gray-700 font-medium">
+          {department.totalStudents.toLocaleString()}
+        </Text>
+      ),
+    },
+    {
+      key: 'courses',
+      label: 'Courses',
+      render: (department) => (
+        <Flex align="center" gap="2">
+          <BookOpen className="w-4 h-4 text-gray-400" />
+          <Text size="2" className="text-gray-700 font-medium">
+            {department.activeCourses}
+          </Text>
+        </Flex>
+      ),
+    },
+    {
+      key: 'performance',
+      label: 'Performance',
+      render: (department) => (
+        <Badge
+          color={getPerformanceColor(department.avgPerformance)}
+          variant="soft"
+          size="1"
+        >
+          {department.avgPerformance.toFixed(1)}/5.0
+        </Badge>
+      ),
+    },
+  ];
+
+  const actions: DataTableAction<Department>[] = [
+    {
+      icon: <Eye className="w-5 h-5" />,
+      label: 'View Department',
+      onClick: handleViewDepartment,
+    },
+  ];
+
+  const handleSort = (sortBy: string, data: Department[]) => {
+    return [...data].sort((a, b) => {
+      switch (sortBy) {
+        case 'instructors':
+          return b.instructorCount - a.instructorCount;
+        case 'students':
+          return b.totalStudents - a.totalStudents;
+        case 'performance':
+          return b.avgPerformance - a.avgPerformance;
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Departments</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {filteredDepartments.length} departments with {instructors.length}{' '}
-            instructors
-          </p>
-        </div>
-        <RadixButton variant="solid" size="2" onClick={handleAddDepartment}>
-          <Plus className="w-4 h-4" />
-          Add Department
-        </RadixButton>
-      </div>
-
-      {/* Statistics */}
-      {/* <ModernStatsGrid stats={stats} /> */}
-
-      {/* Search */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <RadixTextField
-            placeholder="Search departments by name, code, head, or subjects..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-
-      {/* Departments Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDepartments.length === 0 ? (
-          <div className="col-span-full text-center py-12">
-            <div className="text-gray-500 mb-2">No departments found</div>
-            <p className="text-sm text-gray-400">
-              Try adjusting your search terms
-            </p>
-          </div>
-        ) : (
-          filteredDepartments.map((department) => (
-            <DepartmentCard
-              key={department.id}
-              department={department}
-              onClick={handleDepartmentClick}
-            />
-          ))
-        )}
-      </div>
-
-      {/* Selected Department Details */}
-      {selectedDepartment && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Department Details
-          </h3>
-          {(() => {
-            const dept = departments.find((d) => d.id === selectedDepartment);
-            if (!dept) return null;
-
-            const deptInstructors = instructors.filter(
-              (i) => i.department === dept.name
-            );
-
-            return (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">
-                      Basic Information
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Department:</span>
-                        <span className="font-medium">{dept.name}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Code:</span>
-                        <span className="font-medium">{dept.code}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Head:</span>
-                        <span className="font-medium">{dept.head}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Instructors:</span>
-                        <span className="font-medium">
-                          {dept.instructorCount}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">
-                      Performance Metrics
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Avg Performance:</span>
-                        <span className="font-medium">
-                          {dept.avgPerformance.toFixed(1)}/5.0
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Active Courses:</span>
-                        <span className="font-medium">
-                          {dept.activeCourses}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Total Students:</span>
-                        <span className="font-medium">
-                          {dept.totalStudents}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">
-                    Instructors
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {deptInstructors.map((instructor) => (
-                      <div
-                        key={instructor.id}
-                        className="flex items-center justify-between p-2 bg-gray-50 rounded"
-                      >
-                        <span className="text-sm font-medium">
-                          {instructor.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {instructor.designation}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Subjects</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {dept.subjects.map((subject, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md"
-                      >
-                        {subject}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-      )}
-    </div>
+    <DataTable
+      data={departments}
+      columns={columns}
+      actions={actions}
+      title="Departments"
+      icon={<Building className="w-5 h-5 text-purple-600" />}
+      searchPlaceholder="Search by name, code, head, or subjects..."
+      searchFields={['name', 'code', 'head', 'subjects']}
+      sortOptions={[
+        { value: 'name', label: 'Sort by Name' },
+        { value: 'instructors', label: 'Sort by Instructors' },
+        { value: 'students', label: 'Sort by Students' },
+        { value: 'performance', label: 'Sort by Performance' },
+      ]}
+      headerActions={[
+        {
+          label: 'Add Department',
+          icon: <Building className="w-4 h-4 mr-1" />,
+          onClick: handleAddDepartment,
+        },
+      ]}
+      onSort={handleSort}
+      getRowKey={(department, index) => department.id.toString()}
+      isLoading={isLoading}
+      error={error}
+      emptyStateIcon={<Building className="w-12 h-12" />}
+      emptyStateTitle="No departments found"
+      emptyStateSubtitle="Try adjusting your search terms or add a new department"
+    />
   );
 }

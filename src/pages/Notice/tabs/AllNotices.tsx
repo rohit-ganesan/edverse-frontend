@@ -64,20 +64,18 @@ export function AllNotices(): JSX.Element {
         {/* Search and Filters */}
         <Box className="p-6">
           <Flex direction="column" gap="4">
-            {/* Search Bar */}
-            <Box className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <RadixTextField
-                placeholder="Search notices by title, content, or author..."
-                value={filters.search}
-                onChange={(e) => updateFilter('search', e.target.value)}
-                className="pl-10 w-full"
-                size="3"
-              />
-            </Box>
-
-            {/* Filter Row */}
-            <Flex gap="3" align="center" wrap="wrap">
+            {/* Search Bar and Filters Row */}
+            <Flex gap="4" align="center" wrap="wrap">
+              <Box className="relative flex-1 min-w-[300px]">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <RadixTextField
+                  placeholder="Search notices by title, content, or author..."
+                  value={filters.search}
+                  onChange={(e) => updateFilter('search', e.target.value)}
+                  className="pl-10 w-full"
+                  size="3"
+                />
+              </Box>
               <Select.Root
                 value={filters.category}
                 onValueChange={(value) => updateFilter('category', value)}

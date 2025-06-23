@@ -3,16 +3,9 @@ import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import { StatsGrid } from 'components/ui/StatsGrid';
 import { TabContainer } from 'components/ui/TabContainer';
-import {
-  GraduationCap,
-  UserPlus,
-  Calendar,
-  BookOpen,
-  UserCheck,
-  TrendingUp,
-} from 'lucide-react';
+import { GraduationCap, Calendar, BookOpen, UserCheck } from 'lucide-react';
 import { useStudentData } from './hooks/useStudentData';
-import { useStudentManagement } from './hooks/useStudentManagement';
+// Removed useStudentManagement import since it's no longer needed
 import { AllStudents } from './tabs/AllStudents';
 import { Classes } from './tabs/Classes';
 import { Analytics } from './tabs/Analytics';
@@ -20,16 +13,14 @@ import { Reports } from './tabs/Reports';
 
 export function StudentsPage(): JSX.Element {
   const { stats } = useStudentData();
-  const { handleAddStudent } = useStudentManagement();
+  // Removed handleAddStudent since it's now handled in AllStudents tab
 
-  const headerActions = [
-    {
-      label: 'Add New Student',
-      icon: UserPlus,
-      isPrimary: true,
-      onClick: handleAddStudent,
-    },
-  ];
+  const headerActions: Array<{
+    label: string;
+    icon: any;
+    isPrimary: boolean;
+    onClick: () => void;
+  }> = [];
 
   const statsData = [
     {

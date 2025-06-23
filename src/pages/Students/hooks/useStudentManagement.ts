@@ -13,16 +13,30 @@ export function useStudentManagement() {
   const navigate = useNavigate();
 
   // Navigation handlers
-  const handleViewStudent = (studentId: number | string) => {
-    navigate(`/students/view/${studentId}`);
-  };
+  const handleViewStudent = (student: Student) => {
+    // Convert Student type to the format expected by ViewStudentPage
+    const studentData = {
+      id: student.id,
+      name: student.name,
+      email: student.email,
+      phone: student.phone,
+      class: student.class,
+      status: student.status,
+      parentName: student.parentName,
+      parentPhone: student.parentPhone,
+      address: student.address,
+      dateOfBirth: student.dateOfBirth,
+      admissionDate: student.admissionDate,
+      rollNumber: student.rollNumber,
+    };
 
-  const handleEditStudent = (studentId: number | string) => {
-    navigate(`/students/edit/${studentId}`);
+    navigate('/view-student', {
+      state: { studentData },
+    });
   };
 
   const handleAddStudent = () => {
-    navigate('/students/add');
+    navigate('/add-student');
   };
 
   const handleDeleteStudent = (studentId: number | string) => {
@@ -219,7 +233,6 @@ export function useStudentManagement() {
   return {
     // Navigation
     handleViewStudent,
-    handleEditStudent,
     handleAddStudent,
     handleDeleteStudent,
 

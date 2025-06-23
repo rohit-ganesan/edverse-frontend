@@ -1,73 +1,196 @@
-import { ClassSectionCard } from '../components/ClassSectionCard';
+import React from 'react';
+import { Box, Flex, Text, Badge } from '@radix-ui/themes';
+import {
+  DataTable,
+  DataTableColumn,
+  DataTableAction,
+} from 'components/ui/DataTable';
+import { GraduationCap, Users, BookOpen, Eye, User } from 'lucide-react';
 import { useStudentData } from '../hooks/useStudentData';
 import { useStudentManagement } from '../hooks/useStudentManagement';
+import type { ClassSection } from '../types';
 
 export function Classes(): JSX.Element {
   const { classSections } = useStudentData();
   const { handleMarkAttendance } = useStudentManagement();
 
-  const handleViewStudents = (classId: string, section: string) => {
-    console.log('View students for class:', classId, 'section:', section);
+  const getStrengthColor = (strength: number) => {
+    if (strength >= 40) return 'red';
+    if (strength >= 30) return 'yellow';
+    if (strength >= 20) return 'blue';
+    return 'green';
+  };
+
+  const handleViewStudents = (classSection: ClassSection) => {
+    console.log(
+      'View students for class:',
+      classSection.id,
+      'section:',
+      classSection.section
+    );
     // Navigate to filtered student view
   };
 
-  const handleManageClass = (classId: string) => {
-    console.log('Manage class:', classId);
+  const handleManageClass = (classSection: ClassSection) => {
+    console.log('Manage class:', classSection.id);
     // Navigate to class management page
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Class Sections
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Manage classes and their students
-          </p>
-        </div>
-      </div>
+  const handleAttendance = (classSection: ClassSection) => {
+    handleMarkAttendance(classSection.id, classSection.section);
+  };
 
-      {/* Classes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {classSections.map((classSection) => (
-          <ClassSectionCard
-            key={classSection.id}
-            classSection={classSection}
-            onViewStudents={handleViewStudents}
-            onMarkAttendance={handleMarkAttendance}
-            onManageClass={handleManageClass}
-          />
-        ))}
-      </div>
+  const handleAddClass = () => {
+    console.log('Add new class');
+  };
 
-      {classSections.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <svg
-              className="w-8 h-8 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
-            </svg>
+  const columns: DataTableColumn<ClassSection>[] = [
+    {
+      key: 'class',
+      label: 'Class & Section',
+      icon: <GraduationCap className="w-4 h-4 text-gray-500" />,
+      render: (classSection) => (
+        <Flex align="center" gap="3">
+          <Box className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <Text size="1" weight="bold" className="text-blue-600">
+              {classSection.className.charAt(0)}
+              {classSection.section}
+            </Text>
+          </Box>
+          <Box>
+            <Text size="2" weight="medium" className="text-gray-900 block">
+              {classSection.className} - Section {classSection.section}
+            </Text>
+            <Text size="1" className="text-gray-500 block">
+              Class ID: {classSection.id}
+            </Text>
+          </Box>
+        </Flex>
+      ),
+    },
+    {
+      key: 'teacher',
+      label: 'Class Teacher',
+      render: (classSection) => (
+        <Flex align="center" gap="2">
+          <User className="w-4 h-4 text-gray-400" />
+          <Text size="2" className="text-gray-700 block">
+            {classSection.classTeacher}
+          </Text>
+        </Flex>
+      ),
+    },
+    {
+      key: 'students',
+      label: 'Students',
+      render: (classSection) => (
+        <Badge
+          color={getStrengthColor(classSection.strength)}
+          variant="soft"
+          size="1"
+        >
+          <Users className="w-3 h-3 mr-1" />
+          {classSection.strength}
+        </Badge>
+      ),
+    },
+    {
+      key: 'subjects',
+      label: 'Subjects',
+      render: (classSection) => (
+        <Flex align="center" gap="2">
+          <BookOpen className="w-4 h-4 text-gray-400" />
+          <Text size="2" className="text-gray-700 font-medium">
+            {classSection.subjects.length}
+          </Text>
+        </Flex>
+      ),
+    },
+    {
+      key: 'subjectList',
+      label: 'Subject List',
+      render: (classSection) => (
+        <Box>
+          <div className="flex flex-wrap gap-1">
+            {classSection.subjects.slice(0, 3).map((subject, idx) => (
+              <Badge key={idx} variant="soft" size="1" color="blue">
+                {subject}
+              </Badge>
+            ))}
+            {classSection.subjects.length > 3 && (
+              <Badge variant="soft" size="1" color="gray">
+                +{classSection.subjects.length - 3} more
+              </Badge>
+            )}
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No classes found
-          </h3>
-          <p className="text-center">
-            Classes will appear here once they are created.
-          </p>
-        </div>
-      )}
-    </div>
+        </Box>
+      ),
+    },
+  ];
+
+  const actions: DataTableAction<ClassSection>[] = [
+    {
+      icon: <Eye className="w-4 h-4" />,
+      label: 'View Students',
+      onClick: handleViewStudents,
+    },
+    {
+      icon: <Users className="w-4 h-4" />,
+      label: 'Mark Attendance',
+      onClick: handleAttendance,
+    },
+    {
+      icon: <BookOpen className="w-4 h-4" />,
+      label: 'Manage Class',
+      onClick: handleManageClass,
+    },
+  ];
+
+  const handleSort = (sortBy: string, data: ClassSection[]) => {
+    return [...data].sort((a, b) => {
+      switch (sortBy) {
+        case 'students':
+          return b.strength - a.strength;
+        case 'subjects':
+          return b.subjects.length - a.subjects.length;
+        case 'teacher':
+          return a.classTeacher.localeCompare(b.classTeacher);
+        default:
+          return (
+            a.className.localeCompare(b.className) ||
+            a.section.localeCompare(b.section)
+          );
+      }
+    });
+  };
+
+  return (
+    <DataTable
+      data={classSections}
+      columns={columns}
+      actions={actions}
+      title="Class Sections"
+      icon={<GraduationCap className="w-5 h-5 text-purple-600" />}
+      searchPlaceholder="Search by class, section, teacher, or subjects..."
+      searchFields={['className', 'section', 'classTeacher', 'subjects']}
+      sortOptions={[
+        { value: 'name', label: 'Sort by Name' },
+        { value: 'students', label: 'Sort by Students' },
+        { value: 'subjects', label: 'Sort by Subjects' },
+        { value: 'teacher', label: 'Sort by Teacher' },
+      ]}
+      headerActions={[
+        {
+          label: 'Add Class',
+          icon: <GraduationCap className="w-4 h-4 mr-1" />,
+          onClick: handleAddClass,
+        },
+      ]}
+      onSort={handleSort}
+      getRowKey={(classSection, index) => classSection.id.toString()}
+      emptyStateIcon={<GraduationCap className="w-12 h-12" />}
+      emptyStateTitle="No classes found"
+      emptyStateSubtitle="Try adjusting your search terms or add a new class"
+    />
   );
 }

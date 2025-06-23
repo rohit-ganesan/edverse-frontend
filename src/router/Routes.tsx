@@ -14,12 +14,12 @@ import { FeePage } from 'pages/FeePage';
 import { ResultPage } from 'pages/Result';
 import { InstructorsPage } from 'pages/Instructors';
 import { StudentsPage } from 'pages/Students';
-import { AddInstructorPage } from 'pages/AddInstructorPage';
-import { AddStudentPage } from 'pages/AddStudentPage';
-import { ViewInstructorPage } from 'pages/ViewInstructorPage';
-import { ViewStudentPage } from 'pages/ViewStudentPage';
-import { EditInstructorPage } from 'pages/EditInstructorPage';
-import { EditStudentPage } from 'pages/EditStudentPage';
+import { AddInstructorPage } from 'pages/Instructors/AddInstructorPage';
+import { AddStudentPage } from 'pages/Students/AddStudentPage';
+import { ViewInstructorPage } from 'pages/Instructors/ViewInstructorPage';
+import { ViewStudentPage } from 'pages/Students/ViewStudentPage';
+import { EditInstructorPage } from 'pages/Instructors/EditInstructorPage';
+import { EditStudentPage } from 'pages/Students/EditStudentPage';
 import { ProfilePage } from 'pages/ProfilePage';
 import { DebugPage } from 'pages/DebugPage';
 import { TestPage } from 'pages/TestPage';
@@ -123,7 +123,7 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/instructors/add"
+          path="/add-instructor"
           element={
             <ProtectedRoute>
               <AddInstructorPage />
@@ -131,7 +131,7 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/instructors/view"
+          path="/view-instructor"
           element={
             <ProtectedRoute>
               <ViewInstructorPage />
@@ -139,7 +139,7 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/instructors/edit"
+          path="/edit-instructor"
           element={
             <ProtectedRoute>
               <EditInstructorPage />
@@ -155,7 +155,7 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/students/add"
+          path="/add-student"
           element={
             <ProtectedRoute>
               <AddStudentPage />
@@ -163,7 +163,7 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/students/view"
+          path="/view-student"
           element={
             <ProtectedRoute>
               <ViewStudentPage />
@@ -171,7 +171,7 @@ export function AppRoutes(): JSX.Element {
           }
         />
         <Route
-          path="/students/edit"
+          path="/edit-student"
           element={
             <ProtectedRoute>
               <EditStudentPage />

@@ -14,89 +14,80 @@ import { RadixButton } from 'components/ui/RadixButton';
 import { FormField } from 'components/ui/FormField';
 import { StatusBadge } from 'components/ui/StatusBadge';
 import { PersonAvatar } from 'components/ui/PersonAvatar';
-import {
-  ArrowLeft,
-  Edit,
-  Trash2,
-  Mail,
-  Phone,
-  GraduationCap,
-} from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Mail, Phone, BookOpen } from 'lucide-react';
 
-interface StudentData {
+interface InstructorData {
   id: string;
   name: string;
   email: string;
   phone: string;
-  class: string;
-  status: 'Active' | 'Inactive';
-  parentName: string;
-  parentPhone: string;
+  subject: string;
+  experience: string;
+  status: 'Active' | 'On Leave';
   address: string;
-  dateOfBirth: string;
-  admissionDate: string;
+  qualification: string;
+  joiningDate: string;
   avatar?: string;
-  rollNumber?: string;
+  employeeId?: string;
 }
 
-export function ViewStudentPage(): JSX.Element {
+export function ViewInstructorPage(): JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
-  const [student, setStudent] = useState<StudentData | null>(null);
+  const [instructor, setInstructor] = useState<InstructorData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const initializeStudent = () => {
+    const initializeInstructor = () => {
       try {
         setIsLoading(true);
 
-        // Get student data from navigation state
-        const studentData = location.state?.studentData;
+        // Get instructor data from navigation state
+        const instructorData = location.state?.instructorData;
 
-        if (!studentData) {
-          // If no data in state, redirect back to students list
+        if (!instructorData) {
+          // If no data in state, redirect back to instructors list
           setError(
-            'No student data found. Please select a student from the list.'
+            'No instructor data found. Please select an instructor from the list.'
           );
-          navigate('/students');
+          navigate('/instructors');
           return;
         }
 
-        // Convert the student data to the expected format
-        const fullStudentData: StudentData = {
-          id: studentData.id,
-          name: studentData.name,
-          email: studentData.email || 'john.smith@example.com',
-          phone: studentData.phone || '+1-555-0123',
-          class: studentData.class,
-          status: studentData.status,
-          parentName: studentData.parentName || 'Parent Name',
-          parentPhone: studentData.parentPhone || '+1-555-0124',
+        // Convert the instructor data to the expected format
+        const fullInstructorData: InstructorData = {
+          id: instructorData.id,
+          name: instructorData.name,
+          email: instructorData.email,
+          phone: instructorData.phone,
+          subject: instructorData.subject,
+          experience: instructorData.experience,
+          status: instructorData.status,
           address:
-            studentData.address || '123 Main Street, Springfield, IL 62701',
-          dateOfBirth: studentData.dateOfBirth || '2008-05-15',
-          admissionDate: studentData.admissionDate || '2023-08-15',
-          rollNumber: studentData.rollNumber || `ST${studentData.id}`,
+            instructorData.address || '456 Oak Avenue, Springfield, IL 62701',
+          qualification: instructorData.qualification || 'Ph.D. in Mathematics',
+          joiningDate: instructorData.joiningDate || '2020-08-15',
+          employeeId: instructorData.employeeId || `EMP${instructorData.id}`,
         };
 
-        setStudent(fullStudentData);
+        setInstructor(fullInstructorData);
       } catch (err) {
-        console.error('Error initializing student:', err);
-        setError('Failed to load student details. Please try again.');
+        console.error('Error initializing instructor:', err);
+        setError('Failed to load instructor details. Please try again.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeStudent();
+    initializeInstructor();
   }, [location.state, navigate]);
 
   const handleEdit = () => {
-    if (student) {
-      navigate('/students/edit', {
-        state: { studentData: student },
+    if (instructor) {
+      navigate('/edit-instructor', {
+        state: { instructorData: instructor },
       });
     }
   };
@@ -104,16 +95,16 @@ export function ViewStudentPage(): JSX.Element {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      // TODO: Implement API call to delete student
-      console.log('Deleting student:', student?.id);
+      // TODO: Implement API call to delete instructor
+      console.log('Deleting instructor:', instructor?.id);
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      navigate('/students');
+      navigate('/instructors');
     } catch (error) {
-      console.error('Error deleting student:', error);
-      setError('Failed to delete student. Please try again.');
+      console.error('Error deleting instructor:', error);
+      setError('Failed to delete instructor. Please try again.');
     } finally {
       setIsDeleting(false);
     }
@@ -136,23 +127,26 @@ export function ViewStudentPage(): JSX.Element {
     return (
       <DashboardLayout>
         <Box className="p-6">
-          <Text>Loading student details...</Text>
+          <Text>Loading instructor details...</Text>
         </Box>
       </DashboardLayout>
     );
   }
 
-  if (error || !student) {
+  if (error || !instructor) {
     return (
       <DashboardLayout>
         <Box className="p-6">
           <RadixCard size="3" className="p-6 text-center">
             <Text color="red" size="3" className="block mb-4">
-              {error || 'Student not found'}
+              {error || 'Instructor not found'}
             </Text>
-            <RadixButton variant="soft" onClick={() => navigate('/students')}>
+            <RadixButton
+              variant="soft"
+              onClick={() => navigate('/instructors')}
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Students
+              Back to Instructors
             </RadixButton>
           </RadixCard>
         </Box>
@@ -168,17 +162,17 @@ export function ViewStudentPage(): JSX.Element {
           <Flex align="center" gap="3">
             <RadixButton
               variant="ghost"
-              onClick={() => navigate('/students')}
+              onClick={() => navigate('/instructors')}
               className="p-2"
             >
               <ArrowLeft className="w-4 h-4" />
             </RadixButton>
             <Box>
               <Heading size="6" className="text-gray-900 dark:text-gray-100">
-                Student Details
+                Instructor Details
               </Heading>
               <Text size="2" color="gray">
-                View and manage student information
+                View and manage instructor information
               </Text>
             </Box>
           </Flex>
@@ -197,12 +191,12 @@ export function ViewStudentPage(): JSX.Element {
                 </RadixButton>
               </AlertDialog.Trigger>
               <AlertDialog.Content style={{ maxWidth: 450 }}>
-                <AlertDialog.Title>Delete Student</AlertDialog.Title>
+                <AlertDialog.Title>Delete Instructor</AlertDialog.Title>
                 <AlertDialog.Description size="2">
                   Are you sure you want to delete{' '}
-                  <strong>{student?.name}</strong>? This action cannot be undone
-                  and will permanently remove all student data including
-                  academic records and attendance history.
+                  <strong>{instructor?.name}</strong>? This action cannot be
+                  undone and will permanently remove all instructor data
+                  including course assignments and teaching history.
                 </AlertDialog.Description>
 
                 <Flex gap="3" mt="4" justify="end">
@@ -218,7 +212,7 @@ export function ViewStudentPage(): JSX.Element {
                       onClick={handleDelete}
                       disabled={isDeleting}
                     >
-                      {isDeleting ? 'Deleting...' : 'Delete Student'}
+                      {isDeleting ? 'Deleting...' : 'Delete Instructor'}
                     </Button>
                   </AlertDialog.Action>
                 </Flex>
@@ -227,45 +221,45 @@ export function ViewStudentPage(): JSX.Element {
           </Flex>
         </Flex>
 
-        {/* Student Profile Card */}
+        {/* Instructor Profile Card */}
         <RadixCard size="3" className="p-6">
           <Flex gap="6" align="start">
-            <PersonAvatar name={student.name} size="large" />
+            <PersonAvatar name={instructor.name} size="large" />
             <Box className="flex-1">
               <Flex justify="between" align="start" className="mb-4">
                 <Box>
                   <Heading size="5" className="mb-2">
-                    {student.name}
+                    {instructor.name}
                   </Heading>
                   <Flex align="center" gap="2" className="mb-2">
-                    <GraduationCap className="w-4 h-4 text-blue-600" />
+                    <BookOpen className="w-4 h-4 text-blue-600" />
                     <Text size="2" color="gray">
-                      {student.class}
+                      {instructor.subject}
                     </Text>
                   </Flex>
-                  {student.rollNumber && (
+                  {instructor.employeeId && (
                     <Text size="2" color="gray">
-                      Roll Number: {student.rollNumber}
+                      Employee ID: {instructor.employeeId}
                     </Text>
                   )}
                 </Box>
-                <StatusBadge status={student.status} />
+                <StatusBadge status={instructor.status} />
               </Flex>
 
               <Flex
                 gap="4"
                 className="text-sm text-gray-600 dark:text-gray-400"
               >
-                {student.email && (
+                {instructor.email && (
                   <Flex align="center" gap="1">
                     <Mail className="w-4 h-4" />
-                    <Text size="2">{student.email}</Text>
+                    <Text size="2">{instructor.email}</Text>
                   </Flex>
                 )}
-                {student.phone && (
+                {instructor.phone && (
                   <Flex align="center" gap="1">
                     <Phone className="w-4 h-4" />
-                    <Text size="2">{student.phone}</Text>
+                    <Text size="2">{instructor.phone}</Text>
                   </Flex>
                 )}
               </Flex>
@@ -276,46 +270,39 @@ export function ViewStudentPage(): JSX.Element {
         {/* Details Card */}
         <RadixCard size="3" className="p-6">
           <Box className="space-y-6">
-            {/* Student Information Section */}
+            {/* Personal Information Section */}
             <Box>
               <Heading
                 size="4"
                 className="mb-4 text-gray-900 dark:text-gray-100"
               >
-                Student Information
+                Personal Information
               </Heading>
               <Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   label="Full Name"
-                  value={student.name}
+                  value={instructor.name}
                   onChange={() => {}}
                   isEditing={false}
                 />
 
                 <FormField
                   label="Email Address"
-                  value={student.email || 'Not provided'}
+                  value={instructor.email}
                   onChange={() => {}}
                   isEditing={false}
                 />
 
                 <FormField
                   label="Phone Number"
-                  value={student.phone || 'Not provided'}
-                  onChange={() => {}}
-                  isEditing={false}
-                />
-
-                <FormField
-                  label="Date of Birth"
-                  value={formatDate(student.dateOfBirth)}
+                  value={instructor.phone}
                   onChange={() => {}}
                   isEditing={false}
                 />
 
                 <FormField
                   label="Address"
-                  value={student.address || 'Not provided'}
+                  value={instructor.address || 'Not provided'}
                   onChange={() => {}}
                   isEditing={false}
                   className="md:col-span-2"
@@ -323,57 +310,46 @@ export function ViewStudentPage(): JSX.Element {
               </Box>
             </Box>
 
-            {/* Academic Information Section */}
+            {/* Professional Information Section */}
             <Box>
               <Heading
                 size="4"
                 className="mb-4 text-gray-900 dark:text-gray-100"
               >
-                Academic Information
+                Professional Information
               </Heading>
               <Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
-                  label="Class/Grade"
-                  value={student.class}
+                  label="Subject/Department"
+                  value={instructor.subject}
                   onChange={() => {}}
                   isEditing={false}
                 />
 
                 <FormField
-                  label="Admission Date"
-                  value={formatDate(student.admissionDate)}
+                  label="Years of Experience"
+                  value={instructor.experience}
+                  onChange={() => {}}
+                  isEditing={false}
+                />
+
+                <FormField
+                  label="Qualification"
+                  value={instructor.qualification || 'Not specified'}
+                  onChange={() => {}}
+                  isEditing={false}
+                />
+
+                <FormField
+                  label="Joining Date"
+                  value={formatDate(instructor.joiningDate)}
                   onChange={() => {}}
                   isEditing={false}
                 />
 
                 <FormField
                   label="Status"
-                  value={student.status}
-                  onChange={() => {}}
-                  isEditing={false}
-                />
-              </Box>
-            </Box>
-
-            {/* Parent/Guardian Information Section */}
-            <Box>
-              <Heading
-                size="4"
-                className="mb-4 text-gray-900 dark:text-gray-100"
-              >
-                Parent/Guardian Information
-              </Heading>
-              <Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  label="Parent/Guardian Name"
-                  value={student.parentName}
-                  onChange={() => {}}
-                  isEditing={false}
-                />
-
-                <FormField
-                  label="Parent/Guardian Phone"
-                  value={student.parentPhone}
+                  value={instructor.status}
                   onChange={() => {}}
                   isEditing={false}
                 />

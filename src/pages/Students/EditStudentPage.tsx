@@ -9,20 +9,21 @@ import { RadixTextField } from 'components/ui/RadixTextField';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import { z } from 'zod';
 
-interface InstructorFormData {
+interface StudentFormData {
   name: string;
   email: string;
   phone: string;
-  subject: string;
-  experience: string;
-  status: 'Active' | 'On Leave';
+  class: string;
+  status: 'Active' | 'Inactive';
+  parentName: string;
+  parentPhone: string;
   address: string;
-  qualification: string;
-  joiningDate: string;
+  dateOfBirth: string;
+  admissionDate: string;
 }
 
 // Zod validation schema
-const instructorSchema = z.object({
+const studentSchema = z.object({
   name: z
     .string()
     .min(1, 'Full name is required')
@@ -35,31 +36,38 @@ const instructorSchema = z.object({
 
   email: z
     .string()
-    .min(1, 'Email address is required')
-    .email('Please enter a valid email address'),
+    .optional()
+    .refine((val) => !val || z.string().email().safeParse(val).success, {
+      message: 'Please enter a valid email address',
+    }),
 
   phone: z
     .string()
-    .min(1, 'Phone number is required')
-    .regex(/^[+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number'),
+    .optional()
+    .refine((val) => !val || /^[+]?[1-9][\d]{0,15}$/.test(val), {
+      message: 'Please enter a valid phone number',
+    }),
 
-  subject: z
-    .string()
-    .min(1, 'Subject/Department is required')
-    .min(2, 'Subject must be at least 2 characters')
-    .max(100, 'Subject must be less than 100 characters'),
+  class: z.string().min(1, 'Class/Grade is required'),
 
-  experience: z
+  status: z.enum(['Active', 'Inactive'], {
+    errorMap: () => ({ message: 'Status must be either Active or Inactive' }),
+  }),
+
+  parentName: z
     .string()
-    .min(1, 'Years of experience is required')
+    .min(1, 'Parent/Guardian name is required')
+    .min(2, 'Parent/Guardian name must be at least 2 characters')
+    .max(100, 'Parent/Guardian name must be less than 100 characters')
     .regex(
-      /^\d+(\.\d+)?\s*(years?|yrs?)?$/i,
-      'Please enter a valid experience format (e.g., "5 years" or "2.5")'
+      /^[a-zA-Z\s'-]+$/,
+      'Parent/Guardian name can only contain letters, spaces, hyphens, and apostrophes'
     ),
 
-  status: z.enum(['Active', 'On Leave'], {
-    errorMap: () => ({ message: 'Status must be either Active or On Leave' }),
-  }),
+  parentPhone: z
+    .string()
+    .min(1, 'Parent/Guardian phone is required')
+    .regex(/^[+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number'),
 
   address: z
     .string()
@@ -68,14 +76,17 @@ const instructorSchema = z.object({
       message: 'Address must be less than 200 characters',
     }),
 
-  qualification: z
+  dateOfBirth: z
     .string()
     .optional()
-    .refine((val) => !val || val.length <= 150, {
-      message: 'Qualification must be less than 150 characters',
+    .refine((val) => !val || !isNaN(Date.parse(val)), {
+      message: 'Please enter a valid date',
+    })
+    .refine((val) => !val || new Date(val) < new Date(), {
+      message: 'Date of birth must be in the past',
     }),
 
-  joiningDate: z
+  admissionDate: z
     .string()
     .optional()
     .refine((val) => !val || !isNaN(Date.parse(val)), {
@@ -83,72 +94,88 @@ const instructorSchema = z.object({
     }),
 });
 
-export function EditInstructorPage(): JSX.Element {
+const gradeOptions = [
+  'Pre-K',
+  'Kindergarten',
+  'Grade 1',
+  'Grade 2',
+  'Grade 3',
+  'Grade 4',
+  'Grade 5',
+  'Grade 6',
+  'Grade 7',
+  'Grade 8',
+  'Grade 9',
+  'Grade 10',
+  'Grade 11',
+  'Grade 12',
+];
+
+export function EditStudentPage(): JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [formData, setFormData] = useState<InstructorFormData>({
+  const [formData, setFormData] = useState<StudentFormData>({
     name: '',
     email: '',
     phone: '',
-    subject: '',
-    experience: '',
+    class: '',
     status: 'Active',
+    parentName: '',
+    parentPhone: '',
     address: '',
-    qualification: '',
-    joiningDate: '',
+    dateOfBirth: '',
+    admissionDate: '',
   });
 
   useEffect(() => {
-    const initializeInstructor = () => {
+    const initializeStudent = () => {
       try {
         setIsLoading(true);
 
-        // Get instructor data from navigation state
-        const instructorData = location.state?.instructorData;
+        // Get student data from navigation state
+        const studentData = location.state?.studentData;
 
-        if (!instructorData) {
-          // If no data in state, redirect back to instructors list
+        if (!studentData) {
+          // If no data in state, redirect back to students list
           setErrors({
             general:
-              'No instructor data found. Please select an instructor from the list.',
+              'No student data found. Please select a student from the list.',
           });
-          navigate('/instructors');
+          navigate('/students');
           return;
         }
 
-        // Set form data from the passed instructor data
+        // Set form data from the passed student data
         setFormData({
-          name: instructorData.name || '',
-          email: instructorData.email || '',
-          phone: instructorData.phone || '',
-          subject: instructorData.subject || '',
-          experience: instructorData.experience || '',
-          status: instructorData.status || 'Active',
-          address: instructorData.address || '',
-          qualification: instructorData.qualification || '',
-          joiningDate: instructorData.joiningDate || '',
+          name: studentData.name || '',
+          email: studentData.email || '',
+          phone: studentData.phone || '',
+          class: studentData.class || '',
+          status: studentData.status || 'Active',
+          parentName: studentData.parentName || '',
+          parentPhone: studentData.parentPhone || '',
+          address: studentData.address || '',
+          dateOfBirth: studentData.dateOfBirth || '',
+          admissionDate: studentData.admissionDate || '',
         });
       } catch (err) {
-        console.error('Error initializing instructor:', err);
+        console.error('Error initializing student:', err);
         setErrors({
-          general: 'Failed to load instructor details. Please try again.',
+          general: 'Failed to load student details. Please try again.',
         });
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeInstructor();
+    initializeStudent();
   }, [location.state, navigate]);
 
-  const handleInputChange = (
-    field: keyof InstructorFormData,
-    value: string
-  ) => {
+  const handleInputChange = (field: keyof StudentFormData, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -170,28 +197,28 @@ export function EditInstructorPage(): JSX.Element {
 
     try {
       // Validate form data with Zod
-      const validatedData = instructorSchema.parse(formData);
+      const validatedData = studentSchema.parse(formData);
 
-      // TODO: Implement API call to update instructor
-      console.log('Updating instructor:', validatedData);
+      // TODO: Implement API call to update student
+      console.log('Updating student:', validatedData);
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Navigate back to view page with updated data
-      const instructorData = location.state?.instructorData;
-      if (instructorData) {
-        // Update the instructor data with form data for the view page
-        const updatedInstructorData = {
-          ...instructorData,
+      const studentData = location.state?.studentData;
+      if (studentData) {
+        // Update the student data with form data for the view page
+        const updatedStudentData = {
+          ...studentData,
           ...formData,
         };
-        navigate('/instructors/view', {
-          state: { instructorData: updatedInstructorData },
+        navigate('/view-student', {
+          state: { studentData: updatedStudentData },
         });
       } else {
         // Fallback to list if no data available
-        navigate('/instructors');
+        navigate('/students');
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -205,11 +232,11 @@ export function EditInstructorPage(): JSX.Element {
         setErrors(fieldErrors);
         console.log('Validation errors:', fieldErrors);
       } else {
-        console.error('Error updating instructor:', error);
+        console.error('Error updating student:', error);
         // Handle other errors (e.g., API errors)
         setErrors({
           general:
-            'An error occurred while updating the instructor. Please try again.',
+            'An error occurred while updating the student. Please try again.',
         });
       }
     } finally {
@@ -218,15 +245,15 @@ export function EditInstructorPage(): JSX.Element {
   };
 
   const handleCancel = () => {
-    // Navigate back to view page with the same instructor data
-    const instructorData = location.state?.instructorData;
-    if (instructorData) {
-      navigate('/instructors/view', {
-        state: { instructorData },
+    // Navigate back to view page with the same student data
+    const studentData = location.state?.studentData;
+    if (studentData) {
+      navigate('/view-student', {
+        state: { studentData },
       });
     } else {
       // Fallback to list if no data available
-      navigate('/instructors');
+      navigate('/students');
     }
   };
 
@@ -234,7 +261,7 @@ export function EditInstructorPage(): JSX.Element {
     return (
       <DashboardLayout>
         <Box className="p-6">
-          <Text>Loading instructor details...</Text>
+          <Text>Loading student details...</Text>
         </Box>
       </DashboardLayout>
     );
@@ -249,13 +276,13 @@ export function EditInstructorPage(): JSX.Element {
             <RadixButton
               variant="ghost"
               onClick={() => {
-                const instructorData = location.state?.instructorData;
-                if (instructorData) {
-                  navigate('/instructors/view', {
-                    state: { instructorData },
+                const studentData = location.state?.studentData;
+                if (studentData) {
+                  navigate('/view-student', {
+                    state: { studentData },
                   });
                 } else {
-                  navigate('/instructors');
+                  navigate('/students');
                 }
               }}
               className="p-2"
@@ -264,10 +291,10 @@ export function EditInstructorPage(): JSX.Element {
             </RadixButton>
             <Box>
               <Heading size="6" className="text-gray-900 dark:text-gray-100">
-                Edit Instructor
+                Edit Student
               </Heading>
               <Text size="2" color="gray">
-                Update instructor information
+                Update student information
               </Text>
             </Box>
           </Flex>
@@ -285,13 +312,13 @@ export function EditInstructorPage(): JSX.Element {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Personal Information Section */}
+            {/* Student Information Section */}
             <Box>
               <Heading
                 size="4"
                 className="mb-4 text-gray-900 dark:text-gray-100"
               >
-                Personal Information
+                Student Information
               </Heading>
               <Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -310,7 +337,7 @@ export function EditInstructorPage(): JSX.Element {
                 </FormField>
 
                 <FormField
-                  label="Email Address *"
+                  label="Email Address"
                   value={formData.email}
                   onChange={(value) => handleInputChange('email', value)}
                   isEditing={true}
@@ -320,13 +347,12 @@ export function EditInstructorPage(): JSX.Element {
                     placeholder="Enter email address"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    required
                     error={errors.email}
                   />
                 </FormField>
 
                 <FormField
-                  label="Phone Number *"
+                  label="Phone Number"
                   value={formData.phone}
                   onChange={(value) => handleInputChange('phone', value)}
                   isEditing={true}
@@ -336,8 +362,23 @@ export function EditInstructorPage(): JSX.Element {
                     placeholder="Enter phone number"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    required
                     error={errors.phone}
+                  />
+                </FormField>
+
+                <FormField
+                  label="Date of Birth"
+                  value={formData.dateOfBirth}
+                  onChange={(value) => handleInputChange('dateOfBirth', value)}
+                  isEditing={true}
+                >
+                  <RadixTextField
+                    type="date"
+                    value={formData.dateOfBirth}
+                    onChange={(e) =>
+                      handleInputChange('dateOfBirth', e.target.value)
+                    }
+                    error={errors.dateOfBirth}
                   />
                 </FormField>
 
@@ -360,80 +401,63 @@ export function EditInstructorPage(): JSX.Element {
               </Box>
             </Box>
 
-            {/* Professional Information Section */}
+            {/* Academic Information Section */}
             <Box>
               <Heading
                 size="4"
                 className="mb-4 text-gray-900 dark:text-gray-100"
               >
-                Professional Information
+                Academic Information
               </Heading>
               <Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  label="Subject/Department *"
-                  value={formData.subject}
-                  onChange={(value) => handleInputChange('subject', value)}
-                  isEditing={true}
-                >
-                  <RadixTextField
-                    placeholder="Enter subject or department"
-                    value={formData.subject}
-                    onChange={(e) =>
-                      handleInputChange('subject', e.target.value)
-                    }
+                <Box>
+                  <Text
+                    as="label"
+                    size="2"
+                    weight="medium"
+                    className="block mb-2"
+                  >
+                    Class/Grade *
+                  </Text>
+                  <Select.Root
+                    value={formData.class}
+                    onValueChange={(value) => handleInputChange('class', value)}
                     required
-                    error={errors.subject}
-                  />
-                </FormField>
+                  >
+                    <Select.Trigger
+                      className="w-full"
+                      placeholder="Select class/grade"
+                    />
+                    <Select.Content>
+                      {gradeOptions.map((grade) => (
+                        <Select.Item key={grade} value={grade}>
+                          {grade}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
+                  {errors.class && (
+                    <Text size="1" color="red" className="block mt-1">
+                      {errors.class}
+                    </Text>
+                  )}
+                </Box>
 
                 <FormField
-                  label="Years of Experience *"
-                  value={formData.experience}
-                  onChange={(value) => handleInputChange('experience', value)}
-                  isEditing={true}
-                >
-                  <RadixTextField
-                    placeholder="e.g., 5 years"
-                    value={formData.experience}
-                    onChange={(e) =>
-                      handleInputChange('experience', e.target.value)
-                    }
-                    required
-                    error={errors.experience}
-                  />
-                </FormField>
-
-                <FormField
-                  label="Qualification"
-                  value={formData.qualification}
+                  label="Admission Date"
+                  value={formData.admissionDate}
                   onChange={(value) =>
-                    handleInputChange('qualification', value)
+                    handleInputChange('admissionDate', value)
                   }
                   isEditing={true}
                 >
                   <RadixTextField
-                    placeholder="Enter highest qualification"
-                    value={formData.qualification}
-                    onChange={(e) =>
-                      handleInputChange('qualification', e.target.value)
-                    }
-                    error={errors.qualification}
-                  />
-                </FormField>
-
-                <FormField
-                  label="Joining Date"
-                  value={formData.joiningDate}
-                  onChange={(value) => handleInputChange('joiningDate', value)}
-                  isEditing={true}
-                >
-                  <RadixTextField
                     type="date"
-                    value={formData.joiningDate}
+                    value={formData.admissionDate}
                     onChange={(e) =>
-                      handleInputChange('joiningDate', e.target.value)
+                      handleInputChange('admissionDate', e.target.value)
                     }
-                    error={errors.joiningDate}
+                    error={errors.admissionDate}
                   />
                 </FormField>
 
@@ -451,7 +475,7 @@ export function EditInstructorPage(): JSX.Element {
                     onValueChange={(value) =>
                       handleInputChange(
                         'status',
-                        value as 'Active' | 'On Leave'
+                        value as 'Active' | 'Inactive'
                       )
                     }
                     required
@@ -459,10 +483,56 @@ export function EditInstructorPage(): JSX.Element {
                     <Select.Trigger className="w-full" />
                     <Select.Content>
                       <Select.Item value="Active">Active</Select.Item>
-                      <Select.Item value="On Leave">On Leave</Select.Item>
+                      <Select.Item value="Inactive">Inactive</Select.Item>
                     </Select.Content>
                   </Select.Root>
                 </Box>
+              </Box>
+            </Box>
+
+            {/* Parent/Guardian Information Section */}
+            <Box>
+              <Heading
+                size="4"
+                className="mb-4 text-gray-900 dark:text-gray-100"
+              >
+                Parent/Guardian Information
+              </Heading>
+              <Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  label="Parent/Guardian Name *"
+                  value={formData.parentName}
+                  onChange={(value) => handleInputChange('parentName', value)}
+                  isEditing={true}
+                >
+                  <RadixTextField
+                    placeholder="Enter parent/guardian name"
+                    value={formData.parentName}
+                    onChange={(e) =>
+                      handleInputChange('parentName', e.target.value)
+                    }
+                    required
+                    error={errors.parentName}
+                  />
+                </FormField>
+
+                <FormField
+                  label="Parent/Guardian Phone *"
+                  value={formData.parentPhone}
+                  onChange={(value) => handleInputChange('parentPhone', value)}
+                  isEditing={true}
+                >
+                  <RadixTextField
+                    type="tel"
+                    placeholder="Enter parent/guardian phone"
+                    value={formData.parentPhone}
+                    onChange={(e) =>
+                      handleInputChange('parentPhone', e.target.value)
+                    }
+                    required
+                    error={errors.parentPhone}
+                  />
+                </FormField>
               </Box>
             </Box>
 
@@ -479,7 +549,7 @@ export function EditInstructorPage(): JSX.Element {
               </RadixButton>
               <RadixButton type="submit" disabled={isSubmitting}>
                 <Save className="w-4 h-4 mr-2" />
-                {isSubmitting ? 'Updating...' : 'Update Instructor'}
+                {isSubmitting ? 'Updating...' : 'Update Student'}
               </RadixButton>
             </Flex>
           </form>

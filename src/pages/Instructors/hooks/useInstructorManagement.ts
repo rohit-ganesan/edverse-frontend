@@ -1,21 +1,34 @@
 import { useNavigate } from 'react-router-dom';
-import { Users, UserPlus, Award, Calendar, BookOpen, Star } from 'lucide-react';
+import { Users, Award, Calendar, BookOpen, Star } from 'lucide-react';
 import type { Instructor } from '../types';
 
 export function useInstructorManagement() {
   const navigate = useNavigate();
 
   // Navigation handlers
-  const handleViewInstructor = (instructorId: number | string) => {
-    navigate(`/instructors/view/${instructorId}`);
-  };
+  const handleViewInstructor = (instructor: Instructor) => {
+    // Convert Instructor type to the format expected by ViewInstructorPage
+    const instructorData = {
+      id: instructor.id,
+      name: instructor.name,
+      email: instructor.email,
+      phone: instructor.phone,
+      subject: instructor.subjects.join(', '), // Join multiple subjects
+      experience: `${instructor.experience.years} years`,
+      status: instructor.status,
+      address: instructor.address,
+      qualification: instructor.qualification,
+      joiningDate: instructor.dateOfJoining,
+      employeeId: instructor.employeeId,
+    };
 
-  const handleEditInstructor = (instructorId: number | string) => {
-    navigate(`/instructors/edit/${instructorId}`);
+    navigate('/view-instructor', {
+      state: { instructorData },
+    });
   };
 
   const handleAddInstructor = () => {
-    navigate('/instructors/add');
+    navigate('/add-instructor');
   };
 
   // Export functionality
@@ -162,11 +175,12 @@ export function useInstructorManagement() {
   return {
     // Navigation
     handleViewInstructor,
-    handleEditInstructor,
+    handleViewDetails: handleViewInstructor, // Alias for consistency
     handleAddInstructor,
 
     // Export & Operations
     handleExportInstructors,
+    handleExport: handleExportInstructors, // Alias for consistency
     handleContactInstructor,
 
     // Performance

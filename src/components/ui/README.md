@@ -18,6 +18,7 @@ This directory contains reusable UI components built on top of Radix UI primitiv
 - **TabContainer**: Reusable tab container with consistent styling
 - **StatsGrid**: Grid layout for statistics cards
 - **StatsCard**: Individual statistic display card
+- **DataTable**: Comprehensive tabular data component with search, filters, and actions
 
 ### Modern UI Components ⭐ REFACTORED
 
@@ -183,6 +184,197 @@ All Modern UI components include comprehensive text overflow protection:
 - **ModernCard**: Titles truncate, subtitles use 2-line clamp
 - **ModernProgressBar**: Headers truncate, statistics wrap responsively
 - **ModernStatsGrid**: Responsive column layout prevents overflow
+
+## DataTable Component ⭐ NEW
+
+The DataTable component provides a comprehensive, reusable solution for displaying tabular data with consistent styling and functionality.
+
+### Features
+
+- **Purple Gradient Header**: Matches the design system with `from-purple-50 to-indigo-50`
+- **Advanced Search**: Multi-field search capabilities
+- **Dynamic Filters**: Configurable dropdown filters
+- **Flexible Sorting**: Custom sort functions or built-in sorting
+- **Row Actions**: Customizable action buttons per row
+- **Header Actions**: Export, filter, and custom actions
+- **Loading & Error States**: Built-in loading and error handling
+- **Empty State**: Customizable empty state with icon and messages
+- **TypeScript Generic**: Fully typed with generic data types
+
+### Basic Usage
+
+```tsx
+import { DataTable } from 'components/ui/DataTable';
+import { Users, Eye, Edit, Trash } from 'lucide-react';
+
+function StudentsTable() {
+  const columns = [
+    {
+      key: 'name',
+      label: 'Student',
+      icon: <Users className="w-4 h-4 text-gray-500" />,
+      render: (student) => (
+        <Flex align="center" gap="3">
+          <Box className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <Text size="1" weight="bold" className="text-blue-600">
+              {student.name.charAt(0)}
+            </Text>
+          </Box>
+          <Box>
+            <Text size="2" weight="medium">
+              {student.name}
+            </Text>
+            <Text size="1" className="text-gray-500">
+              {student.rollNumber}
+            </Text>
+          </Box>
+        </Flex>
+      ),
+    },
+    // ... more columns
+  ];
+
+  const actions = [
+    {
+      icon: <Eye className="w-4 h-4" />,
+      label: 'View',
+      onClick: (student) => handleView(student),
+    },
+    {
+      icon: <Edit className="w-4 h-4" />,
+      label: 'Edit',
+      onClick: (student) => handleEdit(student),
+    },
+  ];
+
+  return (
+    <DataTable
+      data={students}
+      columns={columns}
+      actions={actions}
+      title="Student Records"
+      searchPlaceholder="Search students..."
+      searchFields={['name', 'rollNumber', 'email']}
+      headerActions={[
+        {
+          label: 'Add Student',
+          icon: <Plus className="w-4 h-4 mr-1" />,
+          onClick: handleAddStudent,
+        },
+      ]}
+      emptyStateIcon={<Users className="w-12 h-12" />}
+    />
+  );
+}
+```
+
+### Advanced Configuration
+
+```tsx
+<DataTable
+  data={instructors}
+  columns={instructorColumns}
+  title="Instructor Records"
+  subtitle="Manage teaching staff"
+  icon={<Users className="w-5 h-5 text-purple-600" />}
+  // Search & Filters
+  searchPlaceholder="Search by name, ID, email, or subjects..."
+  searchFields={['name', 'employeeId', 'email', 'subjects']}
+  filters={[
+    {
+      key: 'department',
+      label: 'Departments',
+      options: [
+        { value: 'mathematics', label: 'Mathematics' },
+        { value: 'science', label: 'Science' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'active', label: 'Active' },
+        { value: 'on-leave', label: 'On Leave' },
+      ],
+    },
+  ]}
+  sortOptions={[
+    { value: 'name', label: 'Sort by Name' },
+    { value: 'experience', label: 'Sort by Experience' },
+    { value: 'rating', label: 'Sort by Rating' },
+  ]}
+  // Custom processing
+  onSort={(sortBy, data) => customSortFunction(sortBy, data)}
+  onFilter={(filters, data) => customFilterFunction(filters, data)}
+  onSearch={(term, data) => customSearchFunction(term, data)}
+  // States
+  isLoading={isLoading}
+  error={error}
+  // Customization
+  getRowKey={(instructor) => instructor.id}
+  emptyStateTitle="No instructors found"
+  emptyStateSubtitle="Add instructors to get started"
+/>
+```
+
+### Column Configuration
+
+```tsx
+const columns: DataTableColumn<Student>[] = [
+  {
+    key: 'student',
+    label: 'Student',
+    icon: <Users className="w-4 h-4 text-gray-500" />,
+    render: (student, index) => <StudentNameCell student={student} />,
+  },
+  {
+    key: 'class',
+    label: 'Class',
+    render: (student) => (
+      <Badge variant="soft" color="blue">
+        {student.class} - {student.section}
+      </Badge>
+    ),
+  },
+  {
+    key: 'attendance',
+    label: 'Attendance',
+    render: (student) => (
+      <Badge
+        color={getAttendanceColor(student.attendance.percentage)}
+        variant="soft"
+      >
+        {student.attendance.percentage}%
+      </Badge>
+    ),
+  },
+];
+```
+
+### TypeScript Interfaces
+
+```tsx
+interface DataTableColumn<T> {
+  key: string;
+  label: string;
+  icon?: ReactNode;
+  render: (item: T, index: number) => ReactNode;
+  sortable?: boolean;
+}
+
+interface DataTableAction<T> {
+  icon: ReactNode;
+  label: string;
+  onClick: (item: T) => void;
+  variant?: 'ghost' | 'soft' | 'solid';
+}
+
+interface DataTableFilter {
+  key: string;
+  label: string;
+  options: { value: string; label: string }[];
+}
+```
 
 ## Responsive Design
 
