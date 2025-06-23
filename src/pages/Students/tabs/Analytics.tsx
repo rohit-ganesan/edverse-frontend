@@ -1,5 +1,17 @@
-import { BarChart3, PieChart, TrendingUp, Users } from 'lucide-react';
-import { ModernStatsCard } from 'components/ui/ModernStatsCard';
+import {
+  BarChart3,
+  PieChart,
+  TrendingUp,
+  Users,
+  FileText,
+  Eye,
+  Download,
+  UserPlus,
+  Settings,
+  Bell,
+  Calendar,
+} from 'lucide-react';
+import { QuickActions } from 'components/ui/QuickActions';
 import { useStudentData } from '../hooks/useStudentData';
 
 export function Analytics(): JSX.Element {
@@ -7,33 +19,31 @@ export function Analytics(): JSX.Element {
 
   return (
     <div className="space-y-6">
-      {/* Key Metrics */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <ModernStatsCard
-          label="Total Students"
-          value={stats.totalStudents.toString()}
-          icon={<Users />}
-          iconColor="blue"
-        />
-        <ModernStatsCard
-          label="Active Students"
-          value={stats.activeStudents.toString()}
-          icon={<Users />}
-          iconColor="green"
-        />
-        <ModernStatsCard
-          label="Avg Attendance"
-          value={`${stats.averageAttendance.toFixed(1)}%`}
-          icon={<TrendingUp />}
-          iconColor="purple"
-        />
-        <ModernStatsCard
-          label="Total Classes"
-          value={stats.totalClasses.toString()}
-          icon={<BarChart3 />}
-          iconColor="orange"
-        />
-      </div> */}
+      {/* Quick Actions */}
+      <QuickActions
+        actions={[
+          {
+            icon: FileText,
+            label: 'Generate Report',
+            onClick: () => console.log('Generate Report'),
+          },
+          {
+            icon: Download,
+            label: 'Export Data',
+            onClick: () => console.log('Export Data'),
+          },
+          {
+            icon: Bell,
+            label: 'Notifications',
+            onClick: () => console.log('Notifications'),
+          },
+          {
+            icon: Calendar,
+            label: 'Schedule',
+            onClick: () => console.log('Schedule'),
+          },
+        ]}
+      />
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -167,52 +177,6 @@ export function Analytics(): JSX.Element {
             </p>
             <p className="text-xs text-blue-600 mt-1">Students with B grades</p>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Quick Actions
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="bg-white border border-gray-200 rounded-lg p-4 text-left hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-4 h-4 text-blue-600" />
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900">Generate Report</h4>
-                <p className="text-sm text-gray-600">
-                  Create detailed analytics report
-                </p>
-              </div>
-            </div>
-          </button>
-          <button className="bg-white border border-gray-200 rounded-lg p-4 text-left hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-green-600" />
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900">Track Progress</h4>
-                <p className="text-sm text-gray-600">
-                  Monitor student performance
-                </p>
-              </div>
-            </div>
-          </button>
-          <button className="bg-white border border-gray-200 rounded-lg p-4 text-left hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 text-purple-600" />
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900">Export Data</h4>
-                <p className="text-sm text-gray-600">Download analytics data</p>
-              </div>
-            </div>
-          </button>
         </div>
       </div>
     </div>

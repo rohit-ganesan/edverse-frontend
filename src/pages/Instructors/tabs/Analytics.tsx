@@ -1,14 +1,19 @@
 import { useMemo } from 'react';
 import {
-  TrendingUp,
   Users,
   Award,
   BookOpen,
+  BarChart3,
+  FileText,
+  Eye,
+  Download,
+  UserPlus,
+  Settings,
+  Bell,
   Calendar,
-  Target,
 } from 'lucide-react';
-import { ModernStatsGrid } from 'components/ui/ModernStatsGrid';
 import { ModernCard } from 'components/ui/ModernCard';
+import { QuickActions } from 'components/ui/QuickActions';
 import { useInstructorData } from '../hooks/useInstructorData';
 
 export function Analytics(): JSX.Element {
@@ -98,37 +103,7 @@ export function Analytics(): JSX.Element {
     };
   }, [instructors]);
 
-  // Stats for the grid
-  const stats = useMemo(() => {
-    if (!analytics) return [];
-
-    return [
-      {
-        icon: <Award />,
-        label: 'Avg Performance',
-        value: `${analytics.avgPerformance.toFixed(1)}/5.0`,
-        iconColor: 'purple' as const,
-      },
-      {
-        icon: <Calendar />,
-        label: 'Avg Experience',
-        value: `${analytics.avgExperience.toFixed(1)} years`,
-        iconColor: 'blue' as const,
-      },
-      {
-        icon: <Target />,
-        label: 'Avg Attendance',
-        value: `${analytics.avgAttendance.toFixed(1)}%`,
-        iconColor: 'green' as const,
-      },
-      {
-        icon: <TrendingUp />,
-        label: 'Avg Salary',
-        value: `$${Math.round(analytics.avgSalary).toLocaleString()}`,
-        iconColor: 'orange' as const,
-      },
-    ];
-  }, [analytics]);
+  // Removed stats since we're not using ModernStatsGrid
 
   if (isLoading) {
     return (
@@ -156,19 +131,31 @@ export function Analytics(): JSX.Element {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900">
-          Instructor Analytics
-        </h2>
-        <p className="text-sm text-gray-600 mt-1">
-          Performance insights and statistics for {instructors.length}{' '}
-          instructors
-        </p>
-      </div>
-
-      {/* Key Metrics */}
-      {/* <ModernStatsGrid stats={stats} /> */}
+      {/* Quick Actions */}
+      <QuickActions
+        actions={[
+          {
+            icon: FileText,
+            label: 'Generate Report',
+            onClick: () => console.log('Generate Report'),
+          },
+          {
+            icon: Download,
+            label: 'Export Data',
+            onClick: () => console.log('Export Data'),
+          },
+          {
+            icon: Bell,
+            label: 'Notifications',
+            onClick: () => console.log('Notifications'),
+          },
+          {
+            icon: Calendar,
+            label: 'Schedule',
+            onClick: () => console.log('Schedule'),
+          },
+        ]}
+      />
 
       {/* Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

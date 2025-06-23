@@ -474,6 +474,52 @@ className="animate-in fade-in-0 slide-in-from-bottom-2 duration-700"
 - **Bundle Splitting**: Components can be imported individually
 - **Responsive Images**: Images are optimized for different screen sizes
 
+## QuickActions
+
+A seamless component for displaying quick action buttons that flow naturally with the page layout.
+
+### Props
+
+- `actions`: Array of action items with icon, label, and onClick handler
+- `className`: Additional CSS classes
+
+### Usage
+
+```tsx
+import { QuickActions } from 'components/ui/QuickActions';
+import { FileText, Download, Bell } from 'lucide-react';
+
+<QuickActions
+  actions={[
+    {
+      icon: FileText,
+      label: 'Generate Report',
+      onClick: () => console.log('Generate Report'),
+    },
+    {
+      icon: Download,
+      label: 'Export Data',
+      onClick: () => console.log('Export Data'),
+    },
+    {
+      icon: Bell,
+      label: 'Notifications',
+      onClick: () => console.log('Notifications'),
+    },
+  ]}
+/>;
+```
+
+### Design Features
+
+- **Seamless Integration**: No container background, blends naturally with page
+- **Clean Cards**: White background with subtle shadows matching page elements
+- **Natural Flow**: Positioned to flow with existing layout and spacing
+- **Right Alignment**: Actions aligned to the right with proper margin
+- **Consistent Styling**: Matches the design language of other page components
+- **Smooth Interactions**: Subtle hover effects with shadow and border changes
+- **TypeScript Support**: Full type safety
+
 ## Best Practices
 
 1. **Consistent Design**: Always use the Modern UI pattern for new features
