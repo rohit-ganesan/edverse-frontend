@@ -93,7 +93,7 @@ const menuItems: MenuItem[] = [
   },
   {
     id: 'fee',
-    label: 'Fee Management',
+    label: 'Fee',
     icon: DollarSign,
     path: '/fee',
   },
