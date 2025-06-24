@@ -12,4 +12,20 @@ export { PaymentCard } from './components/PaymentCard';
 export { useFeeData } from './hooks/useFeeData';
 
 // Types
-export type { FeeStructure, Payment, Reminder, FeeStats } from './types';
+export type {
+  FeeStructure,
+  ApplicabilityRule,
+  FeeDiscount,
+  Student,
+  FeeAssignment,
+  Payment,
+  FeeReminder,
+  ReminderResponse,
+  FeeReport,
+  ReportFilter,
+  FeeStats,
+  FeeDashboardData,
+  CollectionTrend,
+  FeeAlert,
+  QuickAction,
+} from './types';

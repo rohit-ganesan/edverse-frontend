@@ -171,24 +171,25 @@ export function Analytics(): JSX.Element {
             <Flex direction="column" gap="4">
               {[
                 {
-                  status: 'Paid',
-                  count: payments.filter((p) => p.status === 'paid').length,
+                  status: 'Completed',
+                  count: payments.filter((p) => p.status === 'completed')
+                    .length,
                   color: 'bg-green-500',
-                },
-                {
-                  status: 'Partial',
-                  count: payments.filter((p) => p.status === 'partial').length,
-                  color: 'bg-yellow-500',
                 },
                 {
                   status: 'Pending',
                   count: payments.filter((p) => p.status === 'pending').length,
-                  color: 'bg-blue-500',
+                  color: 'bg-yellow-500',
                 },
                 {
-                  status: 'Overdue',
-                  count: payments.filter((p) => p.status === 'overdue').length,
+                  status: 'Failed',
+                  count: payments.filter((p) => p.status === 'failed').length,
                   color: 'bg-red-500',
+                },
+                {
+                  status: 'Refunded',
+                  count: payments.filter((p) => p.status === 'refunded').length,
+                  color: 'bg-blue-500',
                 },
               ].map((item, index) => (
                 <Box
@@ -242,7 +243,7 @@ export function Analytics(): JSX.Element {
                 {stats.collectionRate}%
               </Text>
               <Text size="2" className="text-gray-600 mt-2">
-                ${stats.totalCollected.toLocaleString()} collected
+                ${stats.totalFeesCollected.toLocaleString()} collected
               </Text>
             </Box>
           </Box>

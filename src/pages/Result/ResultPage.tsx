@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
-import { StatsGrid } from 'components/ui/StatsGrid';
+import {
+  ModernStatsGridColored,
+  ColoredStatItem,
+} from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
 import { Download, Plus, Users, CheckCircle, Star, Trophy } from 'lucide-react';
 import { useResultData } from './hooks/useResultData';
@@ -31,34 +34,55 @@ export function ResultPage(): JSX.Element {
     },
   ];
 
-  const stats = [
+  // Convert stats to ModernStatsGridColored format
+  const coloredStats: ColoredStatItem[] = [
     {
       title: 'Total Students',
       value: analytics.totalStudents,
       icon: Users,
+      gradient: {
+        from: 'from-blue-50',
+        to: 'to-indigo-50',
+      },
       iconColor: 'text-blue-600',
       iconBgColor: 'bg-blue-100',
+      subtitle: 'Enrolled students',
     },
     {
       title: 'Pass Rate',
       value: `${analytics.passPercentage}%`,
       icon: CheckCircle,
+      gradient: {
+        from: 'from-green-50',
+        to: 'to-emerald-50',
+      },
       iconColor: 'text-green-600',
       iconBgColor: 'bg-green-100',
+      subtitle: 'Success rate',
     },
     {
       title: 'Average GPA',
       value: analytics.averageGPA,
       icon: Star,
+      gradient: {
+        from: 'from-purple-50',
+        to: 'to-violet-50',
+      },
       iconColor: 'text-purple-600',
       iconBgColor: 'bg-purple-100',
+      subtitle: 'Overall performance',
     },
     {
       title: 'Top Performers',
       value: analytics.topPerformers.length,
       icon: Trophy,
+      gradient: {
+        from: 'from-orange-50',
+        to: 'to-amber-50',
+      },
       iconColor: 'text-orange-600',
       iconBgColor: 'bg-orange-100',
+      subtitle: 'Excellence awards',
     },
   ];
 
@@ -70,7 +94,7 @@ export function ResultPage(): JSX.Element {
         actions={headerActions}
       />
 
-      <StatsGrid stats={stats} />
+      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
 
       <TabContainer
         activeTab={selectedTab}

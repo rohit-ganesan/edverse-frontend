@@ -175,14 +175,14 @@ export function Analytics(): JSX.Element {
                     </Box>
                     <Box className="flex items-center gap-2">
                       <Text size="2" className="text-gray-600">
-                        {program.applicants} applications
+                        {program.applicationsReceived} applications
                       </Text>
                       <Text size="1" className="text-gray-500">
                         (
                         {Math.round(
-                          (program.applicants /
+                          (program.applicationsReceived /
                             programs.reduce(
-                              (sum, p) => sum + p.applicants,
+                              (sum, p) => sum + p.applicationsReceived,
                               0
                             )) *
                             100

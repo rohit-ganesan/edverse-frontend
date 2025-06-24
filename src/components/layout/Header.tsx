@@ -13,12 +13,16 @@ import {
   Settings,
   Moon,
   Sun,
+  ArrowUpDown,
+  Check,
 } from 'lucide-react';
 import { useAuth } from 'features/auth/AuthContext';
 import { useTheme } from 'contexts/ThemeContext';
 
 interface HeaderProps {
   className?: string;
+  isRearrangeMode?: boolean;
+  onToggleRearrangeMode?: () => void;
 }
 
 interface BreadcrumbItem {
@@ -26,7 +30,11 @@ interface BreadcrumbItem {
   path?: string;
 }
 
-export function Header({ className = '' }: HeaderProps): JSX.Element {
+export function Header({
+  className = '',
+  isRearrangeMode = false,
+  onToggleRearrangeMode,
+}: HeaderProps): JSX.Element {
   const authContext = useAuth();
   const themeContext = useTheme();
   const location = useLocation();
@@ -304,6 +312,22 @@ export function Header({ className = '' }: HeaderProps): JSX.Element {
                       <Moon className="w-4 h-4 mr-3" />
                     )}
                     <Text size="2">{isDark ? 'Light Mode' : 'Dark Mode'}</Text>
+                  </button>
+                  <button
+                    onClick={onToggleRearrangeMode}
+                    className={`
+                      flex items-center w-full px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700
+                      ${isRearrangeMode ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : ''}
+                    `}
+                  >
+                    {isRearrangeMode ? (
+                      <Check className="w-4 h-4 mr-3" />
+                    ) : (
+                      <ArrowUpDown className="w-4 h-4 mr-3" />
+                    )}
+                    <Text size="2">
+                      {isRearrangeMode ? 'Done Rearranging' : 'Rearrange Menu'}
+                    </Text>
                   </button>
                   <Box className="border-t border-gray-100 dark:border-gray-700 mt-1 pt-1">
                     <button

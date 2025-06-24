@@ -12,205 +12,153 @@ import {
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
 import {
-  FileText,
   Download,
   Calendar,
+  FileText,
+  TrendingUp,
+  DollarSign,
+  Users,
   Filter,
   BarChart3,
-  Users,
-  TrendingUp,
-  GraduationCap,
-  DollarSign,
+  PieChart,
+  FileSpreadsheet,
+  FileBarChart,
   Clock,
-  Search,
   Plus,
   Edit,
   Trash2,
   Eye,
-  MoreHorizontal,
   CheckCircle,
   AlertCircle,
+  MoreHorizontal,
+  Search,
+  FileIcon,
 } from 'lucide-react';
-import { useStudentData } from '../hooks/useStudentData';
-import { useStudentManagement } from '../hooks/useStudentManagement';
-
-interface ReportType {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  category: 'academic' | 'attendance' | 'demographic' | 'financial';
-  color: string;
-}
-
-const reportTypes: ReportType[] = [
-  {
-    id: 'student-list',
-    title: 'Student Directory',
-    description: 'Complete list of all students with contact information',
-    icon: <Users className="w-4 h-4" />,
-    category: 'demographic',
-    color: 'bg-purple-500',
-  },
-  {
-    id: 'attendance-summary',
-    title: 'Attendance Summary',
-    description: 'Monthly attendance report for all students',
-    icon: <Calendar className="w-4 h-4" />,
-    category: 'attendance',
-    color: 'bg-green-500',
-  },
-  {
-    id: 'academic-performance',
-    title: 'Academic Performance',
-    description: 'Grade reports and academic standings',
-    icon: <BarChart3 className="w-4 h-4" />,
-    category: 'academic',
-    color: 'bg-blue-500',
-  },
-  {
-    id: 'class-wise-analysis',
-    title: 'Class-wise Analysis',
-    description: 'Performance analysis by class and section',
-    icon: <TrendingUp className="w-4 h-4" />,
-    category: 'academic',
-    color: 'bg-indigo-500',
-  },
-  {
-    id: 'fee-collection',
-    title: 'Fee Collection Report',
-    description: 'Fee payment status and pending amounts',
-    icon: <DollarSign className="w-4 h-4" />,
-    category: 'financial',
-    color: 'bg-orange-500',
-  },
-  {
-    id: 'student-demographics',
-    title: 'Student Demographics',
-    description: 'Age, gender, and geographic distribution',
-    icon: <GraduationCap className="w-4 h-4" />,
-    category: 'demographic',
-    color: 'bg-pink-500',
-  },
-];
 
 export function Reports(): JSX.Element {
-  const { students } = useStudentData();
-  const { handleExportStudents } = useStudentManagement();
-  const [selectedReportType, setSelectedReportType] = useState('student-list');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [reportType, setReportType] = useState('collection');
   const [dateRange, setDateRange] = useState('this_month');
   const [format, setFormat] = useState('pdf');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [isGenerating, setIsGenerating] = useState(false);
+
+  const reportTypes = [
+    {
+      value: 'collection',
+      label: 'Collection Report',
+      description: 'Fee collection summary and trends',
+      icon: <TrendingUp className="w-4 h-4" />,
+      color: 'bg-blue-500',
+    },
+    {
+      value: 'outstanding',
+      label: 'Outstanding Fees',
+      description: 'Unpaid fees and overdue amounts',
+      icon: <AlertCircle className="w-4 h-4" />,
+      color: 'bg-red-500',
+    },
+    {
+      value: 'refunds',
+      label: 'Refunds Report',
+      description: 'Refund requests and processed refunds',
+      icon: <DollarSign className="w-4 h-4" />,
+      color: 'bg-orange-500',
+    },
+    {
+      value: 'student_wise',
+      label: 'Student-wise Report',
+      description: 'Individual student payment history',
+      icon: <Users className="w-4 h-4" />,
+      color: 'bg-purple-500',
+    },
+    {
+      value: 'category_wise',
+      label: 'Category-wise Report',
+      description: 'Fee collection by category',
+      icon: <PieChart className="w-4 h-4" />,
+      color: 'bg-green-500',
+    },
+    {
+      value: 'method_wise',
+      label: 'Payment Method Report',
+      description: 'Payment distribution by method',
+      icon: <BarChart3 className="w-4 h-4" />,
+      color: 'bg-indigo-500',
+    },
+  ];
 
   const recentReports = [
     {
       id: 1,
-      name: 'Student Directory - November 2024',
-      type: 'Student Directory',
+      name: 'Monthly Collection Report - November 2024',
+      type: 'Collection Report',
       date: '2024-11-15',
       format: 'PDF',
-      size: '3.2 MB',
+      size: '2.4 MB',
       status: 'completed',
       generatedBy: 'Admin User',
-      category: 'demographic',
     },
     {
       id: 2,
-      name: 'Monthly Attendance Summary',
-      type: 'Attendance Summary',
-      date: '2024-11-12',
+      name: 'Outstanding Fees Report - Q4 2024',
+      type: 'Outstanding Fees',
+      date: '2024-11-10',
       format: 'Excel',
-      size: '2.1 MB',
+      size: '1.8 MB',
       status: 'completed',
-      generatedBy: 'Academic Team',
-      category: 'attendance',
+      generatedBy: 'Finance Team',
     },
     {
       id: 3,
-      name: 'Academic Performance Q4 2024',
-      type: 'Academic Performance',
-      date: '2024-11-10',
+      name: 'Student-wise Payment History',
+      type: 'Student-wise Report',
+      date: '2024-11-08',
       format: 'CSV',
-      size: '1.8 MB',
+      size: '892 KB',
       status: 'completed',
-      generatedBy: 'Academic Team',
-      category: 'academic',
+      generatedBy: 'Admin User',
     },
     {
       id: 4,
-      name: 'Fee Collection Status Report',
-      type: 'Fee Collection Report',
-      date: '2024-11-08',
+      name: 'Payment Method Analysis - October',
+      type: 'Payment Method Report',
+      date: '2024-11-01',
       format: 'PDF',
-      size: '2.5 MB',
+      size: '1.2 MB',
       status: 'completed',
       generatedBy: 'Finance Team',
-      category: 'financial',
     },
   ];
 
   const scheduledReports = [
     {
       id: 1,
-      name: 'Weekly Attendance Summary',
+      name: 'Weekly Collection Summary',
       frequency: 'Every Monday',
       format: 'PDF',
-      recipients: 'academic@school.edu, principal@school.edu',
+      recipients: 'admin@school.edu, finance@school.edu',
       status: 'active',
       nextRun: '2024-11-18',
       lastRun: '2024-11-11',
-      category: 'attendance',
     },
     {
       id: 2,
-      name: 'Monthly Academic Performance',
+      name: 'Monthly Outstanding Report',
       frequency: 'First day of month',
       format: 'Excel',
-      recipients: 'academic@school.edu',
+      recipients: 'principal@school.edu',
       status: 'active',
       nextRun: '2024-12-01',
       lastRun: '2024-11-01',
-      category: 'academic',
     },
   ];
 
-  const filteredReportTypes =
-    selectedCategory === 'all'
-      ? reportTypes
-      : reportTypes.filter((report) => report.category === selectedCategory);
+  const handleGenerateReport = () => {
+    console.log('Generating report:', { reportType, dateRange, format });
+  };
 
-  const filteredReports = recentReports.filter((report) => {
-    const matchesSearch =
-      report.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.type.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === 'all' || report.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const handleGenerateReport = async () => {
-    setIsGenerating(true);
-    try {
-      // Simulate report generation
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      if (selectedReportType === 'student-list') {
-        handleExportStudents(students);
-      }
-
-      console.log('Generated report:', {
-        selectedReportType,
-        dateRange,
-        format,
-      });
-    } catch (error) {
-      console.error('Error generating report:', error);
-    } finally {
-      setIsGenerating(false);
-    }
+  const handleScheduleReport = () => {
+    console.log('Scheduling report:', { reportType, dateRange, format });
   };
 
   const getFormatIcon = (format: string) => {
@@ -218,11 +166,11 @@ export function Reports(): JSX.Element {
       case 'pdf':
         return <FileText className="w-4 h-4" />;
       case 'excel':
-        return <FileText className="w-4 h-4" />;
+        return <FileSpreadsheet className="w-4 h-4" />;
       case 'csv':
-        return <FileText className="w-4 h-4" />;
+        return <FileBarChart className="w-4 h-4" />;
       default:
-        return <FileText className="w-4 h-4" />;
+        return <FileIcon className="w-4 h-4" />;
     }
   };
 
@@ -241,35 +189,28 @@ export function Reports(): JSX.Element {
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'academic':
-        return 'blue';
-      case 'attendance':
-        return 'green';
-      case 'demographic':
-        return 'purple';
-      case 'financial':
-        return 'orange';
-      default:
-        return 'gray';
-    }
-  };
+  const filteredReports = recentReports.filter((report) => {
+    const matchesSearch =
+      report.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.type.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' || report.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <Box className="space-y-8">
       {/* Report Generator */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
         {/* Header Section */}
-        <Box className="p-6 bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100">
+        <Box className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100">
           <Flex justify="between" align="center" className="mb-6">
             <Box>
               <Heading size="5" className="text-gray-900 mb-1">
-                Generate Student Report
+                Generate Report
               </Heading>
               <Text size="3" className="text-gray-600">
-                Create comprehensive reports for {students?.length || 0}{' '}
-                students
+                Select report type and customize parameters
               </Text>
             </Box>
             <Flex gap="2">
@@ -290,15 +231,15 @@ export function Reports(): JSX.Element {
               Report Type
             </Text>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-              {filteredReportTypes.map((type) => (
+              {reportTypes.map((type) => (
                 <Box
-                  key={type.id}
+                  key={type.value}
                   className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
-                    selectedReportType === type.id
-                      ? 'ring-2 ring-emerald-500 bg-emerald-50 border-emerald-200'
+                    reportType === type.value
+                      ? 'ring-2 ring-indigo-500 bg-indigo-50 border-indigo-200'
                       : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                   }`}
-                  onClick={() => setSelectedReportType(type.id)}
+                  onClick={() => setReportType(type.value)}
                 >
                   <Flex direction="column" align="center" gap="2">
                     <div className={`p-2 ${type.color} rounded-lg text-white`}>
@@ -309,7 +250,7 @@ export function Reports(): JSX.Element {
                       weight="medium"
                       className="text-gray-900 text-center leading-tight"
                     >
-                      {type.title}
+                      {type.label}
                     </Text>
                   </Flex>
                 </Box>
@@ -318,27 +259,7 @@ export function Reports(): JSX.Element {
           </Box>
 
           {/* Configuration Section - Horizontal Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Box>
-              <Text size="2" className="text-gray-700 mb-2 block font-medium">
-                Category
-              </Text>
-              <Select.Root
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-                size="2"
-              >
-                <Select.Trigger className="w-full" />
-                <Select.Content>
-                  <Select.Item value="all">All Categories</Select.Item>
-                  <Select.Item value="academic">Academic</Select.Item>
-                  <Select.Item value="attendance">Attendance</Select.Item>
-                  <Select.Item value="demographic">Demographic</Select.Item>
-                  <Select.Item value="financial">Financial</Select.Item>
-                </Select.Content>
-              </Select.Root>
-            </Box>
-
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Box>
               <Text size="2" className="text-gray-700 mb-2 block font-medium">
                 Date Range
@@ -356,6 +277,7 @@ export function Reports(): JSX.Element {
                   <Select.Item value="last_month">Last Month</Select.Item>
                   <Select.Item value="this_quarter">This Quarter</Select.Item>
                   <Select.Item value="this_year">This Year</Select.Item>
+                  <Select.Item value="custom">Custom Range</Select.Item>
                 </Select.Content>
               </Select.Root>
             </Box>
@@ -375,13 +297,13 @@ export function Reports(): JSX.Element {
                   </Select.Item>
                   <Select.Item value="excel">
                     <Flex align="center" gap="2">
-                      <FileText className="w-4 h-4" />
+                      <FileSpreadsheet className="w-4 h-4" />
                       Excel
                     </Flex>
                   </Select.Item>
                   <Select.Item value="csv">
                     <Flex align="center" gap="2">
-                      <FileText className="w-4 h-4" />
+                      <FileBarChart className="w-4 h-4" />
                       CSV
                     </Flex>
                   </Select.Item>
@@ -393,36 +315,50 @@ export function Reports(): JSX.Element {
               <Text size="2" className="text-gray-700 mb-2 block font-medium">
                 Actions
               </Text>
-              <RadixButton
-                onClick={handleGenerateReport}
-                size="2"
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
-                disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4 mr-1" />
-                    Generate
-                  </>
-                )}
-              </RadixButton>
+              <Flex gap="2">
+                <RadixButton
+                  onClick={handleGenerateReport}
+                  size="2"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                >
+                  <Download className="w-4 h-4 mr-1" />
+                  Generate
+                </RadixButton>
+              </Flex>
             </Box>
 
             <Box>
               <Text size="2" className="text-gray-700 mb-2 block font-medium">
                 Schedule
               </Text>
-              <RadixButton variant="outline" size="2" className="w-full">
+              <RadixButton
+                variant="outline"
+                onClick={handleScheduleReport}
+                size="2"
+                className="w-full"
+              >
                 <Calendar className="w-4 h-4 mr-1" />
                 Schedule
               </RadixButton>
             </Box>
           </div>
+
+          {dateRange === 'custom' && (
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <Box>
+                <Text size="2" className="text-gray-700 mb-2 block font-medium">
+                  Start Date
+                </Text>
+                <TextField.Root type="date" size="2" className="w-full" />
+              </Box>
+              <Box>
+                <Text size="2" className="text-gray-700 mb-2 block font-medium">
+                  End Date
+                </Text>
+                <TextField.Root type="date" size="2" className="w-full" />
+              </Box>
+            </div>
+          )}
         </Box>
       </RadixCard>
 
@@ -509,7 +445,7 @@ export function Reports(): JSX.Element {
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell className="py-4 px-6 text-left">
                     <Text size="2" weight="medium" className="text-gray-700">
-                      Category
+                      Type
                     </Text>
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell className="py-4 px-6 text-left">
@@ -567,12 +503,8 @@ export function Reports(): JSX.Element {
                       </Flex>
                     </Table.Cell>
                     <Table.Cell className="py-4 px-6">
-                      <Badge
-                        color={getCategoryColor(report.category)}
-                        variant="soft"
-                        size="1"
-                      >
-                        {report.category}
+                      <Badge variant="soft" size="1">
+                        {report.type}
                       </Badge>
                     </Table.Cell>
                     <Table.Cell className="py-4 px-6">
@@ -637,7 +569,7 @@ export function Reports(): JSX.Element {
       {/* Scheduled Reports DataTable */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
         {/* Header Section */}
-        <Box className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
+        <Box className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
           <Flex justify="between" align="center">
             <Box>
               <Heading size="5" className="text-gray-900 mb-1">
@@ -647,7 +579,7 @@ export function Reports(): JSX.Element {
                 {scheduledReports.length} active schedules
               </Text>
             </Box>
-            <RadixButton size="2" className="bg-purple-600 hover:bg-purple-700">
+            <RadixButton size="2" className="bg-green-600 hover:bg-green-700">
               <Plus className="w-4 h-4 mr-1" />
               New Schedule
             </RadixButton>
@@ -666,11 +598,6 @@ export function Reports(): JSX.Element {
                       Schedule Name
                     </Text>
                   </Flex>
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="py-4 px-6 text-left">
-                  <Text size="2" weight="medium" className="text-gray-700">
-                    Category
-                  </Text>
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell className="py-4 px-6 text-left">
                   <Text size="2" weight="medium" className="text-gray-700">
@@ -714,8 +641,8 @@ export function Reports(): JSX.Element {
                 >
                   <Table.Cell className="py-4 px-6">
                     <Flex align="center" gap="3">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <Calendar className="w-4 h-4 text-purple-600" />
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <Calendar className="w-4 h-4 text-green-600" />
                       </div>
                       <Box>
                         <Text
@@ -730,15 +657,6 @@ export function Reports(): JSX.Element {
                         </Text>
                       </Box>
                     </Flex>
-                  </Table.Cell>
-                  <Table.Cell className="py-4 px-6">
-                    <Badge
-                      color={getCategoryColor(schedule.category)}
-                      variant="soft"
-                      size="1"
-                    >
-                      {schedule.category}
-                    </Badge>
                   </Table.Cell>
                   <Table.Cell className="py-4 px-6">
                     <Text size="2" className="text-gray-700">

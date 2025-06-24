@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
-import { StatsGrid } from 'components/ui/StatsGrid';
+import {
+  ModernStatsGridColored,
+  ColoredStatItem,
+} from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
 import {
   Bell,
@@ -24,6 +27,58 @@ export function NoticePage(): JSX.Element {
   const { analytics } = useNoticeData();
   const { handleCreateNotice, handleExportNotices } = useNoticeManagement();
 
+  // Convert stats to ModernStatsGridColored format
+  const coloredStats: ColoredStatItem[] = [
+    {
+      title: 'Total Notices',
+      value: analytics.totalNotices.toString(),
+      icon: Bell,
+      gradient: {
+        from: 'from-blue-50',
+        to: 'to-indigo-50',
+      },
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+      subtitle: 'All announcements',
+    },
+    {
+      title: 'Published',
+      value: analytics.publishedNotices.toString(),
+      icon: CheckCircle,
+      gradient: {
+        from: 'from-green-50',
+        to: 'to-emerald-50',
+      },
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+      subtitle: 'Live notices',
+    },
+    {
+      title: 'Urgent',
+      value: analytics.urgentNotices.toString(),
+      icon: AlertTriangle,
+      gradient: {
+        from: 'from-red-50',
+        to: 'to-rose-50',
+      },
+      iconColor: 'text-red-600',
+      iconBgColor: 'bg-red-100',
+      subtitle: 'High priority',
+    },
+    {
+      title: 'Total Views',
+      value: analytics.totalViews.toLocaleString(),
+      icon: TrendingUp,
+      gradient: {
+        from: 'from-purple-50',
+        to: 'to-violet-50',
+      },
+      iconColor: 'text-purple-600',
+      iconBgColor: 'bg-purple-100',
+      subtitle: 'Engagement',
+    },
+  ];
+
   return (
     <DashboardLayout>
       <PageHeader
@@ -45,38 +100,7 @@ export function NoticePage(): JSX.Element {
         ]}
       />
 
-      <StatsGrid
-        stats={[
-          {
-            title: 'Total Notices',
-            value: analytics.totalNotices.toString(),
-            icon: Bell,
-            iconColor: 'text-blue-600',
-            iconBgColor: 'bg-blue-100',
-          },
-          {
-            title: 'Published',
-            value: analytics.publishedNotices.toString(),
-            icon: CheckCircle,
-            iconColor: 'text-green-600',
-            iconBgColor: 'bg-green-100',
-          },
-          {
-            title: 'Urgent',
-            value: analytics.urgentNotices.toString(),
-            icon: AlertTriangle,
-            iconColor: 'text-red-600',
-            iconBgColor: 'bg-red-100',
-          },
-          {
-            title: 'Total Views',
-            value: analytics.totalViews.toLocaleString(),
-            icon: TrendingUp,
-            iconColor: 'text-purple-600',
-            iconBgColor: 'bg-purple-100',
-          },
-        ]}
-      />
+      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
 
       <TabContainer
         activeTab={activeTab}

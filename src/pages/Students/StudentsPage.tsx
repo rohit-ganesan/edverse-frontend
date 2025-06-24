@@ -1,9 +1,18 @@
 import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
-import { StatsGrid } from 'components/ui/StatsGrid';
+import {
+  ModernStatsGridColored,
+  ColoredStatItem,
+} from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
-import { GraduationCap, Calendar, BookOpen, UserCheck } from 'lucide-react';
+import {
+  GraduationCap,
+  Calendar,
+  BookOpen,
+  UserCheck,
+  ArrowUpRight,
+} from 'lucide-react';
 import { useStudentData } from './hooks/useStudentData';
 // Removed useStudentManagement import since it's no longer needed
 import { AllStudents } from './tabs/AllStudents';
@@ -22,37 +31,67 @@ export function StudentsPage(): JSX.Element {
     onClick: () => void;
   }> = [];
 
-  const statsData = [
+  // Convert stats to ModernStatsGridColored format
+  const coloredStats: ColoredStatItem[] = [
     {
       title: 'Total Students',
       value: stats.totalStudents.toString(),
       icon: GraduationCap,
+      gradient: {
+        from: 'from-blue-50',
+        to: 'to-indigo-50',
+      },
       iconColor: 'text-blue-600',
       iconBgColor: 'bg-blue-100',
-      trend: { value: '8%', isPositive: true },
+      trend: {
+        icon: ArrowUpRight,
+        value: '+8% growth',
+        color: 'text-green-600',
+      },
     },
     {
       title: 'Active Students',
       value: stats.activeStudents.toString(),
       icon: UserCheck,
+      gradient: {
+        from: 'from-green-50',
+        to: 'to-emerald-50',
+      },
       iconColor: 'text-green-600',
       iconBgColor: 'bg-green-100',
-      trend: { value: '2%', isPositive: true },
+      trend: {
+        icon: ArrowUpRight,
+        value: '+2% increase',
+        color: 'text-green-600',
+      },
     },
     {
       title: 'Avg Attendance',
       value: `${stats.averageAttendance.toFixed(1)}%`,
       icon: Calendar,
+      gradient: {
+        from: 'from-purple-50',
+        to: 'to-violet-50',
+      },
       iconColor: 'text-purple-600',
       iconBgColor: 'bg-purple-100',
-      trend: { value: '1.5%', isPositive: true },
+      trend: {
+        icon: ArrowUpRight,
+        value: '+1.5% improvement',
+        color: 'text-green-600',
+      },
     },
     {
       title: 'Total Classes',
       value: stats.totalClasses.toString(),
       icon: BookOpen,
+      gradient: {
+        from: 'from-orange-50',
+        to: 'to-amber-50',
+      },
       iconColor: 'text-orange-600',
       iconBgColor: 'bg-orange-100',
+      subtitle: 'Active classes',
     },
   ];
 
@@ -89,7 +128,7 @@ export function StudentsPage(): JSX.Element {
         actions={headerActions}
       />
 
-      <StatsGrid stats={statsData} />
+      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
 
       <TabContainer
         tabs={tabItems}

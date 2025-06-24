@@ -5,6 +5,7 @@ export interface UserProfile {
   lastName?: string;
   address?: string;
   role?: string;
+  menuOrder?: string[]; // Array of menu item IDs in user's preferred order
 }
 
 export interface AuthContextType {

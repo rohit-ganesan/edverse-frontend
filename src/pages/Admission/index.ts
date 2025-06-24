@@ -14,8 +14,17 @@ export { useAdmissionData } from './hooks/useAdmissionData';
 // Types
 export type {
   Application,
-  Document,
-  AcademicScore,
+  ApplicationDocument,
+  AcademicRecord,
+  SubjectGrade,
+  TestScore,
+  InterviewDetails,
+  ReviewNote,
   AdmissionProgram,
+  ProgramRequirement,
   AdmissionStats,
+  AdmissionDashboardData,
+  UrgentAction,
+  Deadline,
+  PerformanceMetric,
 } from './types';

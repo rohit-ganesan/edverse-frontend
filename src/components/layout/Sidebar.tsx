@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Box, Text, Heading, Separator } from '@radix-ui/themes';
+import { useState, useEffect } from 'react';
+import { useAuth } from 'features/auth/AuthContext';
 import {
   Home,
   BookOpen,
@@ -17,6 +19,8 @@ import {
   CalendarDays,
   UserCheck,
   Award,
+  GripVertical,
+  Check,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -28,9 +32,11 @@ interface MenuItem {
 
 interface SidebarProps {
   className?: string;
+  isRearrangeMode?: boolean;
+  onToggleRearrangeMode?: () => void;
 }
 
-const menuItems: MenuItem[] = [
+const defaultMenuItems: MenuItem[] = [
   {
     id: 'home',
     label: 'Home',
@@ -138,8 +144,54 @@ const otherItems: MenuItem[] = [
   },
 ];
 
-export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
+export function Sidebar({
+  className = '',
+  isRearrangeMode = false,
+  onToggleRearrangeMode,
+}: SidebarProps): JSX.Element {
   const location = useLocation();
+  const { user, userProfile, updateUserProfile } = useAuth();
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems);
+  const [draggedItem, setDraggedItem] = useState<string | null>(null);
+
+  // Load saved menu order from user profile on component mount
+  useEffect(() => {
+    if (userProfile?.menuOrder && userProfile.menuOrder.length > 0) {
+      try {
+        const reorderedItems = userProfile.menuOrder
+          .map((id: string) => defaultMenuItems.find((item) => item.id === id))
+          .filter((item): item is MenuItem => item !== undefined);
+
+        // Add any new items that weren't in the saved order
+        const savedIds = new Set(userProfile.menuOrder);
+        const newItems = defaultMenuItems.filter(
+          (item) => !savedIds.has(item.id)
+        );
+
+        setMenuItems([...reorderedItems, ...newItems]);
+      } catch (error) {
+        console.error('Error loading menu order from profile:', error);
+        setMenuItems(defaultMenuItems);
+      }
+    } else {
+      setMenuItems(defaultMenuItems);
+    }
+  }, [userProfile]);
+
+  // Save menu order to user profile
+  const saveMenuOrder = async (items: MenuItem[]) => {
+    if (!user || !updateUserProfile) {
+      console.warn('Cannot save menu order: user not authenticated');
+      return;
+    }
+
+    try {
+      const orderIds = items.map((item) => item.id);
+      await updateUserProfile({ menuOrder: orderIds });
+    } catch (error) {
+      console.error('Error saving menu order to profile:', error);
+    }
+  };
 
   const isActive = (path: string): boolean => {
     return (
@@ -147,18 +199,73 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
     );
   };
 
-  const renderMenuItem = (item: MenuItem): JSX.Element => {
+  const handleDragStart = (e: React.DragEvent, itemId: string) => {
+    setDraggedItem(itemId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetItemId: string) => {
+    e.preventDefault();
+
+    if (!draggedItem || draggedItem === targetItemId) {
+      setDraggedItem(null);
+      return;
+    }
+
+    const draggedIndex = menuItems.findIndex((item) => item.id === draggedItem);
+    const targetIndex = menuItems.findIndex((item) => item.id === targetItemId);
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedItem(null);
+      return;
+    }
+
+    const newItems = [...menuItems];
+    const [removed] = newItems.splice(draggedIndex, 1);
+    newItems.splice(targetIndex, 0, removed);
+
+    setMenuItems(newItems);
+    await saveMenuOrder(newItems);
+    setDraggedItem(null);
+  };
+
+  const renderMenuItem = (item: MenuItem, index: number): JSX.Element => {
     const active = isActive(item.path);
+    const isDragging = draggedItem === item.id;
+
+    const handleClick = (e: React.MouseEvent) => {
+      if (isRearrangeMode) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
 
     return (
-      <Box key={item.id}>
+      <Box
+        key={item.id}
+        className={`relative ${isDragging ? 'opacity-50' : ''}`}
+        draggable={isRearrangeMode}
+        onDragStart={(e) => handleDragStart(e, item.id)}
+        onDragOver={handleDragOver}
+        onDrop={(e) => handleDrop(e, item.id)}
+      >
         <Link
           to={item.path}
+          onClick={handleClick}
           className={`
             flex items-center px-3 py-2 rounded-lg transition-colors no-underline
             ${active ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}
+            ${isRearrangeMode ? 'cursor-move pointer-events-none' : ''}
           `}
         >
+          {isRearrangeMode && (
+            <GripVertical className="w-4 h-4 mr-2 text-gray-400" />
+          )}
           <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
           <Text size="2" className="flex-1">
             {item.label}
@@ -187,8 +294,39 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
 
       {/* Main Navigation */}
       <Box className="flex-1 overflow-y-auto p-4">
+        {isRearrangeMode && (
+          <>
+            {/* Done Button */}
+            <Box className="mb-3">
+              <button
+                onClick={onToggleRearrangeMode}
+                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
+              >
+                <Check className="w-4 h-4" />
+                Done
+              </button>
+            </Box>
+
+            {/* Help Text */}
+            <Box className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <Text
+                size="2"
+                className="text-blue-700 dark:text-blue-300 font-medium block mb-2"
+              >
+                🔄 Rearrange Mode Active
+              </Text>
+              <Text
+                size="1"
+                className="text-blue-600 dark:text-blue-400 leading-relaxed"
+              >
+                Drag and drop menu items to reorder them
+              </Text>
+            </Box>
+          </>
+        )}
+
         <Box className="space-y-1">
-          {menuItems.map((item) => renderMenuItem(item))}
+          {menuItems.map((item, index) => renderMenuItem(item, index))}
         </Box>
 
         <Separator className="my-6" />
@@ -201,7 +339,7 @@ export function Sidebar({ className = '' }: SidebarProps): JSX.Element {
           >
             Other
           </Text>
-          {otherItems.map((item) => renderMenuItem(item))}
+          {otherItems.map((item) => renderMenuItem(item, -1))}
         </Box>
       </Box>
     </Box>
