@@ -360,7 +360,6 @@ export function FeeStructures(): JSX.Element {
                       <Flex align="center" gap="2">
                         <Calendar className="w-3 h-3 text-gray-500" />
                         <Text size="2" className="text-gray-900">
-                          Due:{' '}
                           {new Date(structure.dueDate).toLocaleDateString()}
                         </Text>
                       </Flex>

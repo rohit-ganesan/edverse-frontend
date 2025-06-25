@@ -1,13 +1,14 @@
-import { Box, Flex, Text, Heading, Grid } from '@radix-ui/themes';
+import { Box, Flex, Text, Heading } from '@radix-ui/themes';
 import { RadixCard } from 'components/ui/RadixCard';
-import { Button } from 'components/ui/RadixButton';
-import { BookOpen, Users, Calendar, Eye } from 'lucide-react';
+import { Bell, FileText, RefreshCw, ChevronRight } from 'lucide-react';
 
 interface QuickActionItem {
   id: string;
   title: string;
-  subtitle: string;
+  description: string;
   icon: React.ComponentType<{ className?: string }>;
+  count?: string;
+  urgent?: boolean;
   onClick: () => void;
 }
 
@@ -20,85 +21,94 @@ export function QuickActions({
 }: QuickActionsProps): JSX.Element {
   const quickActions: QuickActionItem[] = [
     {
-      id: 'subjects',
-      title: 'Subjects',
-      subtitle: 'Manage subjects',
-      icon: BookOpen,
-      onClick: () => console.log('Navigate to subjects'),
+      id: 'payment-reminders',
+      title: 'Send Payment Reminders',
+      description: 'Send automated reminders to students with pending payments',
+      icon: Bell,
+      count: '15 items',
+      urgent: true,
+      onClick: () => console.log('Navigate to payment reminders'),
     },
     {
-      id: 'classes',
-      title: 'Classes',
-      subtitle: 'View all classes',
-      icon: Users,
-      onClick: () => console.log('Navigate to classes'),
+      id: 'collection-report',
+      title: 'Generate Collection Report',
+      description: 'Generate detailed collection report for this month',
+      icon: FileText,
+      onClick: () => console.log('Generate collection report'),
     },
     {
-      id: 'attendance',
-      title: 'Attendance',
-      subtitle: 'Track attendance',
-      icon: Calendar,
-      onClick: () => console.log('Navigate to attendance'),
-    },
-    {
-      id: 'students',
-      title: 'Students',
-      subtitle: 'Manage students',
-      icon: Eye,
-      onClick: () => console.log('Navigate to students'),
-    },
-    {
-      id: 'attendance-2',
-      title: 'Attendance',
-      subtitle: 'View reports',
-      icon: Calendar,
-      onClick: () => console.log('Navigate to attendance reports'),
-    },
-    {
-      id: 'students-2',
-      title: 'Students',
-      subtitle: 'Student records',
-      icon: Eye,
-      onClick: () => console.log('Navigate to student records'),
+      id: 'pending-refunds',
+      title: 'Process Pending Refunds',
+      description: 'Review and process pending refund requests',
+      icon: RefreshCw,
+      count: '3 items',
+      onClick: () => console.log('Navigate to pending refunds'),
     },
   ];
 
   return (
-    <RadixCard size="2" className={`p-6 ${className}`}>
-      <Box className="mb-4">
-        <Heading size="4" className="text-gray-900 dark:text-gray-100">
+    <RadixCard
+      className={`p-0 shadow-xl border-0 bg-white overflow-hidden ${className}`}
+    >
+      <Box className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100">
+        <Heading size="4" className="text-gray-900 mb-1">
           Quick Actions
         </Heading>
+        <Text size="2" className="text-gray-600">
+          Common tasks and operations
+        </Text>
       </Box>
 
-      <Grid columns="2" gap="4">
-        {quickActions.map((action) => (
-          <Button
-            key={action.id}
-            variant="ghost"
-            className="h-auto p-4 justify-start"
-            onClick={action.onClick}
-          >
-            <Flex align="center" gap="3" className="w-full">
-              <Box className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                <action.icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </Box>
-              <Box className="text-left">
-                <Text
-                  size="2"
-                  weight="medium"
-                  className="text-gray-900 dark:text-gray-100 block"
+      <Box className="p-6">
+        <Flex direction="column" gap="3">
+          {quickActions.map((action) => (
+            <Box
+              key={action.id}
+              className="p-4 bg-gray-50 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
+              onClick={action.onClick}
+            >
+              <Flex align="center" gap="3">
+                <Box
+                  className={`p-2 rounded-lg ${
+                    action.urgent ? 'bg-red-100' : 'bg-blue-100'
+                  }`}
                 >
-                  {action.title}
-                </Text>
-                <Text size="1" className="text-gray-600 dark:text-gray-400">
-                  {action.subtitle}
-                </Text>
-              </Box>
-            </Flex>
-          </Button>
-        ))}
-      </Grid>
+                  <action.icon
+                    className={`w-5 h-5 ${
+                      action.urgent ? 'text-red-600' : 'text-blue-600'
+                    }`}
+                  />
+                </Box>
+                <Box className="flex-1">
+                  <Text
+                    size="2"
+                    weight="medium"
+                    className="text-gray-900 block mb-1"
+                  >
+                    {action.title}
+                  </Text>
+                  <Text size="1" className="text-gray-600">
+                    {action.description}
+                  </Text>
+                  {action.count && (
+                    <Text
+                      size="1"
+                      className={`mt-1 inline-block px-2 py-1 rounded-full ${
+                        action.urgent
+                          ? 'bg-red-100 text-red-600'
+                          : 'bg-blue-100 text-blue-600'
+                      }`}
+                    >
+                      {action.count}
+                    </Text>
+                  )}
+                </Box>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </Flex>
+            </Box>
+          ))}
+        </Flex>
+      </Box>
     </RadixCard>
   );
 }

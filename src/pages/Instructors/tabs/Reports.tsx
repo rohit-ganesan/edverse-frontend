@@ -29,8 +29,6 @@ import {
   Eye,
   MoreHorizontal,
   CheckCircle,
-  AlertCircle,
-  UserCheck,
 } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import { useInstructorManagement } from '../hooks/useInstructorManagement';

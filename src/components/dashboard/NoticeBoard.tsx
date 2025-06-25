@@ -276,7 +276,7 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
 
             {/* Bottom fade indicator for more content */}
             {scrollState.canScrollMore && (
-              <Box className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white via-white/95 via-white/80 dark:from-gray-900 dark:via-gray-900/95 dark:via-gray-900/80 to-transparent pointer-events-none" />
+              <Box className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white via-white/95 dark:from-gray-900 dark:via-gray-900/95 to-transparent pointer-events-none" />
             )}
           </>
         )}

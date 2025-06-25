@@ -1,0 +1,103 @@
+import { useState } from 'react';
+import { DashboardLayout } from 'components/layout/DashboardLayout';
+import { PageHeader } from 'components/ui/PageHeader';
+import {
+  ModernStatsGridColored,
+  ColoredStatItem,
+} from 'components/ui/ModernStatsGridColored';
+import { TabContainer } from 'components/ui/TabContainer';
+import { FileText, BookOpen, Target, CheckCircle } from 'lucide-react';
+import { Overview } from './tabs/Overview';
+import { Analytics } from './tabs/Analytics';
+import { Settings } from './tabs/Settings';
+import { useSyllabusData } from './hooks/useSyllabusData';
+
+export function SyllabusPage(): JSX.Element {
+  const [activeTab, setActiveTab] = useState('overview');
+  const { stats } = useSyllabusData();
+
+  // Convert stats to ModernStatsGridColored format
+  const coloredStats: ColoredStatItem[] = [
+    {
+      title: 'Total Syllabi',
+      value: stats.totalSyllabi.toString(),
+      icon: FileText,
+      gradient: {
+        from: 'from-purple-50',
+        to: 'to-violet-50',
+      },
+      iconColor: 'text-purple-600',
+      iconBgColor: 'bg-purple-100',
+      subtitle: 'Active syllabi',
+    },
+    {
+      title: 'Topics Covered',
+      value: stats.topicsCovered.toString(),
+      icon: BookOpen,
+      gradient: {
+        from: 'from-blue-50',
+        to: 'to-indigo-50',
+      },
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+      subtitle: 'Total topics',
+    },
+    {
+      title: 'Learning Objectives',
+      value: stats.learningObjectives.toString(),
+      icon: Target,
+      gradient: {
+        from: 'from-green-50',
+        to: 'to-emerald-50',
+      },
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+      subtitle: 'Defined objectives',
+    },
+    {
+      title: 'Completion Rate',
+      value: `${stats.completionRate}%`,
+      icon: CheckCircle,
+      gradient: {
+        from: 'from-orange-50',
+        to: 'to-amber-50',
+      },
+      iconColor: 'text-orange-600',
+      iconBgColor: 'bg-orange-100',
+      subtitle: 'Average progress',
+    },
+  ];
+
+  return (
+    <DashboardLayout>
+      <PageHeader
+        title="Syllabus Management"
+        description="Manage curriculum structure, learning objectives, and academic standards with comprehensive tracking"
+      />
+
+      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+
+      <TabContainer
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabs={[
+          {
+            value: 'overview',
+            label: 'Overview',
+            content: <Overview />,
+          },
+          {
+            value: 'analytics',
+            label: 'Analytics',
+            content: <Analytics />,
+          },
+          {
+            value: 'settings',
+            label: 'Settings',
+            content: <Settings />,
+          },
+        ]}
+      />
+    </DashboardLayout>
+  );
+}

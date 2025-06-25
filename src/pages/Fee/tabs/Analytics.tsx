@@ -12,7 +12,6 @@ import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
 import {
   BarChart3,
-  PieChart,
   TrendingUp,
   Download,
   Calendar,

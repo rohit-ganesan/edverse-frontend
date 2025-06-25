@@ -3,10 +3,10 @@ import { ProtectedRoute } from 'components/ProtectedRoute';
 import { LoginPage } from 'pages/LoginPage';
 import { SignUpPage } from 'pages/SignUpPage';
 import { DashboardPage } from 'pages/DashboardPage';
-import { CoursesPage } from 'pages/CoursesPage';
+import { CoursesPage } from 'pages/Courses';
 import { AcademicsPage } from 'pages/AcademicsPage';
-import { ClassesPage } from 'pages/ClassesPage';
-import { SyllabusPage } from 'pages/SyllabusPage';
+import { ClassesPage } from 'pages/Classes';
+import { SyllabusPage } from 'pages/Syllabus';
 import { NoticePage } from 'pages/Notice';
 import { AdmissionPage } from 'pages/Admission';
 import { AttendancePage } from 'pages/Attendance';
@@ -23,6 +23,11 @@ import { EditStudentPage } from 'pages/Students/EditStudentPage';
 import { ProfilePage } from 'pages/ProfilePage';
 import { DebugPage } from 'pages/DebugPage';
 import { TestPage } from 'pages/TestPage';
+import { WhatsNewPage } from 'pages/WhatsNewPage';
+import { OrganizationPage } from 'pages/OrganizationPage';
+import { AdminsPage } from 'pages/AdminsPage';
+import { SupportPage } from 'pages/SupportPage';
+import { SettingsPage } from 'pages/SettingsPage';
 
 export function AppRoutes(): JSX.Element {
   return (
@@ -191,6 +196,46 @@ export function AppRoutes(): JSX.Element {
           element={
             <ProtectedRoute>
               <TestPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/whats-new"
+          element={
+            <ProtectedRoute>
+              <WhatsNewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organization"
+          element={
+            <ProtectedRoute>
+              <OrganizationPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admins"
+          element={
+            <ProtectedRoute>
+              <AdminsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/support"
+          element={
+            <ProtectedRoute>
+              <SupportPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
             </ProtectedRoute>
           }
         />

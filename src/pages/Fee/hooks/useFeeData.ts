@@ -6,7 +6,6 @@ import {
   FeeStats,
   FeeDashboardData,
   FeeAssignment,
-  Student,
   FeeAlert,
   QuickAction,
   CollectionTrend,

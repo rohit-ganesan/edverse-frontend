@@ -8,8 +8,8 @@ import { LucideIcon } from 'lucide-react';
 export interface ColoredStatItem {
   /** The title/label displayed above the value */
   title: string;
-  /** The main value to display (can be string or number) */
-  value: string | number;
+  /** The main value to display (can be string, number, null, or undefined - safely handled) */
+  value: string | number | null | undefined;
   /** Optional subtitle text displayed below the value */
   subtitle?: string;
   /** Lucide icon component to display */
@@ -45,6 +45,8 @@ interface ModernStatsGridColoredProps {
   gap?: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
   /** Additional CSS classes */
   className?: string;
+  /** Loading state for API calls - shows loading indicators when true */
+  isLoading?: boolean;
 }
 
 /**
@@ -56,6 +58,8 @@ interface ModernStatsGridColoredProps {
  * - Responsive grid layout with configurable columns
  * - Clean card styling with rounded corners and shadows (no unwanted borders)
  * - Built-in bottom margin (mb-8) for proper spacing from content below
+ * - Safe stat value conversion with null/undefined handling
+ * - Loading state support for API calls (shows '...' when loading)
  * - TypeScript support with comprehensive interfaces
  *
  * @example
@@ -82,7 +86,12 @@ interface ModernStatsGridColoredProps {
  *   },
  * ];
  *
- * <ModernStatsGridColored stats={stats} columns="4" gap="6" />
+ * <ModernStatsGridColored
+ *   stats={stats}
+ *   columns="4"
+ *   gap="6"
+ *   isLoading={isLoadingStats}
+ * />
  * ```
  */
 export function ModernStatsGridColored({
@@ -90,7 +99,17 @@ export function ModernStatsGridColored({
   columns = '4',
   gap = '6',
   className = '',
+  isLoading = false,
 }: ModernStatsGridColoredProps): JSX.Element {
+  // Safe stat value conversion
+  const getStatValue = (value: unknown, fallback: string = '0'): string => {
+    if (isLoading) return '...';
+    if (value === null || value === undefined) return fallback;
+    if (typeof value === 'number') return value.toString();
+    if (typeof value === 'string') return value;
+    return fallback;
+  };
+
   if (!stats || stats.length === 0) {
     return <Box className={`mb-8 ${className}`} />;
   }
@@ -113,7 +132,7 @@ export function ModernStatsGridColored({
                     {stat.title}
                   </Text>
                   <Heading size="6" className="text-gray-900 mb-2">
-                    {stat.value}
+                    {getStatValue(stat.value)}
                   </Heading>
                   {stat.trend ? (
                     <Flex align="center" gap="1">

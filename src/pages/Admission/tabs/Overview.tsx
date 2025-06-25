@@ -1,69 +1,21 @@
-import React, { useState } from 'react';
-import { RadixCard } from '../../../components/ui/RadixCard';
-import { ApplicationCard } from '../components/ApplicationCard';
+import { DataTable, DataTableColumn } from '../../../components/ui/DataTable';
 import { useAdmissionData } from '../hooks/useAdmissionData';
+import { Application } from '../types';
 import {
   Calendar,
-  Clock,
-  Users,
   FileText,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
   Eye,
   MessageSquare,
-  Filter,
-  Search,
   ChevronRight,
+  GraduationCap,
 } from 'lucide-react';
 
 export function Overview(): JSX.Element {
   const { applications, dashboardData } = useAdmissionData();
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
 
-  // Filter applications based on status and search
-  const filteredApplications = applications.filter((app) => {
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-    const matchesSearch =
-      searchTerm === '' ||
-      app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.applicationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.program.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
-
-  const recentApplications = filteredApplications.slice(0, 6);
-
-  const statusOptions = [
-    { value: 'all', label: 'All Applications', count: applications.length },
-    {
-      value: 'submitted',
-      label: 'Submitted',
-      count: applications.filter((a) => a.status === 'submitted').length,
-    },
-    {
-      value: 'under_review',
-      label: 'Under Review',
-      count: applications.filter((a) => a.status === 'under_review').length,
-    },
-    {
-      value: 'interview_scheduled',
-      label: 'Interview Scheduled',
-      count: applications.filter((a) => a.status === 'interview_scheduled')
-        .length,
-    },
-    {
-      value: 'accepted',
-      label: 'Accepted',
-      count: applications.filter((a) => a.status === 'accepted').length,
-    },
-    {
-      value: 'rejected',
-      label: 'Rejected',
-      count: applications.filter((a) => a.status === 'rejected').length,
-    },
-  ];
+  // Use all applications for the DataTable (filtering will be handled by DataTable component)
+  const filteredApplications = applications;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -97,183 +49,259 @@ export function Overview(): JSX.Element {
     }
   };
 
+  // DataTable columns for applications
+  const applicationColumns: DataTableColumn<Application>[] = [
+    {
+      key: 'applicationNumber',
+      label: 'Application #',
+      render: (app) => (
+        <div className="font-medium text-blue-600">{app.applicationNumber}</div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'studentName',
+      label: 'Student Name',
+      render: (app) => (
+        <div className="flex items-center">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+            {app.studentName.charAt(0)}
+          </div>
+          <div>
+            <div className="font-medium text-gray-900">{app.studentName}</div>
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'program',
+      label: 'Program',
+      render: (app) => (
+        <div className="flex items-center">
+          <GraduationCap className="h-4 w-4 text-gray-400 mr-2" />
+          <span className="text-gray-900">{app.program}</span>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (app) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}
+        >
+          {app.status
+            .replace('_', ' ')
+            .replace(/\b\w/g, (l) => l.toUpperCase())}
+        </span>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'submissionDate',
+      label: 'Submitted',
+      render: (app) => (
+        <div className="text-sm text-gray-600">
+          {new Date(app.submissionDate).toLocaleDateString()}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'lastUpdated',
+      label: 'Last Updated',
+      render: (app) => (
+        <div className="text-sm text-gray-600">
+          {new Date(app.lastUpdated).toLocaleDateString()}
+        </div>
+      ),
+      sortable: true,
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Urgent Actions */}
-      {dashboardData.urgentActions.length > 0 && (
-        <RadixCard className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
-              Urgent Actions Required
-            </h3>
-            <span className="text-sm text-gray-500">
-              {dashboardData.urgentActions.length} items
-            </span>
+      {/* Side-by-side: Urgent Actions & Upcoming Deadlines */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Urgent Actions Required */}
+        <div className="rounded-lg shadow-lg overflow-hidden border-0 bg-white">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-6 text-gray-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mr-4">
+                  <AlertTriangle className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Urgent Actions Required
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    {dashboardData.urgentActions.length} items need attention
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="space-y-3">
-            {dashboardData.urgentActions.slice(0, 5).map((action) => (
-              <div
-                key={action.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-2 h-2 rounded-full ${getPriorityColor(action.priority)}`}
-                  />
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {action.studentName}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {action.description}
-                    </p>
+          <div className="p-6">
+            <div className="space-y-3">
+              {dashboardData.urgentActions.slice(0, 3).map((action) => (
+                <div
+                  key={action.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div
+                      className={`w-2 h-2 rounded-full ${getPriorityColor(action.priority)}`}
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {action.studentName}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {action.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500">
+                      Due: {new Date(action.dueDate).toLocaleDateString()}
+                    </span>
+                    <button className="p-1 hover:bg-gray-200 rounded">
+                      <ChevronRight className="h-4 w-4 text-gray-400" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-500">
-                    Due: {new Date(action.dueDate).toLocaleDateString()}
-                  </span>
-                  <button className="p-1 hover:bg-gray-200 rounded">
-                    <ChevronRight className="h-4 w-4 text-gray-400" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </RadixCard>
-      )}
-
-      {/* Upcoming Deadlines */}
-      {dashboardData.upcomingDeadlines.length > 0 && (
-        <RadixCard className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Calendar className="h-5 w-5 text-blue-600 mr-2" />
-              Upcoming Deadlines
-            </h3>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            {dashboardData.upcomingDeadlines.slice(0, 4).map((deadline) => (
-              <div
-                key={deadline.id}
-                className="p-3 border border-gray-200 rounded-lg"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium text-gray-900">{deadline.title}</p>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      deadline.daysRemaining <= 3
-                        ? 'bg-red-100 text-red-800'
-                        : deadline.daysRemaining <= 7
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
-                    }`}
-                  >
-                    {deadline.daysRemaining} days
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600">{deadline.description}</p>
-              </div>
-            ))}
-          </div>
-        </RadixCard>
-      )}
-
-      {/* Applications Section */}
-      <RadixCard className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Recent Applications
-          </h3>
-          <div className="flex items-center space-x-3">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search applications..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {statusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label} ({option.count})
-                </option>
               ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Applications Grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {recentApplications.map((application) => (
-            <ApplicationCard key={application.id} application={application} />
-          ))}
-        </div>
-
-        {filteredApplications.length === 0 && (
-          <div className="text-center py-8">
-            <FileText className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No applications found
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Try adjusting your search or filter criteria.
-            </p>
-          </div>
-        )}
-
-        {filteredApplications.length > 6 && (
-          <div className="mt-6 text-center">
-            <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-              View All Applications
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </button>
-          </div>
-        )}
-      </RadixCard>
-
-      {/* Performance Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {dashboardData.performanceMetrics.map((metric, index) => (
-          <RadixCard key={index} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  {metric.label}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {metric.value} {metric.unit}
-                </p>
+            </div>
+            {dashboardData.urgentActions.length > 3 && (
+              <div className="mt-4 text-center">
+                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View All {dashboardData.urgentActions.length} Actions
+                </button>
               </div>
-              <div
-                className={`flex items-center text-sm ${
-                  metric.trend === 'up'
-                    ? 'text-green-600'
-                    : metric.trend === 'down'
-                      ? 'text-red-600'
-                      : 'text-gray-600'
-                }`}
-              >
-                {metric.trend === 'up' && '↗'}
-                {metric.trend === 'down' && '↘'}
-                {metric.trend === 'stable' && '→'}
-                {metric.trendPercentage > 0 && `${metric.trendPercentage}%`}
+            )}
+          </div>
+        </div>
+
+        {/* Upcoming Deadlines */}
+        <div className="rounded-lg shadow-lg overflow-hidden border-0 bg-white">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 text-gray-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mr-4">
+                  <Calendar className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Upcoming Deadlines
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    {dashboardData.upcomingDeadlines.length} deadlines
+                    approaching
+                  </p>
+                </div>
               </div>
             </div>
-          </RadixCard>
-        ))}
+          </div>
+          <div className="p-6">
+            <div className="space-y-3">
+              {dashboardData.upcomingDeadlines.slice(0, 3).map((deadline) => (
+                <div
+                  key={deadline.id}
+                  className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="font-medium text-gray-900">
+                      {deadline.title}
+                    </p>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        deadline.daysRemaining <= 3
+                          ? 'bg-red-100 text-red-800'
+                          : deadline.daysRemaining <= 7
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {deadline.daysRemaining} days
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {deadline.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+            {dashboardData.upcomingDeadlines.length > 3 && (
+              <div className="mt-4 text-center">
+                <button className="text-green-600 hover:text-green-700 text-sm font-medium">
+                  View All {dashboardData.upcomingDeadlines.length} Deadlines
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Recent Applications - DataTable */}
+      <DataTable
+        data={filteredApplications}
+        columns={applicationColumns}
+        title="Recent Applications"
+        subtitle={`${filteredApplications.length} applications found`}
+        icon={<FileText className="h-5 w-5 text-purple-600" />}
+        searchPlaceholder="Search by name, application number, or program..."
+        searchFields={['studentName', 'applicationNumber', 'program']}
+        filters={[
+          {
+            key: 'status',
+            label: 'Status',
+            options: [
+              { value: 'all', label: 'All Status' },
+              { value: 'submitted', label: 'Submitted' },
+              { value: 'under_review', label: 'Under Review' },
+              { value: 'interview_scheduled', label: 'Interview Scheduled' },
+              { value: 'accepted', label: 'Accepted' },
+              { value: 'rejected', label: 'Rejected' },
+              { value: 'waitlisted', label: 'Waitlisted' },
+            ],
+          },
+        ]}
+        sortOptions={[
+          { value: 'submissionDate', label: 'Sort by Submitted Date' },
+          { value: 'lastUpdated', label: 'Sort by Last Updated' },
+          { value: 'studentName', label: 'Sort by Student Name' },
+          { value: 'status', label: 'Sort by Status' },
+        ]}
+        actions={[
+          {
+            icon: <Eye className="h-4 w-4" />,
+            label: 'View Details',
+            onClick: (app) => console.log('View application:', app),
+            variant: 'ghost',
+          },
+          {
+            icon: <MessageSquare className="h-4 w-4" />,
+            label: 'Add Note',
+            onClick: (app) => console.log('Add note to:', app),
+            variant: 'ghost',
+          },
+        ]}
+        headerActions={[
+          {
+            label: 'Export Applications',
+            icon: <FileText className="h-4 w-4" />,
+            onClick: () => console.log('Export applications'),
+            variant: 'ghost',
+          },
+        ]}
+        emptyStateIcon={<FileText className="h-12 w-12 text-gray-400" />}
+        emptyStateTitle="No applications found"
+        emptyStateSubtitle="Try adjusting your search or filter criteria."
+        getRowKey={(app) => app.id}
+      />
     </div>
   );
 }

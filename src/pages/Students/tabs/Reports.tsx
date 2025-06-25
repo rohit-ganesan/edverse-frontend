@@ -29,7 +29,6 @@ import {
   Eye,
   MoreHorizontal,
   CheckCircle,
-  AlertCircle,
 } from 'lucide-react';
 import { useStudentData } from '../hooks/useStudentData';
 import { useStudentManagement } from '../hooks/useStudentManagement';

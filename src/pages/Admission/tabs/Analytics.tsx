@@ -13,7 +13,6 @@ import { RadixButton } from 'components/ui/RadixButton';
 import {
   BarChart3,
   PieChart,
-  TrendingUp,
   Download,
   Calendar,
   Users,
@@ -23,7 +22,7 @@ import {
 import { useAdmissionData } from '../hooks/useAdmissionData';
 
 export function Analytics(): JSX.Element {
-  const { applications, programs, stats } = useAdmissionData();
+  const { programs, stats } = useAdmissionData();
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedProgram, setSelectedProgram] = useState('all');
 
