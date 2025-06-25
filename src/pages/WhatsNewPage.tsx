@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Flex, Text, Heading, Badge, Grid } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
@@ -33,6 +33,7 @@ import {
   Target,
   Activity,
 } from 'lucide-react';
+import { useTabRouting } from 'lib/useTabRouting';
 
 interface Update {
   id: string;
@@ -58,7 +59,12 @@ interface Announcement {
 }
 
 export function WhatsNewPage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('updates');
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'updates',
+    validTabs: ['updates', 'announcements', 'roadmap'],
+    basePath: '/whats-new',
+  });
 
   const updates: Update[] = [
     {

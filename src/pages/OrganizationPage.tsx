@@ -44,6 +44,7 @@ import {
   AlertCircle,
   Info,
 } from 'lucide-react';
+import { useTabRouting } from 'lib/useTabRouting';
 
 interface Department {
   id: string;
@@ -83,7 +84,13 @@ interface OrganizationSettings {
 }
 
 export function OrganizationPage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('overview');
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: ['overview', 'departments', 'locations', 'settings'],
+    basePath: '/organization',
+  });
+
   const [editMode, setEditMode] = useState(false);
 
   const departments: Department[] = [

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import {
@@ -8,15 +7,21 @@ import {
 import { TabContainer } from 'components/ui/TabContainer';
 import { Users, Calendar, Award, ArrowUpRight } from 'lucide-react';
 import { useInstructorData } from './hooks/useInstructorData';
-// Removed useInstructorManagement import since it's no longer needed
 import { AllInstructors } from './tabs/AllInstructors';
 import { Departments } from './tabs/Departments';
 import { Analytics } from './tabs/Analytics';
 import { Reports } from './tabs/Reports';
+import { useTabRouting } from 'lib/useTabRouting';
 
 export function InstructorsPage(): JSX.Element {
   const { stats } = useInstructorData();
-  // Removed handleAddInstructor since it's now handled in AllInstructors tab
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'all-instructors',
+    validTabs: ['all-instructors', 'departments', 'analytics', 'reports'],
+    basePath: '/instructors',
+  });
 
   const headerActions: Array<{
     label: string;
@@ -103,8 +108,6 @@ export function InstructorsPage(): JSX.Element {
       content: <Reports />,
     },
   ];
-
-  const [activeTab, setActiveTab] = useState('all-instructors');
 
   return (
     <DashboardLayout>

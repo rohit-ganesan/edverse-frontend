@@ -42,6 +42,7 @@ import {
   Award,
   Target,
 } from 'lucide-react';
+import { useTabRouting } from 'lib/useTabRouting';
 
 interface Admin {
   id: string;
@@ -57,7 +58,13 @@ interface Admin {
 }
 
 export function AdminsPage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('overview');
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: ['overview', 'admins', 'permissions', 'settings'],
+    basePath: '/admins',
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const admins: Admin[] = [

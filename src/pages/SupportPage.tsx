@@ -43,6 +43,7 @@ import {
   ModernStatsGridColored,
   ColoredStatItem,
 } from '../components/ui/ModernStatsGridColored';
+import { useTabRouting } from '../lib/useTabRouting';
 
 interface FAQ {
   id: string;
@@ -85,7 +86,13 @@ interface ContactInfo {
 }
 
 export function SupportPage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('overview');
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: ['overview', 'faq', 'tickets', 'resources', 'contact'],
+    basePath: '/support',
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const faqs: FAQ[] = [

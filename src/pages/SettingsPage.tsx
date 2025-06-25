@@ -37,6 +37,7 @@ import {
   ModernStatsGridColored,
   ColoredStatItem,
 } from '../components/ui/ModernStatsGridColored';
+import { useTabRouting } from '../lib/useTabRouting';
 
 interface UserPreferences {
   theme: 'light' | 'dark' | 'auto';
@@ -78,7 +79,20 @@ interface UserPreferences {
 }
 
 export function SettingsPage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('general');
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'general',
+    validTabs: [
+      'general',
+      'account',
+      'notifications',
+      'security',
+      'appearance',
+      'advanced',
+    ],
+    basePath: '/settings',
+  });
+
   const [preferences, setPreferences] = useState<UserPreferences>({
     theme: 'light',
     language: 'en',

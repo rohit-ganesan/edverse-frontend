@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import {
@@ -24,10 +24,24 @@ import { FeeStructures } from './tabs/FeeStructures';
 import { Reports } from './tabs/Reports';
 import { Settings } from './tabs/Settings';
 import { useFeeData } from './hooks/useFeeData';
+import { useTabRouting } from '../../lib/useTabRouting';
 
 export function FeePage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('overview');
   const { stats } = useFeeData();
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: [
+      'overview',
+      'payments',
+      'fee-structures',
+      'reports',
+      'analytics',
+      'settings',
+    ],
+    basePath: '/fee',
+  });
 
   const handleCreateFeeStructure = () => {
     console.log('Create new fee structure');

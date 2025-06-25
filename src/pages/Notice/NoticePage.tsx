@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import {
@@ -20,12 +19,18 @@ import { Drafts } from './tabs/Drafts';
 import { Analytics } from './tabs/Analytics';
 import { useNoticeData } from './hooks/useNoticeData';
 import { useNoticeManagement } from './hooks/useNoticeManagement';
-import type { NoticeTab } from './types';
+import { useTabRouting } from 'lib/useTabRouting';
 
 export function NoticePage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState<NoticeTab>('all');
   const { analytics } = useNoticeData();
   const { handleCreateNotice, handleExportNotices } = useNoticeManagement();
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'all-notices',
+    validTabs: ['all-notices', 'recent', 'drafts', 'analytics'],
+    basePath: '/notice',
+  });
 
   // Convert stats to ModernStatsGridColored format
   const coloredStats: ColoredStatItem[] = [
@@ -104,10 +109,10 @@ export function NoticePage(): JSX.Element {
 
       <TabContainer
         activeTab={activeTab}
-        onTabChange={(value) => setActiveTab(value as NoticeTab)}
+        onTabChange={setActiveTab}
         tabs={[
           {
-            value: 'all',
+            value: 'all-notices',
             label: 'All Notices',
             content: <AllNotices />,
           },

@@ -55,78 +55,158 @@ export function AppRoutes(): JSX.Element {
             </ProtectedRoute>
           }
         />
+
+        {/* Courses routes with tabs */}
         <Route
-          path="/courses"
+          path="/courses/:tab"
           element={
             <ProtectedRoute>
               <CoursesPage />
             </ProtectedRoute>
           }
         />
+
+        {/* Classes routes with tabs */}
         <Route
-          path="/classes"
+          path="/classes/:tab"
           element={
             <ProtectedRoute>
               <ClassesPage />
             </ProtectedRoute>
           }
         />
+
+        {/* Syllabus routes with tabs */}
         <Route
-          path="/syllabus"
+          path="/syllabus/:tab"
           element={
             <ProtectedRoute>
               <SyllabusPage />
             </ProtectedRoute>
           }
         />
+
+        {/* Notice routes with tabs */}
         <Route
-          path="/notice"
+          path="/notice/:tab"
           element={
             <ProtectedRoute>
               <NoticePage />
             </ProtectedRoute>
           }
         />
+
+        {/* Admission routes with tabs */}
         <Route
-          path="/admission"
+          path="/admission/:tab"
           element={
             <ProtectedRoute>
               <AdmissionPage />
             </ProtectedRoute>
           }
         />
+
+        {/* Attendance routes with tabs */}
         <Route
-          path="/attendance"
+          path="/attendance/:tab"
           element={
             <ProtectedRoute>
               <AttendancePage />
             </ProtectedRoute>
           }
         />
+
+        {/* Fee routes with tabs */}
         <Route
-          path="/fee"
+          path="/fee/:tab"
           element={
             <ProtectedRoute>
               <FeePage />
             </ProtectedRoute>
           }
         />
+
+        {/* Result routes with tabs */}
         <Route
-          path="/result"
+          path="/result/:tab"
           element={
             <ProtectedRoute>
               <ResultPage />
             </ProtectedRoute>
           }
         />
+
+        {/* Instructors routes with tabs */}
         <Route
-          path="/instructors"
+          path="/instructors/:tab"
           element={
             <ProtectedRoute>
               <InstructorsPage />
             </ProtectedRoute>
           }
         />
+
+        {/* Students routes with tabs */}
+        <Route
+          path="/students/:tab"
+          element={
+            <ProtectedRoute>
+              <StudentsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* WhatsNew routes with tabs */}
+        <Route
+          path="/whats-new/:tab"
+          element={
+            <ProtectedRoute>
+              <WhatsNewPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Organization routes with tabs */}
+        <Route
+          path="/organization/:tab"
+          element={
+            <ProtectedRoute>
+              <OrganizationPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admins routes with tabs */}
+        <Route
+          path="/admins/:tab"
+          element={
+            <ProtectedRoute>
+              <AdminsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Support routes with tabs */}
+        <Route
+          path="/support/:tab"
+          element={
+            <ProtectedRoute>
+              <SupportPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Settings routes with tabs */}
+        <Route
+          path="/settings/:tab"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Individual instructor management routes */}
         <Route
           path="/add-instructor"
           element={
@@ -151,14 +231,8 @@ export function AppRoutes(): JSX.Element {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/students"
-          element={
-            <ProtectedRoute>
-              <StudentsPage />
-            </ProtectedRoute>
-          }
-        />
+
+        {/* Individual student management routes */}
         <Route
           path="/add-student"
           element={
@@ -183,6 +257,8 @@ export function AppRoutes(): JSX.Element {
             </ProtectedRoute>
           }
         />
+
+        {/* Other routes */}
         <Route
           path="/profile"
           element={
@@ -199,51 +275,11 @@ export function AppRoutes(): JSX.Element {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/whats-new"
-          element={
-            <ProtectedRoute>
-              <WhatsNewPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/organization"
-          element={
-            <ProtectedRoute>
-              <OrganizationPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admins"
-          element={
-            <ProtectedRoute>
-              <AdminsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/support"
-          element={
-            <ProtectedRoute>
-              <SupportPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          }
-        />
 
-        {/* Redirect root to dashboard */}
+        {/* Default redirect */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* Catch all route - redirect to dashboard */}
+        {/* Catch all route */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

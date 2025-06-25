@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import {
@@ -13,11 +12,18 @@ import { Overview } from './tabs/Overview';
 import { StudentResults } from './tabs/StudentResults';
 import { Analytics } from './tabs/Analytics';
 import { PublishResults } from './tabs/PublishResults';
+import { useTabRouting } from 'lib/useTabRouting';
 
 export function ResultPage(): JSX.Element {
-  const [selectedTab, setSelectedTab] = useState('overview');
   const { analytics } = useResultData();
   const { exportResults } = useResultManagement();
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: ['overview', 'student-results', 'analytics', 'publish-results'],
+    basePath: '/result',
+  });
 
   const headerActions = [
     {
@@ -97,8 +103,8 @@ export function ResultPage(): JSX.Element {
       <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
 
       <TabContainer
-        activeTab={selectedTab}
-        onTabChange={setSelectedTab}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
         tabs={[
           {
             value: 'overview',
@@ -106,7 +112,7 @@ export function ResultPage(): JSX.Element {
             content: <Overview />,
           },
           {
-            value: 'results',
+            value: 'student-results',
             label: 'Student Results',
             content: <StudentResults />,
           },
@@ -116,7 +122,7 @@ export function ResultPage(): JSX.Element {
             content: <Analytics />,
           },
           {
-            value: 'publish',
+            value: 'publish-results',
             label: 'Publish Results',
             content: <PublishResults />,
           },

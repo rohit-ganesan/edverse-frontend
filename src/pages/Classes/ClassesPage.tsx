@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import {
@@ -11,10 +10,17 @@ import { Overview } from './tabs/Overview';
 import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
 import { useClassesData } from './hooks/useClassesData';
+import { useTabRouting } from 'lib/useTabRouting';
 
 export function ClassesPage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('overview');
   const { stats } = useClassesData();
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: ['overview', 'analytics', 'settings'],
+    basePath: '/classes',
+  });
 
   // Convert stats to ModernStatsGridColored format
   const coloredStats: ColoredStatItem[] = [

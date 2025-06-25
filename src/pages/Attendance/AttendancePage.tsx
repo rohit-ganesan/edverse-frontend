@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import {
@@ -13,10 +12,23 @@ import { Records } from './tabs/Records';
 import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
 import { useAttendanceData } from './hooks/useAttendanceData';
+import { useTabRouting } from 'lib/useTabRouting';
 
 export function AttendancePage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('overview');
   const { stats } = useAttendanceData();
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: [
+      'overview',
+      'live-tracking',
+      'records',
+      'analytics',
+      'settings',
+    ],
+    basePath: '/attendance',
+  });
 
   // Convert stats to ModernStatsGridColored format
   const coloredStats: ColoredStatItem[] = [

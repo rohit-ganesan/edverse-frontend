@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import {
@@ -21,10 +20,23 @@ import { Applications } from './tabs/Applications';
 import { Programs } from './tabs/Programs';
 import { Settings } from './tabs/Settings';
 import { useAdmissionData } from './hooks/useAdmissionData';
+import { useTabRouting } from '../../lib/useTabRouting';
 
 export function AdmissionPage(): JSX.Element {
-  const [activeTab, setActiveTab] = useState('overview');
   const { stats } = useAdmissionData();
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'overview',
+    validTabs: [
+      'overview',
+      'applications',
+      'programs',
+      'analytics',
+      'settings',
+    ],
+    basePath: '/admission',
+  });
 
   const handleCreateApplication = () => {
     console.log('Create new application');

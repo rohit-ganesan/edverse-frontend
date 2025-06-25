@@ -28,6 +28,7 @@ interface MenuItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
+  basePath: string;
 }
 
 interface SidebarProps {
@@ -42,66 +43,77 @@ const defaultMenuItems: MenuItem[] = [
     label: 'Home',
     icon: Home,
     path: '/dashboard',
+    basePath: '/dashboard',
   },
   {
     id: 'courses',
     label: 'Courses',
     icon: BookOpen,
-    path: '/courses',
+    path: '/courses/overview',
+    basePath: '/courses',
   },
   {
     id: 'classes',
     label: 'Classes',
     icon: CalendarDays,
-    path: '/classes',
+    path: '/classes/overview',
+    basePath: '/classes',
   },
   {
     id: 'syllabus',
     label: 'Syllabus',
     icon: FileText,
-    path: '/syllabus',
+    path: '/syllabus/overview',
+    basePath: '/syllabus',
   },
   {
     id: 'attendance',
     label: 'Attendance',
     icon: UserCheck,
-    path: '/attendance',
+    path: '/attendance/overview',
+    basePath: '/attendance',
   },
   {
     id: 'result',
     label: 'Results',
     icon: Award,
-    path: '/result',
+    path: '/result/overview',
+    basePath: '/result',
   },
   {
     id: 'notice',
     label: 'Notice Board',
     icon: Bell,
-    path: '/notice',
+    path: '/notice/overview',
+    basePath: '/notice',
   },
   {
     id: 'instructors',
     label: 'Instructors',
     icon: Users,
-    path: '/instructors',
+    path: '/instructors/overview',
+    basePath: '/instructors',
   },
   {
     id: 'students',
     label: 'Students',
     icon: GraduationCap,
-    path: '/students',
+    path: '/students/overview',
+    basePath: '/students',
   },
   {
     id: 'admission',
     label: 'Admission',
     icon: UserPlus,
-    path: '/admission',
+    path: '/admission/overview',
+    basePath: '/admission',
   },
   {
     id: 'fee',
     label: 'Fee',
     icon: DollarSign,
-    path: '/fee',
+    path: '/fee/overview',
+    basePath: '/fee',
   },
 ];
 
@@ -111,36 +123,42 @@ const otherItems: MenuItem[] = [
     label: '🧪 Integration Test',
     icon: Settings,
     path: '/test',
+    basePath: '/test',
   },
   {
     id: 'whats-new',
     label: "What's New",
     icon: Sparkles,
-    path: '/whats-new',
+    path: '/whats-new/overview',
+    basePath: '/whats-new',
   },
   {
     id: 'organization',
     label: 'Organization',
     icon: Building,
-    path: '/organization',
+    path: '/organization/overview',
+    basePath: '/organization',
   },
   {
     id: 'admins',
     label: 'Admins',
     icon: Shield,
-    path: '/admins',
+    path: '/admins/overview',
+    basePath: '/admins',
   },
   {
     id: 'support',
     label: 'Support',
     icon: HelpCircle,
-    path: '/support',
+    path: '/support/overview',
+    basePath: '/support',
   },
   {
     id: 'settings',
     label: 'Settings',
     icon: Settings,
-    path: '/settings',
+    path: '/settings/general',
+    basePath: '/settings',
   },
 ];
 
@@ -193,9 +211,10 @@ export function Sidebar({
     }
   };
 
-  const isActive = (path: string): boolean => {
+  const isActive = (basePath: string): boolean => {
     return (
-      location.pathname === path || location.pathname.startsWith(path + '/')
+      location.pathname === basePath ||
+      location.pathname.startsWith(basePath + '/')
     );
   };
 
@@ -235,7 +254,7 @@ export function Sidebar({
   };
 
   const renderMenuItem = (item: MenuItem, index: number): JSX.Element => {
-    const active = isActive(item.path);
+    const active = isActive(item.basePath);
     const isDragging = draggedItem === item.id;
 
     const handleClick = (e: React.MouseEvent) => {

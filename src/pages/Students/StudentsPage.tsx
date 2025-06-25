@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
 import {
@@ -14,15 +13,21 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { useStudentData } from './hooks/useStudentData';
-// Removed useStudentManagement import since it's no longer needed
 import { AllStudents } from './tabs/AllStudents';
 import { Classes } from './tabs/Classes';
 import { Analytics } from './tabs/Analytics';
 import { Reports } from './tabs/Reports';
+import { useTabRouting } from 'lib/useTabRouting';
 
 export function StudentsPage(): JSX.Element {
   const { stats } = useStudentData();
-  // Removed handleAddStudent since it's now handled in AllStudents tab
+
+  // Use tab routing instead of local state
+  const { activeTab, setActiveTab } = useTabRouting({
+    defaultTab: 'all-students',
+    validTabs: ['all-students', 'classes', 'analytics', 'reports'],
+    basePath: '/students',
+  });
 
   const headerActions: Array<{
     label: string;
@@ -117,8 +122,6 @@ export function StudentsPage(): JSX.Element {
       content: <Reports />,
     },
   ];
-
-  const [activeTab, setActiveTab] = useState('all-students');
 
   return (
     <DashboardLayout>
