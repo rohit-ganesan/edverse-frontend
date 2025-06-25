@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Flex,
@@ -7,7 +7,6 @@ import {
   Badge,
   Grid,
   Switch,
-  TextField,
   Select,
 } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
@@ -23,9 +22,6 @@ import {
   Building,
   Users,
   MapPin,
-  Settings,
-  Shield,
-  Calendar,
   Clock,
   Phone,
   Mail,
@@ -33,7 +29,6 @@ import {
   FileText,
   Edit,
   Plus,
-  Trash2,
   Save,
   Upload,
   Download,
@@ -168,7 +163,7 @@ export function OrganizationPage(): JSX.Element {
     },
   ];
 
-  const [orgSettings, setOrgSettings] = useState<OrganizationSettings>({
+  const [orgSettings] = useState<OrganizationSettings>({
     name: 'EdVerse University',
     type: 'University',
     establishedYear: 1995,

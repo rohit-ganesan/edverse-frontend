@@ -12,7 +12,6 @@ import {
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
 import {
-  Settings as SettingsIcon,
   GraduationCap,
   Users,
   BookOpen,
@@ -20,7 +19,6 @@ import {
   Bell,
   Save,
   RotateCcw,
-  Calendar,
 } from 'lucide-react';
 
 export function Settings(): JSX.Element {

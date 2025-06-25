@@ -1,6 +1,6 @@
 import { Box, Flex, Text, Badge, Progress } from '@radix-ui/themes';
 import { RadixCard } from 'components/ui/RadixCard';
-import { Users, Clock, Award, User } from 'lucide-react';
+import { Clock, Award, User } from 'lucide-react';
 
 interface CourseCardProps {
   courseData: {
