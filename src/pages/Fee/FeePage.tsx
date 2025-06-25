@@ -25,9 +25,10 @@ import { Reports } from './tabs/Reports';
 import { Settings } from './tabs/Settings';
 import { useFeeData } from './hooks/useFeeData';
 import { useTabRouting } from '../../lib/useTabRouting';
+import { SkeletonCard } from '../../components/ui/Skeleton';
 
 export function FeePage(): JSX.Element {
-  const { stats } = useFeeData();
+  const { stats, isLoading } = useFeeData();
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -146,7 +147,15 @@ export function FeePage(): JSX.Element {
         ]}
       />
 
-      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      )}
 
       <TabContainer
         activeTab={activeTab}
@@ -155,32 +164,32 @@ export function FeePage(): JSX.Element {
           {
             value: 'overview',
             label: 'Overview',
-            content: <Overview />,
+            content: <Overview isLoading={isLoading} />,
           },
           {
             value: 'payments',
             label: 'Payments',
-            content: <Payments />,
+            content: <Payments isLoading={isLoading} />,
           },
           {
             value: 'fee-structures',
             label: 'Fee Structures',
-            content: <FeeStructures />,
+            content: <FeeStructures isLoading={isLoading} />,
           },
           {
             value: 'reports',
             label: 'Reports',
-            content: <Reports />,
+            content: <Reports isLoading={isLoading} />,
           },
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics />,
+            content: <Analytics isLoading={isLoading} />,
           },
           {
             value: 'settings',
             label: 'Settings',
-            content: <Settings />,
+            content: <Settings isLoading={isLoading} />,
           },
         ]}
       />

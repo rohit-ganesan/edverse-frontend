@@ -20,9 +20,10 @@ import { Analytics } from './tabs/Analytics';
 import { useNoticeData } from './hooks/useNoticeData';
 import { useNoticeManagement } from './hooks/useNoticeManagement';
 import { useTabRouting } from 'lib/useTabRouting';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 export function NoticePage(): JSX.Element {
-  const { analytics } = useNoticeData();
+  const { analytics, isLoading } = useNoticeData();
   const { handleCreateNotice, handleExportNotices } = useNoticeManagement();
 
   // Use tab routing instead of local state
@@ -105,7 +106,15 @@ export function NoticePage(): JSX.Element {
         ]}
       />
 
-      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      )}
 
       <TabContainer
         activeTab={activeTab}
@@ -114,22 +123,22 @@ export function NoticePage(): JSX.Element {
           {
             value: 'all-notices',
             label: 'All Notices',
-            content: <AllNotices />,
+            content: <AllNotices isLoading={isLoading} />,
           },
           {
             value: 'recent',
             label: 'Recent',
-            content: <Recent />,
+            content: <Recent isLoading={isLoading} />,
           },
           {
             value: 'drafts',
             label: 'Drafts',
-            content: <Drafts />,
+            content: <Drafts isLoading={isLoading} />,
           },
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics />,
+            content: <Analytics isLoading={isLoading} />,
           },
         ]}
       />

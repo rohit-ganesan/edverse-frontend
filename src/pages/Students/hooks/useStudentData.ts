@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type {
   Student,
   StudentFilters,
@@ -164,6 +164,13 @@ export function useStudentData() {
     attendanceRange: 'all',
     gradeRange: 'all',
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timeout = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   // Filter students based on current filters
   const filteredStudents = useMemo(() => {
@@ -316,5 +323,6 @@ export function useStudentData() {
     filters,
     updateFilter,
     resetFilters,
+    isLoading,
   };
 }

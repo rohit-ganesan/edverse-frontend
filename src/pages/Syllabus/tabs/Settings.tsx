@@ -21,8 +21,13 @@ import {
   RotateCcw,
   Calendar,
 } from 'lucide-react';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Settings(): JSX.Element {
+export function Settings({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [autoUpdateProgress, setAutoUpdateProgress] = useState(true);
   const [requireApproval, setRequireApproval] = useState(true);
   const [enableVersioning, setEnableVersioning] = useState(true);
@@ -47,6 +52,18 @@ export function Settings(): JSX.Element {
     setMaxTopics('20');
     setReviewCycle('annual');
   };
+
+  if (isLoading) {
+    return (
+      <Box className="space-y-8">
+        <SkeletonCard height={80} />
+        <div className="grid grid-cols-2 gap-8">
+          <SkeletonCard height={320} />
+          <SkeletonCard height={320} />
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box className="space-y-8">

@@ -9,8 +9,13 @@ import { Users, User, Eye, UserPlus } from 'lucide-react';
 import { useStudentData } from '../hooks/useStudentData';
 import { useStudentManagement } from '../hooks/useStudentManagement';
 import type { Student } from '../types';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function AllStudents(): JSX.Element {
+export function AllStudents({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { students } = useStudentData();
   const { handleViewStudent, handleAddStudent } = useStudentManagement();
 
@@ -191,50 +196,60 @@ export function AllStudents(): JSX.Element {
   };
 
   return (
-    <DataTable
-      data={students}
-      columns={columns}
-      actions={actions}
-      title="Student Records"
-      icon={<Users className="w-5 h-5 text-purple-600" />}
-      searchPlaceholder="Search by student name, roll number, or parent..."
-      searchFields={['name', 'rollNumber', 'parentEmail', 'parentName']}
-      filters={[
-        {
-          key: 'class',
-          label: 'Classes',
-          options: classes,
-        },
-        {
-          key: 'status',
-          label: 'Status',
-          options: [
-            { value: 'active', label: 'Active' },
-            { value: 'inactive', label: 'Inactive' },
-            { value: 'suspended', label: 'Suspended' },
-            { value: 'graduated', label: 'Graduated' },
-          ],
-        },
-      ]}
-      sortOptions={[
-        { value: 'name', label: 'Sort by Name' },
-        { value: 'class', label: 'Sort by Class' },
-        { value: 'attendance', label: 'Sort by Attendance' },
-        { value: 'grade', label: 'Sort by Grade' },
-      ]}
-      headerActions={[
-        {
-          label: 'Add Student',
-          icon: <UserPlus className="w-4 h-4 mr-1" />,
-          onClick: handleAddStudent,
-        },
-      ]}
-      onSort={handleSort}
-      onFilter={handleFilter}
-      getRowKey={(student, index) => student.id.toString()}
-      emptyStateIcon={<User className="w-12 h-12" />}
-      emptyStateTitle="No students found"
-      emptyStateSubtitle="Try adjusting your search terms or add a new student"
-    />
+    <Box>
+      {isLoading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} height={96} />
+          ))}
+        </div>
+      ) : (
+        <DataTable
+          data={students}
+          columns={columns}
+          actions={actions}
+          title="Student Records"
+          icon={<Users className="w-5 h-5 text-purple-600" />}
+          searchPlaceholder="Search by student name, roll number, or parent..."
+          searchFields={['name', 'rollNumber', 'parentEmail', 'parentName']}
+          filters={[
+            {
+              key: 'class',
+              label: 'Classes',
+              options: classes,
+            },
+            {
+              key: 'status',
+              label: 'Status',
+              options: [
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+                { value: 'suspended', label: 'Suspended' },
+                { value: 'graduated', label: 'Graduated' },
+              ],
+            },
+          ]}
+          sortOptions={[
+            { value: 'name', label: 'Sort by Name' },
+            { value: 'class', label: 'Sort by Class' },
+            { value: 'attendance', label: 'Sort by Attendance' },
+            { value: 'grade', label: 'Sort by Grade' },
+          ]}
+          headerActions={[
+            {
+              label: 'Add Student',
+              icon: <UserPlus className="w-4 h-4 mr-1" />,
+              onClick: handleAddStudent,
+            },
+          ]}
+          onSort={handleSort}
+          onFilter={handleFilter}
+          getRowKey={(student, index) => student.id.toString()}
+          emptyStateIcon={<User className="w-12 h-12" />}
+          emptyStateTitle="No students found"
+          emptyStateSubtitle="Try adjusting your search terms or add a new student"
+        />
+      )}
+    </Box>
   );
 }

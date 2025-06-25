@@ -10,8 +10,14 @@ import {
   ChevronRight,
   GraduationCap,
 } from 'lucide-react';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
+import { Box } from '@radix-ui/themes';
 
-export function Overview(): JSX.Element {
+export function Overview({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { applications, dashboardData } = useAdmissionData();
 
   // Use all applications for the DataTable (filtering will be handled by DataTable component)
@@ -122,186 +128,203 @@ export function Overview(): JSX.Element {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Side-by-side: Urgent Actions & Upcoming Deadlines */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Urgent Actions Required */}
-        <div className="rounded-lg shadow-lg overflow-hidden border-0 bg-white">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-6 text-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mr-4">
-                  <AlertTriangle className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Urgent Actions Required
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {dashboardData.urgentActions.length} items need attention
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="p-6">
-            <div className="space-y-3">
-              {dashboardData.urgentActions.slice(0, 3).map((action) => (
-                <div
-                  key={action.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className={`w-2 h-2 rounded-full ${getPriorityColor(action.priority)}`}
-                    />
+    <Box>
+      {isLoading ? (
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Side-by-side: Urgent Actions & Upcoming Deadlines */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Urgent Actions Required */}
+            <div className="rounded-lg shadow-lg overflow-hidden border-0 bg-white">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-6 text-gray-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mr-4">
+                      <AlertTriangle className="h-6 w-6 text-blue-600" />
+                    </div>
                     <div>
-                      <p className="font-medium text-gray-900">
-                        {action.studentName}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {action.description}
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Urgent Actions Required
+                      </h3>
+                      <p className="text-gray-600 text-sm">
+                        {dashboardData.urgentActions.length} items need
+                        attention
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500">
-                      Due: {new Date(action.dueDate).toLocaleDateString()}
-                    </span>
-                    <button className="p-1 hover:bg-gray-200 rounded">
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="space-y-3">
+                  {dashboardData.urgentActions.slice(0, 3).map((action) => (
+                    <div
+                      key={action.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className={`w-2 h-2 rounded-full ${getPriorityColor(action.priority)}`}
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {action.studentName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {action.description}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-gray-500">
+                          Due: {new Date(action.dueDate).toLocaleDateString()}
+                        </span>
+                        <button className="p-1 hover:bg-gray-200 rounded">
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {dashboardData.urgentActions.length > 3 && (
+                  <div className="mt-4 text-center">
+                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                      View All {dashboardData.urgentActions.length} Actions
                     </button>
                   </div>
-                </div>
-              ))}
-            </div>
-            {dashboardData.urgentActions.length > 3 && (
-              <div className="mt-4 text-center">
-                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  View All {dashboardData.urgentActions.length} Actions
-                </button>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Upcoming Deadlines */}
-        <div className="rounded-lg shadow-lg overflow-hidden border-0 bg-white">
-          <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 text-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mr-4">
-                  <Calendar className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Upcoming Deadlines
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {dashboardData.upcomingDeadlines.length} deadlines
-                    approaching
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="p-6">
-            <div className="space-y-3">
-              {dashboardData.upcomingDeadlines.slice(0, 3).map((deadline) => (
-                <div
-                  key={deadline.id}
-                  className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-medium text-gray-900">
-                      {deadline.title}
-                    </p>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        deadline.daysRemaining <= 3
-                          ? 'bg-red-100 text-red-800'
-                          : deadline.daysRemaining <= 7
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-blue-100 text-blue-800'
-                      }`}
-                    >
-                      {deadline.daysRemaining} days
-                    </span>
+            {/* Upcoming Deadlines */}
+            <div className="rounded-lg shadow-lg overflow-hidden border-0 bg-white">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 text-gray-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mr-4">
+                      <Calendar className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Upcoming Deadlines
+                      </h3>
+                      <p className="text-gray-600 text-sm">
+                        {dashboardData.upcomingDeadlines.length} deadlines
+                        approaching
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600">
-                    {deadline.description}
-                  </p>
                 </div>
-              ))}
-            </div>
-            {dashboardData.upcomingDeadlines.length > 3 && (
-              <div className="mt-4 text-center">
-                <button className="text-green-600 hover:text-green-700 text-sm font-medium">
-                  View All {dashboardData.upcomingDeadlines.length} Deadlines
-                </button>
               </div>
-            )}
+              <div className="p-6">
+                <div className="space-y-3">
+                  {dashboardData.upcomingDeadlines
+                    .slice(0, 3)
+                    .map((deadline) => (
+                      <div
+                        key={deadline.id}
+                        className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-medium text-gray-900">
+                            {deadline.title}
+                          </p>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              deadline.daysRemaining <= 3
+                                ? 'bg-red-100 text-red-800'
+                                : deadline.daysRemaining <= 7
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {deadline.daysRemaining} days
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {deadline.description}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+                {dashboardData.upcomingDeadlines.length > 3 && (
+                  <div className="mt-4 text-center">
+                    <button className="text-green-600 hover:text-green-700 text-sm font-medium">
+                      View All {dashboardData.upcomingDeadlines.length}{' '}
+                      Deadlines
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Recent Applications - DataTable */}
-      <DataTable
-        data={filteredApplications}
-        columns={applicationColumns}
-        title="Recent Applications"
-        subtitle={`${filteredApplications.length} applications found`}
-        icon={<FileText className="h-5 w-5 text-purple-600" />}
-        searchPlaceholder="Search by name, application number, or program..."
-        searchFields={['studentName', 'applicationNumber', 'program']}
-        filters={[
-          {
-            key: 'status',
-            label: 'Status',
-            options: [
-              { value: 'all', label: 'All Status' },
-              { value: 'submitted', label: 'Submitted' },
-              { value: 'under_review', label: 'Under Review' },
-              { value: 'interview_scheduled', label: 'Interview Scheduled' },
-              { value: 'accepted', label: 'Accepted' },
-              { value: 'rejected', label: 'Rejected' },
-              { value: 'waitlisted', label: 'Waitlisted' },
-            ],
-          },
-        ]}
-        sortOptions={[
-          { value: 'submissionDate', label: 'Sort by Submitted Date' },
-          { value: 'lastUpdated', label: 'Sort by Last Updated' },
-          { value: 'studentName', label: 'Sort by Student Name' },
-          { value: 'status', label: 'Sort by Status' },
-        ]}
-        actions={[
-          {
-            icon: <Eye className="h-4 w-4" />,
-            label: 'View Details',
-            onClick: (app) => console.log('View application:', app),
-            variant: 'ghost',
-          },
-          {
-            icon: <MessageSquare className="h-4 w-4" />,
-            label: 'Add Note',
-            onClick: (app) => console.log('Add note to:', app),
-            variant: 'ghost',
-          },
-        ]}
-        headerActions={[
-          {
-            label: 'Export Applications',
-            icon: <FileText className="h-4 w-4" />,
-            onClick: () => console.log('Export applications'),
-            variant: 'ghost',
-          },
-        ]}
-        emptyStateIcon={<FileText className="h-12 w-12 text-gray-400" />}
-        emptyStateTitle="No applications found"
-        emptyStateSubtitle="Try adjusting your search or filter criteria."
-        getRowKey={(app) => app.id}
-      />
-    </div>
+          {/* Recent Applications - DataTable */}
+          <DataTable
+            data={filteredApplications}
+            columns={applicationColumns}
+            title="Recent Applications"
+            subtitle={`${filteredApplications.length} applications found`}
+            icon={<FileText className="h-5 w-5 text-purple-600" />}
+            searchPlaceholder="Search by name, application number, or program..."
+            searchFields={['studentName', 'applicationNumber', 'program']}
+            filters={[
+              {
+                key: 'status',
+                label: 'Status',
+                options: [
+                  { value: 'all', label: 'All Status' },
+                  { value: 'submitted', label: 'Submitted' },
+                  { value: 'under_review', label: 'Under Review' },
+                  {
+                    value: 'interview_scheduled',
+                    label: 'Interview Scheduled',
+                  },
+                  { value: 'accepted', label: 'Accepted' },
+                  { value: 'rejected', label: 'Rejected' },
+                  { value: 'waitlisted', label: 'Waitlisted' },
+                ],
+              },
+            ]}
+            sortOptions={[
+              { value: 'submissionDate', label: 'Sort by Submitted Date' },
+              { value: 'lastUpdated', label: 'Sort by Last Updated' },
+              { value: 'studentName', label: 'Sort by Student Name' },
+              { value: 'status', label: 'Sort by Status' },
+            ]}
+            actions={[
+              {
+                icon: <Eye className="h-4 w-4" />,
+                label: 'View Details',
+                onClick: (app) => console.log('View application:', app),
+                variant: 'ghost',
+              },
+              {
+                icon: <MessageSquare className="h-4 w-4" />,
+                label: 'Add Note',
+                onClick: (app) => console.log('Add note to:', app),
+                variant: 'ghost',
+              },
+            ]}
+            headerActions={[
+              {
+                label: 'Export Applications',
+                icon: <FileText className="h-4 w-4" />,
+                onClick: () => console.log('Export applications'),
+                variant: 'ghost',
+              },
+            ]}
+            emptyStateIcon={<FileText className="h-12 w-12 text-gray-400" />}
+            emptyStateTitle="No applications found"
+            emptyStateSubtitle="Try adjusting your search or filter criteria."
+            getRowKey={(app) => app.id}
+          />
+        </div>
+      )}
+    </Box>
   );
 }

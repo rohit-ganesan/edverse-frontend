@@ -22,8 +22,13 @@ import {
   RotateCcw,
   MapPin,
 } from 'lucide-react';
+import { SkeletonCard, SkeletonText } from 'components/ui/Skeleton';
 
-export function Settings(): JSX.Element {
+export function Settings({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [autoCreateSchedule, setAutoCreateSchedule] = useState(true);
   const [allowOverlapping, setAllowOverlapping] = useState(false);
   const [requireApproval, setRequireApproval] = useState(true);
@@ -50,6 +55,18 @@ export function Settings(): JSX.Element {
     setMaxStudents('30');
     setDefaultRoom('Room 101');
   };
+
+  if (isLoading) {
+    return (
+      <Box className="space-y-8">
+        <SkeletonCard height={80} />
+        <div className="grid grid-cols-2 gap-8">
+          <SkeletonCard height={320} />
+          <SkeletonCard height={320} />
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box className="space-y-8">

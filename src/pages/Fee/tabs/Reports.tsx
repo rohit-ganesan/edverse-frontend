@@ -34,8 +34,13 @@ import {
   Search,
   FileIcon,
 } from 'lucide-react';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
 
-export function Reports(): JSX.Element {
+export function Reports({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [reportType, setReportType] = useState('collection');
   const [dateRange, setDateRange] = useState('this_month');
   const [format, setFormat] = useState('pdf');
@@ -431,7 +436,13 @@ export function Reports(): JSX.Element {
 
         {/* Reports Table */}
         <Box className="overflow-x-auto">
-          {filteredReports.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonCard key={i} height={80} />
+              ))}
+            </div>
+          ) : filteredReports.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

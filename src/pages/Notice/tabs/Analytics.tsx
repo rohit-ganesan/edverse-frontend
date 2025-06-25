@@ -17,8 +17,13 @@ import { TopNoticeItem } from '../components/TopNoticeItem';
 import { useNoticeData } from '../hooks/useNoticeData';
 import { useNoticeManagement } from '../hooks/useNoticeManagement';
 import { useState } from 'react';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { notices, analytics } = useNoticeData();
   const { handleExportNotices } = useNoticeManagement();
 
@@ -37,7 +42,7 @@ export function Analytics(): JSX.Element {
     .slice(0, 5);
 
   return (
-    <Box className="space-y-6">
+    <Box className="space-y-8">
       {/* Analytics Header */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
         <Box className="p-6 bg-gradient-to-r from-violet-50 to-purple-50 border-b border-violet-100">
@@ -170,17 +175,23 @@ export function Analytics(): JSX.Element {
             </Box>
 
             <Box className="p-6">
-              <Grid columns="2" gap="4">
-                {analytics.topCategories.map((category, index) => (
-                  <CategoryAnalysisCard
-                    key={category.category}
-                    category={category}
-                    rank={index + 1}
-                    className={`animate-slide-in-left`}
-                    style={{ animationDelay: `${index * 150}ms` } as any}
-                  />
-                ))}
-              </Grid>
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonTableRow key={i} columns={2} className="mb-2" />
+                ))
+              ) : (
+                <Grid columns="2" gap="4">
+                  {analytics.topCategories.map((category, index) => (
+                    <CategoryAnalysisCard
+                      key={category.category}
+                      category={category}
+                      rank={index + 1}
+                      className={`animate-slide-in-left`}
+                      style={{ animationDelay: `${index * 150}ms` } as any}
+                    />
+                  ))}
+                </Grid>
+              )}
             </Box>
           </RadixCard>
         </Box>
@@ -205,17 +216,23 @@ export function Analytics(): JSX.Element {
             </Box>
 
             <Box className="p-6">
-              <Flex direction="column" gap="3">
-                {topNotices.map((notice, index) => (
-                  <TopNoticeItem
-                    key={notice.id}
-                    notice={notice}
-                    rank={index + 1}
-                    className={`animate-slide-in-right`}
-                    style={{ animationDelay: `${index * 100}ms` } as any}
-                  />
-                ))}
-              </Flex>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <SkeletonCard key={index} height={40} />
+                ))
+              ) : (
+                <Flex direction="column" gap="3">
+                  {topNotices.map((notice, index) => (
+                    <TopNoticeItem
+                      key={notice.id}
+                      notice={notice}
+                      rank={index + 1}
+                      className={`animate-slide-in-right`}
+                      style={{ animationDelay: `${index * 100}ms` } as any}
+                    />
+                  ))}
+                </Flex>
+              )}
             </Box>
           </RadixCard>
         </Box>
@@ -247,57 +264,69 @@ export function Analytics(): JSX.Element {
         </Box>
 
         <Box className="p-6">
-          <Grid columns="2" gap="6">
+          <Grid columns="2" gap="8">
             {/* Engagement Chart Placeholder */}
-            <Box className="h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center">
-              <Flex direction="column" align="center" gap="3">
-                <BarChart3 className="w-12 h-12 text-gray-400" />
-                <Text size="2" className="text-gray-600 text-center">
-                  Engagement trends chart
-                  <br />
-                  <Text size="1" className="text-gray-500">
-                    Views, likes, and comments over time
-                  </Text>
-                </Text>
-              </Flex>
-            </Box>
+            <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
+              <Box className="p-6">
+                {isLoading ? (
+                  <SkeletonCard height={256} />
+                ) : (
+                  <Flex direction="column" align="center" gap="3">
+                    <BarChart3 className="w-12 h-12 text-gray-400" />
+                    <Text size="2" className="text-gray-600 text-center">
+                      Engagement trends chart
+                      <br />
+                      <Text size="1" className="text-gray-500">
+                        Views, likes, and comments over time
+                      </Text>
+                    </Text>
+                  </Flex>
+                )}
+              </Box>
+            </RadixCard>
 
             {/* Audience Reach */}
             <Box>
               <Heading size="3" className="text-gray-900 mb-4">
                 Audience Reach
               </Heading>
-              <Flex direction="column" gap="3">
-                {analytics.audienceReach.map((audience, index) => (
-                  <Box
-                    key={audience.audience}
-                    className={`p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg animate-fade-in`}
-                    style={{ animationDelay: `${index * 100}ms` } as any}
-                  >
-                    <Flex justify="between" align="center" className="mb-2">
-                      <Text
-                        size="2"
-                        weight="medium"
-                        className="text-gray-900 capitalize"
-                      >
-                        {audience.audience}
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <SkeletonTableRow key={index} columns={2} className="mb-2" />
+                ))
+              ) : (
+                <Flex direction="column" gap="3">
+                  {analytics.audienceReach.map((audience, index) => (
+                    <Box
+                      key={audience.audience}
+                      className={`p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg animate-fade-in`}
+                      style={{ animationDelay: `${index * 100}ms` } as any}
+                    >
+                      <Flex justify="between" align="center" className="mb-2">
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900 capitalize"
+                        >
+                          {audience.audience}
+                        </Text>
+                        <Text size="2" weight="bold" className="text-gray-900">
+                          {audience.count}
+                        </Text>
+                      </Flex>
+                      <Box className="w-full bg-gray-200 rounded-full h-2">
+                        <Box
+                          className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+                          style={{ width: `${audience.percentage}%` }}
+                        />
+                      </Box>
+                      <Text size="1" className="text-gray-600 mt-1">
+                        {Math.round(audience.percentage)}% of total notices
                       </Text>
-                      <Text size="2" weight="bold" className="text-gray-900">
-                        {audience.count}
-                      </Text>
-                    </Flex>
-                    <Box className="w-full bg-gray-200 rounded-full h-2">
-                      <Box
-                        className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
-                        style={{ width: `${audience.percentage}%` }}
-                      />
                     </Box>
-                    <Text size="1" className="text-gray-600 mt-1">
-                      {Math.round(audience.percentage)}% of total notices
-                    </Text>
-                  </Box>
-                ))}
-              </Flex>
+                  ))}
+                </Flex>
+              )}
             </Box>
           </Grid>
         </Box>

@@ -18,8 +18,13 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useSyllabusData } from '../hooks/useSyllabusData';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Overview(): JSX.Element {
+export function Overview({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { syllabi } = useSyllabusData();
 
   return (
@@ -35,7 +40,11 @@ export function Overview(): JSX.Element {
                   Active Syllabi
                 </Heading>
                 <Text size="3" className="text-gray-600">
-                  {syllabi?.length || 0} syllabi available
+                  {isLoading ? (
+                    <span className="inline-block w-24 h-4 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    `${syllabi?.length || 0} syllabi available`
+                  )}
                 </Text>
               </Box>
               <RadixButton
@@ -52,7 +61,11 @@ export function Overview(): JSX.Element {
           {/* Syllabi List */}
           <Box className="p-6">
             <Flex direction="column" gap="6">
-              {syllabi && syllabi.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonCard key={i} height={72} className="mb-2" />
+                ))
+              ) : syllabi && syllabi.length > 0 ? (
                 syllabi.slice(0, 3).map((syllabus, index) => (
                   <Box
                     key={syllabus.id}
@@ -157,102 +170,109 @@ export function Overview(): JSX.Element {
           {/* Progress List */}
           <Box className="p-6">
             <Flex direction="column" gap="5">
-              <Box className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <Flex align="start" gap="4">
-                  <Box className="p-3 bg-blue-100 rounded-lg">
-                    <BookOpen className="w-5 h-5 text-blue-600" />
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonCard key={i} height={56} className="mb-2" />
+                ))
+              ) : (
+                <>
+                  <Box className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <Flex align="start" gap="4">
+                      <Box className="p-3 bg-blue-100 rounded-lg">
+                        <BookOpen className="w-5 h-5 text-blue-600" />
+                      </Box>
+                      <Box className="flex-1">
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900 block mb-1"
+                        >
+                          Total Topics
+                        </Text>
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-blue-600 block"
+                        >
+                          {syllabi?.reduce((sum, s) => sum + s.topics, 0) || 0}
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="flex-1">
-                    <Text
-                      size="2"
-                      weight="medium"
-                      className="text-gray-900 block mb-1"
-                    >
-                      Total Topics
-                    </Text>
-                    <Text
-                      size="4"
-                      weight="bold"
-                      className="text-blue-600 block"
-                    >
-                      {syllabi?.reduce((sum, s) => sum + s.topics, 0) || 0}
-                    </Text>
+                  <Box className="p-4 bg-green-50 rounded-lg border border-green-100">
+                    <Flex align="start" gap="4">
+                      <Box className="p-3 bg-green-100 rounded-lg">
+                        <Target className="w-5 h-5 text-green-600" />
+                      </Box>
+                      <Box className="flex-1">
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900 block mb-1"
+                        >
+                          Learning Objectives
+                        </Text>
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-green-600 block"
+                        >
+                          {syllabi?.reduce((sum, s) => sum + s.objectives, 0) ||
+                            0}
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                </Flex>
-              </Box>
-
-              <Box className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <Flex align="start" gap="4">
-                  <Box className="p-3 bg-green-100 rounded-lg">
-                    <Target className="w-5 h-5 text-green-600" />
+                  <Box className="p-4 bg-orange-50 rounded-lg border border-orange-100">
+                    <Flex align="start" gap="4">
+                      <Box className="p-3 bg-orange-100 rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-orange-600" />
+                      </Box>
+                      <Box className="flex-1">
+                        <Box className="mb-3">
+                          <Text
+                            size="2"
+                            weight="medium"
+                            className="text-gray-900 block mb-1"
+                          >
+                            Avg Completion
+                          </Text>
+                          <Text
+                            size="4"
+                            weight="bold"
+                            className="text-orange-600 block"
+                          >
+                            {syllabi
+                              ? Math.round(
+                                  syllabi.reduce(
+                                    (sum, s) => sum + s.completionRate,
+                                    0
+                                  ) / syllabi.length
+                                )
+                              : 0}
+                            %
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Progress
+                            value={
+                              syllabi
+                                ? Math.round(
+                                    syllabi.reduce(
+                                      (sum, s) => sum + s.completionRate,
+                                      0
+                                    ) / syllabi.length
+                                  )
+                                : 0
+                            }
+                            className="h-2"
+                          />
+                        </Box>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="flex-1">
-                    <Text
-                      size="2"
-                      weight="medium"
-                      className="text-gray-900 block mb-1"
-                    >
-                      Learning Objectives
-                    </Text>
-                    <Text
-                      size="4"
-                      weight="bold"
-                      className="text-green-600 block"
-                    >
-                      {syllabi?.reduce((sum, s) => sum + s.objectives, 0) || 0}
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
-
-              <Box className="p-4 bg-orange-50 rounded-lg border border-orange-100">
-                <Flex align="start" gap="4">
-                  <Box className="p-3 bg-orange-100 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-orange-600" />
-                  </Box>
-                  <Box className="flex-1">
-                    <Box className="mb-3">
-                      <Text
-                        size="2"
-                        weight="medium"
-                        className="text-gray-900 block mb-1"
-                      >
-                        Avg Completion
-                      </Text>
-                      <Text
-                        size="4"
-                        weight="bold"
-                        className="text-orange-600 block"
-                      >
-                        {syllabi
-                          ? Math.round(
-                              syllabi.reduce(
-                                (sum, s) => sum + s.completionRate,
-                                0
-                              ) / syllabi.length
-                            )
-                          : 0}
-                        %
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Progress
-                        value={
-                          syllabi
-                            ? Math.round(
-                                syllabi.reduce(
-                                  (sum, s) => sum + s.completionRate,
-                                  0
-                                ) / syllabi.length
-                              )
-                            : 0
-                        }
-                        className="h-2"
-                      />
-                    </Box>
-                  </Box>
-                </Flex>
-              </Box>
+                </>
+              )}
             </Flex>
 
             <Box className="mt-6 pt-5 border-t border-gray-100">

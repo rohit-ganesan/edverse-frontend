@@ -4,8 +4,13 @@ import { RadixButton } from 'components/ui/RadixButton';
 import { Eye, Calendar, User, Clock } from 'lucide-react';
 import { ClassCard } from '../components/ClassCard';
 import { useClassesData } from '../hooks/useClassesData';
+import { SkeletonCard, SkeletonText } from 'components/ui/Skeleton';
 
-export function Overview(): JSX.Element {
+export function Overview({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { classes } = useClassesData();
 
   return (
@@ -21,7 +26,11 @@ export function Overview(): JSX.Element {
                   Today's Classes
                 </Heading>
                 <Text size="3" className="text-gray-600">
-                  {classes?.length || 0} classes scheduled
+                  {isLoading ? (
+                    <SkeletonText width="6em" />
+                  ) : (
+                    `${classes?.length || 0} classes scheduled`
+                  )}
                 </Text>
               </Box>
               <RadixButton
@@ -38,7 +47,11 @@ export function Overview(): JSX.Element {
           {/* Classes List */}
           <Box className="p-6">
             <Flex direction="column" gap="6">
-              {classes && classes.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonCard key={i} height={72} className="mb-2" />
+                ))
+              ) : classes && classes.length > 0 ? (
                 classes.slice(0, 3).map((classItem, index) => (
                   <Box
                     key={classItem.id}
@@ -122,7 +135,11 @@ export function Overview(): JSX.Element {
           {/* Classes List */}
           <Box className="p-6">
             <Flex direction="column" gap="5">
-              {classes && classes.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonCard key={i} height={56} className="mb-2" />
+                ))
+              ) : classes && classes.length > 0 ? (
                 classes.slice(0, 4).map((classItem, index) => (
                   <Box
                     key={classItem.id}
@@ -153,14 +170,17 @@ export function Overview(): JSX.Element {
               )}
             </Flex>
 
-            {classes && classes.length > 4 && (
-              <Box className="mt-6 pt-5 border-t border-gray-100">
-                <RadixButton variant="ghost" size="2" className="w-full">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View All Classes
-                </RadixButton>
-              </Box>
-            )}
+            {isLoading
+              ? null
+              : classes &&
+                classes.length > 4 && (
+                  <Box className="mt-6 pt-5 border-t border-gray-100">
+                    <RadixButton variant="ghost" size="2" className="w-full">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View All Classes
+                    </RadixButton>
+                  </Box>
+                )}
           </Box>
         </RadixCard>
       </Box>

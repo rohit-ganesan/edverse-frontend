@@ -23,8 +23,13 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useSyllabusData } from '../hooks/useSyllabusData';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedSubject, setSelectedSubject] = useState('all');
   const { syllabi } = useSyllabusData();
@@ -140,18 +145,21 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Placeholder for chart */}
-            <Box className="h-64 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center border border-green-100">
-              <Box className="text-center">
-                <BarChart3 className="w-12 h-12 text-green-400 mx-auto mb-3" />
-                <Text size="3" className="text-gray-600 mb-1">
-                  Progress Trend Chart
-                </Text>
-                <Text size="2" className="text-gray-500">
-                  Chart visualization would appear here
-                </Text>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Box className="h-64 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center border border-green-100">
+                <Box className="text-center">
+                  <BarChart3 className="w-12 h-12 text-green-400 mx-auto mb-3" />
+                  <Text size="3" className="text-gray-600 mb-1">
+                    Progress Trend Chart
+                  </Text>
+                  <Text size="2" className="text-gray-500">
+                    Chart visualization would appear here
+                  </Text>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -177,44 +185,52 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Objectives List */}
-            <Flex direction="column" gap="4">
-              {syllabi && syllabi.length > 0 ? (
-                syllabi.map((syllabus, index) => {
-                  const achievementRate = Math.floor(Math.random() * 25) + 75; // Mock achievement rate
-                  return (
-                    <Box
-                      key={syllabus.id}
-                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <Flex justify="between" align="center" className="mb-2">
-                        <Box>
-                          <Text
-                            size="2"
-                            weight="medium"
-                            className="text-gray-900 block"
-                          >
-                            {syllabus.title}
-                          </Text>
-                          <Text size="1" className="text-gray-600">
-                            {syllabus.subject} - {syllabus.objectives}{' '}
-                            objectives
-                          </Text>
-                        </Box>
-                        <Text size="2" weight="bold" className="text-blue-600">
-                          {achievementRate}%
-                        </Text>
-                      </Flex>
-                      <Progress value={achievementRate} className="h-2" />
-                    </Box>
-                  );
-                })
-              ) : (
-                <Text size="2" className="text-gray-500 text-center py-8">
-                  No syllabus data available
-                </Text>
-              )}
-            </Flex>
+            {isLoading ? (
+              <>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonTableRow key={i} columns={2} className="mb-3" />
+                ))}
+              </>
+            ) : (
+              <Flex direction="column" gap="4">
+                {syllabi && syllabi.length > 0 ? (
+                  syllabi.map((syllabus, index) => {
+                    const achievementRate = Math.floor(Math.random() * 25) + 75; // Mock achievement rate
+                    return (
+                      <Box
+                        key={syllabus.id}
+                        className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <Flex justify="between" align="center" className="mb-2">
+                          <Box>
+                            <Text
+                              size="2"
+                              weight="medium"
+                              className="text-gray-900 block"
+                            >
+                              {syllabus.title}
+                            </Text>
+                            <Text size="1" className="text-gray-600">
+                              {syllabus.subject} - {syllabus.objectives}{' '}
+                            </Text>
+                          </Box>
+                          <Box className="text-right">
+                            <Text size="2" className="text-gray-900 font-bold">
+                              {achievementRate}%
+                            </Text>
+                          </Box>
+                        </Flex>
+                        <Progress value={achievementRate} className="h-2" />
+                      </Box>
+                    );
+                  })
+                ) : (
+                  <Text size="2" className="text-gray-500">
+                    No achievement data
+                  </Text>
+                )}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
       </Grid>

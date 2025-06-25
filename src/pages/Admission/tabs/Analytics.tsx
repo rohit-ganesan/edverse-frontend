@@ -20,8 +20,16 @@ import {
   Award,
 } from 'lucide-react';
 import { useAdmissionData } from '../hooks/useAdmissionData';
+import {
+  SkeletonCard,
+  SkeletonTableRow,
+} from '../../../components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { programs, stats } = useAdmissionData();
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedProgram, setSelectedProgram] = useState('all');
@@ -126,17 +134,21 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
-              <Box className="text-center">
-                <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
-                <Text size="3" className="text-gray-600 mb-1">
-                  Application Trend Chart
-                </Text>
-                <Text size="2" className="text-gray-500">
-                  Chart visualization would appear here
-                </Text>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
+                <Box className="text-center">
+                  <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+                  <Text size="3" className="text-gray-600 mb-1">
+                    Application Trend Chart
+                  </Text>
+                  <Text size="2" className="text-gray-500">
+                    Chart visualization would appear here
+                  </Text>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -216,15 +228,19 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="text-center">
-              <Text size="8" weight="bold" className="text-orange-600 block">
-                {stats.acceptanceRate}%
-              </Text>
-              <Text size="2" className="text-gray-600 mt-2">
-                {stats.acceptedApplications} out of {stats.totalApplications}{' '}
-                applications
-              </Text>
-            </Box>
+            {isLoading ? (
+              <SkeletonCard height={128} />
+            ) : (
+              <Box className="text-center">
+                <Text size="8" weight="bold" className="text-orange-600 block">
+                  {stats.acceptanceRate}%
+                </Text>
+                <Text size="2" className="text-gray-600 mt-2">
+                  {stats.acceptedApplications} out of {stats.totalApplications}{' '}
+                  applications
+                </Text>
+              </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -245,14 +261,18 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="text-center">
-              <Text size="8" weight="bold" className="text-teal-600 block">
-                3.85
-              </Text>
-              <Text size="2" className="text-gray-600 mt-2">
-                Minimum required: 3.0
-              </Text>
-            </Box>
+            {isLoading ? (
+              <SkeletonCard height={128} />
+            ) : (
+              <Box className="text-center">
+                <Text size="8" weight="bold" className="text-teal-600 block">
+                  3.85
+                </Text>
+                <Text size="2" className="text-gray-600 mt-2">
+                  Minimum required: 3.0
+                </Text>
+              </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -273,14 +293,18 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="text-center">
-              <Text size="8" weight="bold" className="text-rose-600 block">
-                85%
-              </Text>
-              <Text size="2" className="text-gray-600 mt-2">
-                {stats.interviewsScheduled} interviews scheduled
-              </Text>
-            </Box>
+            {isLoading ? (
+              <SkeletonCard height={128} />
+            ) : (
+              <Box className="text-center">
+                <Text size="8" weight="bold" className="text-rose-600 block">
+                  85%
+                </Text>
+                <Text size="2" className="text-gray-600 mt-2">
+                  {stats.interviewsScheduled} interviews scheduled
+                </Text>
+              </Box>
+            )}
           </Box>
         </RadixCard>
       </Grid>

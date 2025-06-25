@@ -21,8 +21,13 @@ import {
   Save,
   RotateCcw,
 } from 'lucide-react';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Settings(): JSX.Element {
+export function Settings({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [autoMarkAbsent, setAutoMarkAbsent] = useState(true);
   const [allowLateEntry, setAllowLateEntry] = useState(true);
   const [requireLocation, setRequireLocation] = useState(false);
@@ -47,6 +52,18 @@ export function Settings(): JSX.Element {
     setSessionTimeout('120');
     setDefaultLocation('Main Campus');
   };
+
+  if (isLoading) {
+    return (
+      <Box className="space-y-8">
+        <SkeletonCard height={80} />
+        <div className="grid grid-cols-2 gap-8">
+          <SkeletonCard height={320} />
+          <SkeletonCard height={320} />
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box className="space-y-8">

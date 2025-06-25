@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type {
   Instructor,
   InstructorFilters,
@@ -142,6 +142,13 @@ export function useInstructorData() {
     experience: 'all',
     qualification: 'all',
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timeout = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const filteredInstructors = useMemo(() => {
     return mockInstructors.filter((instructor) => {
@@ -276,7 +283,7 @@ export function useInstructorData() {
     filters,
     updateFilter,
     resetFilters,
-    isLoading: false,
+    isLoading,
     error: null,
   };
 }

@@ -9,8 +9,13 @@ import { GraduationCap, Users, BookOpen, Eye, User } from 'lucide-react';
 import { useStudentData } from '../hooks/useStudentData';
 import { useStudentManagement } from '../hooks/useStudentManagement';
 import type { ClassSection } from '../types';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Classes(): JSX.Element {
+export function Classes({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { classSections } = useStudentData();
   const { handleMarkAttendance } = useStudentManagement();
 
@@ -165,32 +170,42 @@ export function Classes(): JSX.Element {
   };
 
   return (
-    <DataTable
-      data={classSections}
-      columns={columns}
-      actions={actions}
-      title="Class Sections"
-      icon={<GraduationCap className="w-5 h-5 text-purple-600" />}
-      searchPlaceholder="Search by class, section, teacher, or subjects..."
-      searchFields={['className', 'section', 'classTeacher', 'subjects']}
-      sortOptions={[
-        { value: 'name', label: 'Sort by Name' },
-        { value: 'students', label: 'Sort by Students' },
-        { value: 'subjects', label: 'Sort by Subjects' },
-        { value: 'teacher', label: 'Sort by Teacher' },
-      ]}
-      headerActions={[
-        {
-          label: 'Add Class',
-          icon: <GraduationCap className="w-4 h-4 mr-1" />,
-          onClick: handleAddClass,
-        },
-      ]}
-      onSort={handleSort}
-      getRowKey={(classSection, index) => classSection.id.toString()}
-      emptyStateIcon={<GraduationCap className="w-12 h-12" />}
-      emptyStateTitle="No classes found"
-      emptyStateSubtitle="Try adjusting your search terms or add a new class"
-    />
+    <Box>
+      {isLoading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <SkeletonCard key={i} height={80} />
+          ))}
+        </div>
+      ) : (
+        <DataTable
+          data={classSections}
+          columns={columns}
+          actions={actions}
+          title="Class Sections"
+          icon={<GraduationCap className="w-5 h-5 text-purple-600" />}
+          searchPlaceholder="Search by class, section, teacher, or subjects..."
+          searchFields={['className', 'section', 'classTeacher', 'subjects']}
+          sortOptions={[
+            { value: 'name', label: 'Sort by Name' },
+            { value: 'students', label: 'Sort by Students' },
+            { value: 'subjects', label: 'Sort by Subjects' },
+            { value: 'teacher', label: 'Sort by Teacher' },
+          ]}
+          headerActions={[
+            {
+              label: 'Add Class',
+              icon: <GraduationCap className="w-4 h-4 mr-1" />,
+              onClick: handleAddClass,
+            },
+          ]}
+          onSort={handleSort}
+          getRowKey={(classSection, index) => classSection.id.toString()}
+          emptyStateIcon={<GraduationCap className="w-12 h-12" />}
+          emptyStateTitle="No classes found"
+          emptyStateSubtitle="Try adjusting your search terms or add a new class"
+        />
+      )}
+    </Box>
   );
 }

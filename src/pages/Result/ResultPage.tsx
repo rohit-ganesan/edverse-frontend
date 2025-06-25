@@ -13,9 +13,10 @@ import { StudentResults } from './tabs/StudentResults';
 import { Analytics } from './tabs/Analytics';
 import { PublishResults } from './tabs/PublishResults';
 import { useTabRouting } from 'lib/useTabRouting';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 export function ResultPage(): JSX.Element {
-  const { analytics } = useResultData();
+  const { analytics, isLoading } = useResultData();
   const { exportResults } = useResultManagement();
 
   // Use tab routing instead of local state
@@ -100,7 +101,16 @@ export function ResultPage(): JSX.Element {
         actions={headerActions}
       />
 
-      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      {/* Stats Skeleton */}
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      )}
 
       <TabContainer
         activeTab={activeTab}
@@ -109,22 +119,22 @@ export function ResultPage(): JSX.Element {
           {
             value: 'overview',
             label: 'Overview',
-            content: <Overview />,
+            content: <Overview isLoading={isLoading} />,
           },
           {
             value: 'student-results',
             label: 'Student Results',
-            content: <StudentResults />,
+            content: <StudentResults isLoading={isLoading} />,
           },
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics />,
+            content: <Analytics isLoading={isLoading} />,
           },
           {
             value: 'publish-results',
             label: 'Publish Results',
-            content: <PublishResults />,
+            content: <PublishResults isLoading={isLoading} />,
           },
         ]}
       />

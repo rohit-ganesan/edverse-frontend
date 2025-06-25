@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 // Mock data for now - will be replaced with actual API calls
 const mockCourses = [
@@ -53,6 +53,13 @@ const mockCourses = [
 ];
 
 export function useCoursesData() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const stats = useMemo(() => {
     const activeCourses = mockCourses.filter((c) => c.isActive);
     const totalEnrolled = mockCourses.reduce(
@@ -79,7 +86,7 @@ export function useCoursesData() {
   return {
     courses: mockCourses,
     stats,
-    isLoading: false,
+    isLoading,
     error: null,
   };
 }

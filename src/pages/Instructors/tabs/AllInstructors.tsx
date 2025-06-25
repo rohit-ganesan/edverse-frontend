@@ -9,9 +9,14 @@ import { Users, Eye, User } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import { useInstructorManagement } from '../hooks/useInstructorManagement';
 import type { Instructor } from '../types';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function AllInstructors(): JSX.Element {
-  const { instructors, isLoading, error } = useInstructorData();
+export function AllInstructors({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
+  const { instructors, isLoading: dataLoading, error } = useInstructorData();
   const { handleAddInstructor, handleViewDetails } = useInstructorManagement();
 
   // Get unique departments for filter
@@ -197,52 +202,62 @@ export function AllInstructors(): JSX.Element {
   };
 
   return (
-    <DataTable
-      data={instructors}
-      columns={columns}
-      actions={actions}
-      title="Instructor Records"
-      icon={<Users className="w-5 h-5 text-purple-600" />}
-      searchPlaceholder="Search by name, ID, email, or subjects..."
-      searchFields={['name', 'employeeId', 'email', 'subjects']}
-      filters={[
-        {
-          key: 'department',
-          label: 'Departments',
-          options: departments,
-        },
-        {
-          key: 'status',
-          label: 'Status',
-          options: [
-            { value: 'active', label: 'Active' },
-            { value: 'on leave', label: 'On Leave' },
-            { value: 'inactive', label: 'Inactive' },
-            { value: 'retired', label: 'Retired' },
-          ],
-        },
-      ]}
-      sortOptions={[
-        { value: 'name', label: 'Sort by Name' },
-        { value: 'department', label: 'Sort by Department' },
-        { value: 'experience', label: 'Sort by Experience' },
-        { value: 'rating', label: 'Sort by Rating' },
-      ]}
-      headerActions={[
-        {
-          label: 'Add Instructor',
-          icon: <User className="w-4 h-4 mr-1" />,
-          onClick: handleAddInstructor,
-        },
-      ]}
-      onSort={handleSort}
-      onFilter={handleFilter}
-      getRowKey={(instructor, index) => instructor.id.toString()}
-      isLoading={isLoading}
-      error={error}
-      emptyStateIcon={<Users className="w-12 h-12" />}
-      emptyStateTitle="No instructors found"
-      emptyStateSubtitle="Add instructors to get started"
-    />
+    <Box>
+      {isLoading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} height={96} />
+          ))}
+        </div>
+      ) : (
+        <DataTable
+          data={instructors}
+          columns={columns}
+          actions={actions}
+          title="Instructor Records"
+          icon={<Users className="w-5 h-5 text-purple-600" />}
+          searchPlaceholder="Search by name, ID, email, or subjects..."
+          searchFields={['name', 'employeeId', 'email', 'subjects']}
+          filters={[
+            {
+              key: 'department',
+              label: 'Departments',
+              options: departments,
+            },
+            {
+              key: 'status',
+              label: 'Status',
+              options: [
+                { value: 'active', label: 'Active' },
+                { value: 'on leave', label: 'On Leave' },
+                { value: 'inactive', label: 'Inactive' },
+                { value: 'retired', label: 'Retired' },
+              ],
+            },
+          ]}
+          sortOptions={[
+            { value: 'name', label: 'Sort by Name' },
+            { value: 'department', label: 'Sort by Department' },
+            { value: 'experience', label: 'Sort by Experience' },
+            { value: 'rating', label: 'Sort by Rating' },
+          ]}
+          headerActions={[
+            {
+              label: 'Add Instructor',
+              icon: <User className="w-4 h-4 mr-1" />,
+              onClick: handleAddInstructor,
+            },
+          ]}
+          onSort={handleSort}
+          onFilter={handleFilter}
+          getRowKey={(instructor, index) => instructor.id.toString()}
+          isLoading={dataLoading}
+          error={error}
+          emptyStateIcon={<Users className="w-12 h-12" />}
+          emptyStateTitle="No instructors found"
+          emptyStateSubtitle="Add instructors to get started"
+        />
+      )}
+    </Box>
   );
 }

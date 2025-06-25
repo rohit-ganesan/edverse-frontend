@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Notice, NoticeFilters, NoticeAnalytics } from '../types';
 
 const mockNotices: Notice[] = [
@@ -193,6 +193,13 @@ export function useNoticeData() {
     dateRange: {},
     tags: [],
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timeout = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   // Combine published and draft notices for all notices view
   const allNotices = useMemo(() => [...mockNotices, ...mockDraftNotices], []);
@@ -363,6 +370,7 @@ export function useNoticeData() {
         tags: [],
       });
     },
+    isLoading,
   };
 }
 

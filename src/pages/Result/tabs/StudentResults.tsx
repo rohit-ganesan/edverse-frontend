@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useResultData } from '../hooks/useResultData';
 import { useResultManagement } from '../hooks/useResultManagement';
+import { SkeletonTableRow } from 'components/ui/Skeleton';
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -41,7 +42,11 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-export function StudentResults(): JSX.Element {
+export function StudentResults({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { filteredResults, filters, updateFilters } = useResultData();
   const { getGradeColor, getStatusColor, exportResults } =
     useResultManagement();
@@ -142,7 +147,13 @@ export function StudentResults(): JSX.Element {
 
         {/* Results Table */}
         <Box className="overflow-x-auto">
-          {filteredResults && filteredResults.length > 0 ? (
+          {isLoading ? (
+            <>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={8} className="mb-2" />
+              ))}
+            </>
+          ) : filteredResults && filteredResults.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

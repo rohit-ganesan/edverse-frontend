@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Student, AttendanceRecord, AttendanceSession } from '../types';
 
 // Mock data - in real app this would come from API
@@ -141,6 +141,13 @@ export function useAttendanceData({
   searchTerm = '',
   selectedStatus = 'all',
 }: UseAttendanceDataProps = {}) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const filteredRecords = useMemo(() => {
     return mockAttendanceRecords.filter((record) => {
       const matchesSearch =
@@ -191,5 +198,7 @@ export function useAttendanceData({
     filteredRecords,
     stats,
     activeSession,
+    isLoading,
+    error: null,
   };
 }

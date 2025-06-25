@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   Application,
   AdmissionProgram,
@@ -458,6 +458,13 @@ const mockPerformanceMetrics: PerformanceMetric[] = [
 ];
 
 export function useAdmissionData() {
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    setIsLoading(true);
+    const timeout = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const stats = useMemo((): AdmissionStats => {
     const totalApplications = mockApplications.length;
     const acceptedApplications = mockApplications.filter(
@@ -510,7 +517,7 @@ export function useAdmissionData() {
     programs: mockPrograms,
     stats,
     dashboardData,
-    isLoading: false,
+    isLoading,
     error: null,
   };
 }

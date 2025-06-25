@@ -6,8 +6,13 @@ import { SessionCard } from '../components/SessionCard';
 import { ActivityItem } from '../components/ActivityItem';
 import { useAttendanceData } from '../hooks/useAttendanceData';
 import { useSessionManagement } from '../hooks/useSessionManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Overview(): JSX.Element {
+export function Overview({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { attendanceSessions, attendanceRecords } = useAttendanceData();
   const { handleViewSession } = useSessionManagement();
 
@@ -24,7 +29,11 @@ export function Overview(): JSX.Element {
                   Today's Sessions
                 </Heading>
                 <Text size="3" className="text-gray-600">
-                  {attendanceSessions?.length || 0} sessions scheduled
+                  {isLoading ? (
+                    <span className="inline-block w-24 h-4 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    `${attendanceSessions?.length || 0} sessions scheduled`
+                  )}
                 </Text>
               </Box>
               <RadixButton
@@ -41,7 +50,11 @@ export function Overview(): JSX.Element {
           {/* Sessions List */}
           <Box className="p-6">
             <Flex direction="column" gap="4">
-              {attendanceSessions && attendanceSessions.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 2 }).map((_, i) => (
+                  <SkeletonCard key={i} height={56} className="mb-2" />
+                ))
+              ) : attendanceSessions && attendanceSessions.length > 0 ? (
                 attendanceSessions.map((session, index) => (
                   <SessionCard
                     key={session.id}
@@ -96,7 +109,11 @@ export function Overview(): JSX.Element {
           {/* Activity List */}
           <Box className="p-5">
             <Flex direction="column" gap="3">
-              {attendanceRecords && attendanceRecords.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonCard key={i} height={32} className="mb-2" />
+                ))
+              ) : attendanceRecords && attendanceRecords.length > 0 ? (
                 attendanceRecords
                   .slice(0, 6)
                   .map((record, index) => (
@@ -118,14 +135,17 @@ export function Overview(): JSX.Element {
               )}
             </Flex>
 
-            {attendanceRecords && attendanceRecords.length > 6 && (
-              <Box className="mt-5 pt-4 border-t border-gray-100">
-                <RadixButton variant="ghost" size="2" className="w-full">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View All Activity
-                </RadixButton>
-              </Box>
-            )}
+            {isLoading
+              ? null
+              : attendanceRecords &&
+                attendanceRecords.length > 6 && (
+                  <Box className="mt-5 pt-4 border-t border-gray-100">
+                    <RadixButton variant="ghost" size="2" className="w-full">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View All Activity
+                    </RadixButton>
+                  </Box>
+                )}
           </Box>
         </RadixCard>
       </Box>

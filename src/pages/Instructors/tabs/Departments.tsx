@@ -8,9 +8,18 @@ import {
 import { Building, Users, BookOpen, Eye } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import type { Department } from '../types';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Departments(): JSX.Element {
-  const { instructors, isLoading, error } = useInstructorData();
+export function Departments({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
+  const {
+    instructors,
+    isLoading: instructorDataLoading,
+    error,
+  } = useInstructorData();
 
   // Generate department data from instructors
   const departments = useMemo(() => {
@@ -188,34 +197,43 @@ export function Departments(): JSX.Element {
   };
 
   return (
-    <DataTable
-      data={departments}
-      columns={columns}
-      actions={actions}
-      title="Departments"
-      icon={<Building className="w-5 h-5 text-purple-600" />}
-      searchPlaceholder="Search by name, code, head, or subjects..."
-      searchFields={['name', 'code', 'head', 'subjects']}
-      sortOptions={[
-        { value: 'name', label: 'Sort by Name' },
-        { value: 'instructors', label: 'Sort by Instructors' },
-        { value: 'students', label: 'Sort by Students' },
-        { value: 'performance', label: 'Sort by Performance' },
-      ]}
-      headerActions={[
-        {
-          label: 'Add Department',
-          icon: <Building className="w-4 h-4 mr-1" />,
-          onClick: handleAddDepartment,
-        },
-      ]}
-      onSort={handleSort}
-      getRowKey={(department, index) => department.id.toString()}
-      isLoading={isLoading}
-      error={error}
-      emptyStateIcon={<Building className="w-12 h-12" />}
-      emptyStateTitle="No departments found"
-      emptyStateSubtitle="Try adjusting your search terms or add a new department"
-    />
+    <Box>
+      {isLoading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <SkeletonCard key={i} height={80} />
+          ))}
+        </div>
+      ) : (
+        <DataTable
+          data={departments}
+          columns={columns}
+          actions={actions}
+          title="Departments"
+          icon={<Building className="w-5 h-5 text-purple-600" />}
+          searchPlaceholder="Search by name, code, head, or subjects..."
+          searchFields={['name', 'code', 'head', 'subjects']}
+          sortOptions={[
+            { value: 'name', label: 'Sort by Name' },
+            { value: 'instructors', label: 'Sort by Instructors' },
+            { value: 'students', label: 'Sort by Students' },
+            { value: 'performance', label: 'Sort by Performance' },
+          ]}
+          headerActions={[
+            {
+              label: 'Add Department',
+              icon: <Building className="w-4 h-4 mr-1" />,
+              onClick: handleAddDepartment,
+            },
+          ]}
+          onSort={handleSort}
+          getRowKey={(department, index) => department.id.toString()}
+          error={error}
+          emptyStateIcon={<Building className="w-12 h-12" />}
+          emptyStateTitle="No departments found"
+          emptyStateSubtitle="Try adjusting your search terms or add a new department"
+        />
+      )}
+    </Box>
   );
 }

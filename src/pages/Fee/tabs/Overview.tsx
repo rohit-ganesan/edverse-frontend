@@ -36,8 +36,13 @@ import {
   Wallet,
   ArrowUpRight,
 } from 'lucide-react';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
 
-export function Overview(): JSX.Element {
+export function Overview({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { payments, stats, dashboardData } = useFeeData();
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -96,236 +101,266 @@ export function Overview(): JSX.Element {
 
   return (
     <Box className="space-y-6">
-      {/* Alerts & Notifications and Overdue Payments Side by Side */}
-      {(dashboardData.alertsAndNotifications?.length > 0 ||
-        overdueCount > 0 ||
-        dashboardData.overduePayments?.length > 0) && (
-        <Grid columns="2" gap="6">
-          {/* Alerts and Notifications */}
+      {isLoading ? (
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <>
+          {/* Alerts & Notifications and Overdue Payments Side by Side */}
           {(dashboardData.alertsAndNotifications?.length > 0 ||
-            overdueCount > 0) && (
-            <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-              <Box className="p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100">
-                <Flex justify="between" align="center">
-                  <Box>
-                    <Heading size="4" className="text-gray-900 mb-1">
-                      <Flex align="center" gap="2">
-                        <Bell className="w-5 h-5 text-amber-600" />
-                        Alerts & Notifications
-                      </Flex>
-                    </Heading>
-                    <Text size="2" className="text-gray-600">
-                      {dashboardData.alertsAndNotifications?.filter(
-                        (a) => !a.isRead
-                      ).length || 0}{' '}
-                      unread notifications
-                    </Text>
-                  </Box>
-                  <RadixButton
-                    variant="soft"
-                    size="2"
-                    className="bg-white/70 hover:bg-white"
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    View All
-                  </RadixButton>
-                </Flex>
-              </Box>
-
-              <Box className="p-6">
-                <Flex direction="column" gap="4">
-                  {dashboardData.alertsAndNotifications
-                    ?.slice(0, 3)
-                    .map((alert) => (
-                      <Box
-                        key={alert.id}
-                        className={`p-4 rounded-lg border ${
-                          alert.severity === 'critical'
-                            ? 'bg-red-50 border-red-200'
-                            : alert.severity === 'error'
-                              ? 'bg-red-50 border-red-200'
-                              : alert.severity === 'warning'
-                                ? 'bg-yellow-50 border-yellow-200'
-                                : 'bg-blue-50 border-blue-200'
-                        }`}
+            overdueCount > 0 ||
+            dashboardData.overduePayments?.length > 0) && (
+            <Grid columns="2" gap="6">
+              {/* Alerts and Notifications */}
+              {(dashboardData.alertsAndNotifications?.length > 0 ||
+                overdueCount > 0) && (
+                <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
+                  <Box className="p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100">
+                    <Flex justify="between" align="center">
+                      <Box>
+                        <Heading size="4" className="text-gray-900 mb-1">
+                          <Flex align="center" gap="2">
+                            <Bell className="w-5 h-5 text-amber-600" />
+                            Alerts & Notifications
+                          </Flex>
+                        </Heading>
+                        <Text size="2" className="text-gray-600">
+                          {dashboardData.alertsAndNotifications?.filter(
+                            (a) => !a.isRead
+                          ).length || 0}{' '}
+                          unread notifications
+                        </Text>
+                      </Box>
+                      <RadixButton
+                        variant="soft"
+                        size="2"
+                        className="bg-white/70 hover:bg-white"
                       >
-                        <Flex align="start" gap="3">
+                        <Eye className="w-4 h-4 mr-1" />
+                        View All
+                      </RadixButton>
+                    </Flex>
+                  </Box>
+
+                  <Box className="p-6">
+                    <Flex direction="column" gap="4">
+                      {dashboardData.alertsAndNotifications
+                        ?.slice(0, 3)
+                        .map((alert) => (
                           <Box
-                            className={`p-2 rounded-lg ${
-                              alert.severity === 'critical' ||
-                              alert.severity === 'error'
-                                ? 'bg-red-100'
-                                : alert.severity === 'warning'
-                                  ? 'bg-yellow-100'
-                                  : 'bg-blue-100'
+                            key={alert.id}
+                            className={`p-4 rounded-lg border ${
+                              alert.severity === 'critical'
+                                ? 'bg-red-50 border-red-200'
+                                : alert.severity === 'error'
+                                  ? 'bg-red-50 border-red-200'
+                                  : alert.severity === 'warning'
+                                    ? 'bg-yellow-50 border-yellow-200'
+                                    : 'bg-blue-50 border-blue-200'
                             }`}
                           >
-                            <AlertTriangle
-                              className={`w-4 h-4 ${
-                                alert.severity === 'critical' ||
-                                alert.severity === 'error'
-                                  ? 'text-red-600'
-                                  : alert.severity === 'warning'
-                                    ? 'text-yellow-600'
-                                    : 'text-blue-600'
-                              }`}
-                            />
+                            <Flex align="start" gap="3">
+                              <Box
+                                className={`p-2 rounded-lg ${
+                                  alert.severity === 'critical' ||
+                                  alert.severity === 'error'
+                                    ? 'bg-red-100'
+                                    : alert.severity === 'warning'
+                                      ? 'bg-yellow-100'
+                                      : 'bg-blue-100'
+                                }`}
+                              >
+                                <AlertTriangle
+                                  className={`w-4 h-4 ${
+                                    alert.severity === 'critical' ||
+                                    alert.severity === 'error'
+                                      ? 'text-red-600'
+                                      : alert.severity === 'warning'
+                                        ? 'text-yellow-600'
+                                        : 'text-blue-600'
+                                  }`}
+                                />
+                              </Box>
+                              <Box className="flex-1">
+                                <Text
+                                  size="2"
+                                  weight="medium"
+                                  className="text-gray-900 block mb-1"
+                                >
+                                  {alert.title}
+                                </Text>
+                                <Text size="2" className="text-gray-600 mb-2">
+                                  {alert.description}
+                                </Text>
+                                <Text size="1" className="text-gray-500">
+                                  {new Date(
+                                    alert.createdDate
+                                  ).toLocaleDateString()}
+                                </Text>
+                              </Box>
+                              {!alert.isRead && (
+                                <Box className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+                              )}
+                            </Flex>
                           </Box>
-                          <Box className="flex-1">
-                            <Text
-                              size="2"
-                              weight="medium"
-                              className="text-gray-900 block mb-1"
-                            >
-                              {alert.title}
-                            </Text>
-                            <Text size="2" className="text-gray-600 mb-2">
-                              {alert.description}
-                            </Text>
-                            <Text size="1" className="text-gray-500">
-                              {new Date(alert.createdDate).toLocaleDateString()}
-                            </Text>
-                          </Box>
-                          {!alert.isRead && (
-                            <Box className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
-                          )}
-                        </Flex>
+                        ))}
+                    </Flex>
+                  </Box>
+                </RadixCard>
+              )}
+
+              {/* Overdue Payments */}
+              {dashboardData.overduePayments?.length > 0 && (
+                <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
+                  <Box className="p-6 bg-gradient-to-r from-red-50 to-pink-50 border-b border-red-100">
+                    <Flex justify="between" align="center">
+                      <Box>
+                        <Heading size="4" className="text-gray-900 mb-1">
+                          <Flex align="center" gap="2">
+                            <AlertTriangle className="w-5 h-5 text-red-600" />
+                            Overdue Payments
+                          </Flex>
+                        </Heading>
+                        <Text size="2" className="text-red-600 font-medium">
+                          {dashboardData.overduePayments.length} students •{' '}
+                          {formatCurrency(stats.overdueAmount || 0)}
+                        </Text>
                       </Box>
-                    ))}
-                </Flex>
-              </Box>
-            </RadixCard>
+                      <RadixButton
+                        size="2"
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        <Bell className="w-4 h-4 mr-1" />
+                        Send Reminders
+                      </RadixButton>
+                    </Flex>
+                  </Box>
+
+                  <Box className="p-6">
+                    <Flex direction="column" gap="3">
+                      {dashboardData.overduePayments
+                        .slice(0, 3)
+                        .map((assignment) => (
+                          <Box
+                            key={assignment.id}
+                            className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                          >
+                            <Flex
+                              justify="between"
+                              align="center"
+                              className="mb-2"
+                            >
+                              <Text
+                                size="2"
+                                weight="medium"
+                                className="text-red-900"
+                              >
+                                Student ID: {assignment.studentId}
+                              </Text>
+                              <Badge color="red" variant="soft" size="1">
+                                Overdue
+                              </Badge>
+                            </Flex>
+                            <Flex
+                              justify="between"
+                              align="center"
+                              className="mb-3"
+                            >
+                              <Text size="2" className="text-red-800">
+                                Amount: {formatCurrency(assignment.finalAmount)}
+                              </Text>
+                              <Text size="1" className="text-red-700">
+                                Due:{' '}
+                                {new Date(
+                                  assignment.dueDate
+                                ).toLocaleDateString()}
+                              </Text>
+                            </Flex>
+                            <Flex gap="2">
+                              <RadixButton variant="soft" size="1" color="red">
+                                Send Reminder
+                              </RadixButton>
+                              <RadixButton
+                                variant="outline"
+                                size="1"
+                                color="red"
+                              >
+                                Call Student
+                              </RadixButton>
+                            </Flex>
+                          </Box>
+                        ))}
+                    </Flex>
+                  </Box>
+                </RadixCard>
+              )}
+            </Grid>
           )}
 
-          {/* Overdue Payments */}
-          {dashboardData.overduePayments?.length > 0 && (
-            <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-              <Box className="p-6 bg-gradient-to-r from-red-50 to-pink-50 border-b border-red-100">
-                <Flex justify="between" align="center">
-                  <Box>
-                    <Heading size="4" className="text-gray-900 mb-1">
-                      <Flex align="center" gap="2">
-                        <AlertTriangle className="w-5 h-5 text-red-600" />
-                        Overdue Payments
-                      </Flex>
-                    </Heading>
-                    <Text size="2" className="text-red-600 font-medium">
-                      {dashboardData.overduePayments.length} students •{' '}
-                      {formatCurrency(stats.overdueAmount || 0)}
-                    </Text>
-                  </Box>
-                  <RadixButton size="2" className="bg-red-600 hover:bg-red-700">
-                    <Bell className="w-4 h-4 mr-1" />
-                    Send Reminders
-                  </RadixButton>
-                </Flex>
-              </Box>
+          {/* Upcoming Due Dates - Now in its own section */}
+          <Box>
+            {/* Upcoming Due Dates */}
+            {dashboardData.upcomingDueDates?.length > 0 && (
+              <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
+                <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+                  <Flex justify="between" align="center">
+                    <Box>
+                      <Heading size="4" className="text-gray-900 mb-1">
+                        <Flex align="center" gap="2">
+                          <Calendar className="w-5 h-5 text-blue-600" />
+                          Upcoming Due Dates
+                        </Flex>
+                      </Heading>
+                      <Text size="2" className="text-gray-600">
+                        Next 7 days
+                      </Text>
+                    </Box>
+                    <RadixButton
+                      variant="soft"
+                      size="2"
+                      className="bg-white/70 hover:bg-white"
+                    >
+                      <Calendar className="w-4 h-4 mr-1" />
+                      View Calendar
+                    </RadixButton>
+                  </Flex>
+                </Box>
 
-              <Box className="p-6">
-                <Flex direction="column" gap="3">
-                  {dashboardData.overduePayments
-                    .slice(0, 3)
-                    .map((assignment) => (
-                      <Box
-                        key={assignment.id}
-                        className="p-4 bg-red-50 border border-red-200 rounded-lg"
-                      >
-                        <Flex justify="between" align="center" className="mb-2">
+                <Box className="p-6">
+                  <Grid columns="4" gap="3">
+                    {dashboardData.upcomingDueDates
+                      .slice(0, 8)
+                      .map((assignment) => (
+                        <Box
+                          key={assignment.id}
+                          className="p-3 bg-amber-50 border border-amber-200 rounded-lg"
+                        >
                           <Text
                             size="2"
                             weight="medium"
-                            className="text-red-900"
+                            className="text-amber-900 block mb-1"
                           >
                             Student ID: {assignment.studentId}
                           </Text>
-                          <Badge color="red" variant="soft" size="1">
-                            Overdue
-                          </Badge>
-                        </Flex>
-                        <Flex justify="between" align="center" className="mb-3">
-                          <Text size="2" className="text-red-800">
-                            Amount: {formatCurrency(assignment.finalAmount)}
+                          <Text size="2" className="text-amber-800 mb-1">
+                            {formatCurrency(assignment.finalAmount)}
                           </Text>
-                          <Text size="1" className="text-red-700">
+                          <Text size="1" className="text-amber-700">
                             Due:{' '}
                             {new Date(assignment.dueDate).toLocaleDateString()}
                           </Text>
-                        </Flex>
-                        <Flex gap="2">
-                          <RadixButton variant="soft" size="1" color="red">
-                            Send Reminder
-                          </RadixButton>
-                          <RadixButton variant="outline" size="1" color="red">
-                            Call Student
-                          </RadixButton>
-                        </Flex>
-                      </Box>
-                    ))}
-                </Flex>
-              </Box>
-            </RadixCard>
-          )}
-        </Grid>
-      )}
-
-      {/* Upcoming Due Dates - Now in its own section */}
-      <Box>
-        {/* Upcoming Due Dates */}
-        {dashboardData.upcomingDueDates?.length > 0 && (
-          <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-            <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
-              <Flex justify="between" align="center">
-                <Box>
-                  <Heading size="4" className="text-gray-900 mb-1">
-                    <Flex align="center" gap="2">
-                      <Calendar className="w-5 h-5 text-blue-600" />
-                      Upcoming Due Dates
-                    </Flex>
-                  </Heading>
-                  <Text size="2" className="text-gray-600">
-                    Next 7 days
-                  </Text>
+                        </Box>
+                      ))}
+                  </Grid>
                 </Box>
-                <RadixButton
-                  variant="soft"
-                  size="2"
-                  className="bg-white/70 hover:bg-white"
-                >
-                  <Calendar className="w-4 h-4 mr-1" />
-                  View Calendar
-                </RadixButton>
-              </Flex>
-            </Box>
-
-            <Box className="p-6">
-              <Grid columns="4" gap="3">
-                {dashboardData.upcomingDueDates
-                  .slice(0, 8)
-                  .map((assignment) => (
-                    <Box
-                      key={assignment.id}
-                      className="p-3 bg-amber-50 border border-amber-200 rounded-lg"
-                    >
-                      <Text
-                        size="2"
-                        weight="medium"
-                        className="text-amber-900 block mb-1"
-                      >
-                        Student ID: {assignment.studentId}
-                      </Text>
-                      <Text size="2" className="text-amber-800 mb-1">
-                        {formatCurrency(assignment.finalAmount)}
-                      </Text>
-                      <Text size="1" className="text-amber-700">
-                        Due: {new Date(assignment.dueDate).toLocaleDateString()}
-                      </Text>
-                    </Box>
-                  ))}
-              </Grid>
-            </Box>
-          </RadixCard>
-        )}
-      </Box>
+              </RadixCard>
+            )}
+          </Box>
+        </>
+      )}
 
       {/* Recent Payments DataTable */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
@@ -397,7 +432,13 @@ export function Overview(): JSX.Element {
 
         {/* Payments Table */}
         <Box className="overflow-x-auto">
-          {recentPayments.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4 mt-8">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <SkeletonCard key={i} height={64} />
+              ))}
+            </div>
+          ) : recentPayments.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

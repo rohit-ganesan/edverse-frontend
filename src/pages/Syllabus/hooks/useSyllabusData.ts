@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 // Mock data for now - will be replaced with actual API calls
 const mockSyllabi = [
@@ -49,6 +49,13 @@ const mockSyllabi = [
 ];
 
 export function useSyllabusData() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const stats = useMemo(() => {
     const activeSyllabi = mockSyllabi.filter((s) => s.isActive);
     const totalTopics = mockSyllabi.reduce((sum, s) => sum + s.topics, 0);
@@ -72,7 +79,7 @@ export function useSyllabusData() {
   return {
     syllabi: mockSyllabi,
     stats,
-    isLoading: false,
+    isLoading,
     error: null,
   };
 }

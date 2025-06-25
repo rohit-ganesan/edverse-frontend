@@ -21,9 +21,18 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
-  const { instructors, isLoading, error } = useInstructorData();
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
+  const {
+    instructors,
+    isLoading: instructorDataLoading,
+    error,
+  } = useInstructorData();
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
 
@@ -111,7 +120,7 @@ export function Analytics(): JSX.Element {
     };
   }, [instructors]);
 
-  if (isLoading) {
+  if (instructorDataLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-gray-500">Loading analytics...</div>
@@ -236,53 +245,62 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="4">
-              {[
-                {
-                  label: 'Excellent (4.5+)',
-                  count: analytics.performanceRanges.excellent,
-                  color: 'bg-green-500',
-                },
-                {
-                  label: 'Good (4.0-4.4)',
-                  count: analytics.performanceRanges.good,
-                  color: 'bg-blue-500',
-                },
-                {
-                  label: 'Average (3.0-3.9)',
-                  count: analytics.performanceRanges.average,
-                  color: 'bg-yellow-500',
-                },
-                {
-                  label: 'Poor (<3.0)',
-                  count: analytics.performanceRanges.poor,
-                  color: 'bg-red-500',
-                },
-              ].map((item, index) => (
-                <Box
-                  key={index}
-                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Flex justify="between" align="center">
-                    <Box className="flex items-center gap-3">
-                      <Box className={`w-3 h-3 rounded-full ${item.color}`} />
-                      <Text size="2" weight="medium" className="text-gray-700">
-                        {item.label}
-                      </Text>
-                    </Box>
-                    <Box className="flex items-center gap-2">
-                      <Text size="2" className="text-gray-600">
-                        {item.count} instructors
-                      </Text>
-                      <Text size="1" className="text-gray-500">
-                        ({((item.count / instructors.length) * 100).toFixed(1)}
-                        %)
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Box>
-              ))}
-            </Flex>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Flex direction="column" gap="4">
+                {[
+                  {
+                    label: 'Excellent (4.5+)',
+                    count: analytics.performanceRanges.excellent,
+                    color: 'bg-green-500',
+                  },
+                  {
+                    label: 'Good (4.0-4.4)',
+                    count: analytics.performanceRanges.good,
+                    color: 'bg-blue-500',
+                  },
+                  {
+                    label: 'Average (3.0-3.9)',
+                    count: analytics.performanceRanges.average,
+                    color: 'bg-yellow-500',
+                  },
+                  {
+                    label: 'Poor (<3.0)',
+                    count: analytics.performanceRanges.poor,
+                    color: 'bg-red-500',
+                  },
+                ].map((item, index) => (
+                  <Box
+                    key={index}
+                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <Flex justify="between" align="center">
+                      <Box className="flex items-center gap-3">
+                        <Box className={`w-3 h-3 rounded-full ${item.color}`} />
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-700"
+                        >
+                          {item.label}
+                        </Text>
+                      </Box>
+                      <Box className="flex items-center gap-2">
+                        <Text size="2" className="text-gray-600">
+                          {item.count} instructors
+                        </Text>
+                        <Text size="1" className="text-gray-500">
+                          (
+                          {((item.count / instructors.length) * 100).toFixed(1)}
+                          %)
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </Box>
+                ))}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
 
@@ -303,48 +321,57 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="4">
-              {[
-                {
-                  label: 'Junior (<5 years)',
-                  count: analytics.experienceRanges.junior,
-                  color: 'bg-blue-500',
-                },
-                {
-                  label: 'Mid-level (5-9 years)',
-                  count: analytics.experienceRanges.midLevel,
-                  color: 'bg-purple-500',
-                },
-                {
-                  label: 'Senior (10+ years)',
-                  count: analytics.experienceRanges.senior,
-                  color: 'bg-green-500',
-                },
-              ].map((item, index) => (
-                <Box
-                  key={index}
-                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Flex justify="between" align="center">
-                    <Box className="flex items-center gap-3">
-                      <Box className={`w-3 h-3 rounded-full ${item.color}`} />
-                      <Text size="2" weight="medium" className="text-gray-700">
-                        {item.label}
-                      </Text>
-                    </Box>
-                    <Box className="flex items-center gap-2">
-                      <Text size="2" className="text-gray-600">
-                        {item.count} instructors
-                      </Text>
-                      <Text size="1" className="text-gray-500">
-                        ({((item.count / instructors.length) * 100).toFixed(1)}
-                        %)
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Box>
-              ))}
-            </Flex>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Flex direction="column" gap="4">
+                {[
+                  {
+                    label: 'Junior (<5 years)',
+                    count: analytics.experienceRanges.junior,
+                    color: 'bg-blue-500',
+                  },
+                  {
+                    label: 'Mid-level (5-9 years)',
+                    count: analytics.experienceRanges.midLevel,
+                    color: 'bg-purple-500',
+                  },
+                  {
+                    label: 'Senior (10+ years)',
+                    count: analytics.experienceRanges.senior,
+                    color: 'bg-green-500',
+                  },
+                ].map((item, index) => (
+                  <Box
+                    key={index}
+                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <Flex justify="between" align="center">
+                      <Box className="flex items-center gap-3">
+                        <Box className={`w-3 h-3 rounded-full ${item.color}`} />
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-700"
+                        >
+                          {item.label}
+                        </Text>
+                      </Box>
+                      <Box className="flex items-center gap-2">
+                        <Text size="2" className="text-gray-600">
+                          {item.count} instructors
+                        </Text>
+                        <Text size="1" className="text-gray-500">
+                          (
+                          {((item.count / instructors.length) * 100).toFixed(1)}
+                          %)
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </Box>
+                ))}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
 
@@ -365,37 +392,43 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="3">
-              {Object.entries(analytics.departmentStats).map(
-                ([dept, count], index) => (
-                  <Box
-                    key={dept}
-                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <Flex justify="between" align="center">
-                      <Box className="flex items-center gap-3">
-                        <Box className="w-3 h-3 rounded-full bg-indigo-500" />
-                        <Text
-                          size="2"
-                          weight="medium"
-                          className="text-gray-700"
-                        >
-                          {dept}
-                        </Text>
-                      </Box>
-                      <Box className="flex items-center gap-2">
-                        <Text size="2" className="text-gray-600">
-                          {count} instructors
-                        </Text>
-                        <Text size="1" className="text-gray-500">
-                          ({((count / instructors.length) * 100).toFixed(1)}%)
-                        </Text>
-                      </Box>
-                    </Flex>
-                  </Box>
-                )
-              )}
-            </Flex>
+            {isLoading ? (
+              Array.from({ length: 2 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={2} className="mb-2" />
+              ))
+            ) : (
+              <Flex direction="column" gap="3">
+                {Object.entries(analytics.departmentStats).map(
+                  ([dept, count], index) => (
+                    <Box
+                      key={dept}
+                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <Flex justify="between" align="center">
+                        <Box className="flex items-center gap-3">
+                          <Box className="w-3 h-3 rounded-full bg-indigo-500" />
+                          <Text
+                            size="2"
+                            weight="medium"
+                            className="text-gray-700"
+                          >
+                            {dept}
+                          </Text>
+                        </Box>
+                        <Box className="flex items-center gap-2">
+                          <Text size="2" className="text-gray-600">
+                            {count} instructors
+                          </Text>
+                          <Text size="1" className="text-gray-500">
+                            ({((count / instructors.length) * 100).toFixed(1)}%)
+                          </Text>
+                        </Box>
+                      </Flex>
+                    </Box>
+                  )
+                )}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
 
@@ -416,45 +449,49 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="3">
-              {Object.entries(analytics.statusStats).map(
-                ([status, count], index) => (
-                  <Box
-                    key={status}
-                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <Flex justify="between" align="center">
-                      <Box className="flex items-center gap-3">
-                        <Box
-                          className={`w-3 h-3 rounded-full ${
-                            status === 'Active'
-                              ? 'bg-green-500'
-                              : status === 'On Leave'
-                                ? 'bg-yellow-500'
-                                : 'bg-gray-500'
-                          }`}
-                        />
-                        <Text
-                          size="2"
-                          weight="medium"
-                          className="text-gray-700"
-                        >
-                          {status}
-                        </Text>
-                      </Box>
-                      <Box className="flex items-center gap-2">
-                        <Text size="2" className="text-gray-600">
-                          {count} instructors
-                        </Text>
-                        <Text size="1" className="text-gray-500">
-                          ({((count / instructors.length) * 100).toFixed(1)}%)
-                        </Text>
-                      </Box>
-                    </Flex>
-                  </Box>
-                )
-              )}
-            </Flex>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Flex direction="column" gap="3">
+                {Object.entries(analytics.statusStats).map(
+                  ([status, count], index) => (
+                    <Box
+                      key={status}
+                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <Flex justify="between" align="center">
+                        <Box className="flex items-center gap-3">
+                          <Box
+                            className={`w-3 h-3 rounded-full ${
+                              status === 'Active'
+                                ? 'bg-green-500'
+                                : status === 'On Leave'
+                                  ? 'bg-yellow-500'
+                                  : 'bg-gray-500'
+                            }`}
+                          />
+                          <Text
+                            size="2"
+                            weight="medium"
+                            className="text-gray-700"
+                          >
+                            {status}
+                          </Text>
+                        </Box>
+                        <Box className="flex items-center gap-2">
+                          <Text size="2" className="text-gray-600">
+                            {count} instructors
+                          </Text>
+                          <Text size="1" className="text-gray-500">
+                            ({((count / instructors.length) * 100).toFixed(1)}%)
+                          </Text>
+                        </Box>
+                      </Flex>
+                    </Box>
+                  )
+                )}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
       </Grid>
@@ -476,38 +513,42 @@ export function Analytics(): JSX.Element {
         </Box>
 
         <Box className="p-6">
-          <Grid columns="3" gap="4">
-            {analytics.topPerformers.map((instructor) => (
-              <Box
-                key={instructor.id}
-                className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4"
-              >
-                <Flex align="center" gap="3">
-                  <Box className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-600" />
-                  </Box>
-                  <Box>
-                    <Text
-                      size="2"
-                      weight="medium"
-                      className="text-gray-900 block"
-                    >
-                      {instructor.name}
-                    </Text>
-                    <Text size="1" className="text-gray-600">
-                      {instructor.department}
-                    </Text>
-                    <Flex align="center" gap="1" className="mt-1">
-                      <Award className="w-3 h-3 text-yellow-500" />
-                      <Text size="1" className="text-gray-600">
-                        {instructor.performance.rating.toFixed(1)} rating
+          {isLoading ? (
+            <SkeletonCard height={256} />
+          ) : (
+            <Grid columns="3" gap="4">
+              {analytics.topPerformers.map((instructor) => (
+                <Box
+                  key={instructor.id}
+                  className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4"
+                >
+                  <Flex align="center" gap="3">
+                    <Box className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5 text-blue-600" />
+                    </Box>
+                    <Box>
+                      <Text
+                        size="2"
+                        weight="medium"
+                        className="text-gray-900 block"
+                      >
+                        {instructor.name}
                       </Text>
-                    </Flex>
-                  </Box>
-                </Flex>
-              </Box>
-            ))}
-          </Grid>
+                      <Text size="1" className="text-gray-600">
+                        {instructor.department}
+                      </Text>
+                      <Flex align="center" gap="1" className="mt-1">
+                        <Award className="w-3 h-3 text-yellow-500" />
+                        <Text size="1" className="text-gray-600">
+                          {instructor.performance.rating.toFixed(1)} rating
+                        </Text>
+                      </Flex>
+                    </Box>
+                  </Flex>
+                </Box>
+              ))}
+            </Grid>
+          )}
         </Box>
       </RadixCard>
 
@@ -528,36 +569,42 @@ export function Analytics(): JSX.Element {
         </Box>
 
         <Box className="p-6">
-          <Grid columns="3" gap="4">
-            {analytics.recentHires.map((instructor) => (
-              <Box
-                key={instructor.id}
-                className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4"
-              >
-                <Flex align="center" gap="3">
-                  <Box className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-green-600" />
-                  </Box>
-                  <Box>
-                    <Text
-                      size="2"
-                      weight="medium"
-                      className="text-gray-900 block"
-                    >
-                      {instructor.name}
-                    </Text>
-                    <Text size="1" className="text-gray-600">
-                      {instructor.department}
-                    </Text>
-                    <Text size="1" className="text-gray-500 mt-1">
-                      Joined:{' '}
-                      {new Date(instructor.dateOfJoining).toLocaleDateString()}
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
-            ))}
-          </Grid>
+          {isLoading ? (
+            <SkeletonCard height={256} />
+          ) : (
+            <Grid columns="3" gap="4">
+              {analytics.recentHires.map((instructor) => (
+                <Box
+                  key={instructor.id}
+                  className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4"
+                >
+                  <Flex align="center" gap="3">
+                    <Box className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5 text-green-600" />
+                    </Box>
+                    <Box>
+                      <Text
+                        size="2"
+                        weight="medium"
+                        className="text-gray-900 block"
+                      >
+                        {instructor.name}
+                      </Text>
+                      <Text size="1" className="text-gray-600">
+                        {instructor.department}
+                      </Text>
+                      <Text size="1" className="text-gray-500 mt-1">
+                        Joined:{' '}
+                        {new Date(
+                          instructor.dateOfJoining
+                        ).toLocaleDateString()}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </Box>
+              ))}
+            </Grid>
+          )}
         </Box>
       </RadixCard>
     </Box>

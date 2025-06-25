@@ -18,8 +18,13 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { useSessionManagement } from '../hooks/useSessionManagement';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [selectedPeriod, setSelectedPeriod] = useState('week');
   const [selectedClass, setSelectedClass] = useState('all');
   const { handleExportReport } = useSessionManagement();
@@ -134,18 +139,21 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Placeholder for chart */}
-            <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
-              <Box className="text-center">
-                <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
-                <Text size="3" className="text-gray-600 mb-1">
-                  Attendance Trend Chart
-                </Text>
-                <Text size="2" className="text-gray-500">
-                  Chart visualization would appear here
-                </Text>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
+                <Box className="text-center">
+                  <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+                  <Text size="3" className="text-gray-600 mb-1">
+                    Attendance Trend Chart
+                  </Text>
+                  <Text size="2" className="text-gray-500">
+                    Chart visualization would appear here
+                  </Text>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -171,49 +179,58 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Class Performance List */}
-            <Flex direction="column" gap="4">
-              {[
-                {
-                  name: 'Advanced JavaScript Programming',
-                  rate: 94,
-                  trend: 'up',
-                },
-                { name: 'Data Structures Lab', rate: 89, trend: 'down' },
-                { name: 'Introduction to Programming', rate: 92, trend: 'up' },
-                { name: 'Database Management', rate: 87, trend: 'down' },
-              ].map((classItem, index) => (
-                <Box
-                  key={index}
-                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Flex justify="between" align="center">
-                    <Box>
-                      <Text
-                        size="2"
-                        weight="medium"
-                        className="text-gray-900 block"
-                      >
-                        {classItem.name}
-                      </Text>
-                      <Text size="1" className="text-gray-600">
-                        Class attendance rate
-                      </Text>
-                    </Box>
-                    <Flex align="center" gap="2">
-                      <Text size="2" weight="bold" className="text-gray-900">
-                        {classItem.rate}%
-                      </Text>
-                      {classItem.trend === 'up' ? (
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <TrendingDown className="w-4 h-4 text-red-600" />
-                      )}
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={2} className="mb-2" />
+              ))
+            ) : (
+              <Flex direction="column" gap="4">
+                {[
+                  {
+                    name: 'Advanced JavaScript Programming',
+                    rate: 94,
+                    trend: 'up',
+                  },
+                  { name: 'Data Structures Lab', rate: 89, trend: 'down' },
+                  {
+                    name: 'Introduction to Programming',
+                    rate: 92,
+                    trend: 'up',
+                  },
+                  { name: 'Database Management', rate: 87, trend: 'down' },
+                ].map((classItem, index) => (
+                  <Box
+                    key={index}
+                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <Flex justify="between" align="center">
+                      <Box>
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900 block"
+                        >
+                          {classItem.name}
+                        </Text>
+                        <Text size="1" className="text-gray-600">
+                          Class attendance rate
+                        </Text>
+                      </Box>
+                      <Flex align="center" gap="2">
+                        <Text size="2" weight="bold" className="text-gray-900">
+                          {classItem.rate}%
+                        </Text>
+                        {classItem.trend === 'up' ? (
+                          <TrendingUp className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4 text-red-600" />
+                        )}
+                      </Flex>
                     </Flex>
-                  </Flex>
-                </Box>
-              ))}
-            </Flex>
+                  </Box>
+                ))}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
       </Grid>

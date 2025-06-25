@@ -11,9 +11,10 @@ import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
 import { useCoursesData } from './hooks/useCoursesData';
 import { useTabRouting } from 'lib/useTabRouting';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 export function CoursesPage(): JSX.Element {
-  const { stats } = useCoursesData();
+  const { stats, isLoading } = useCoursesData();
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -81,7 +82,16 @@ export function CoursesPage(): JSX.Element {
         description="Manage course curriculum, enrollment, and academic programs with comprehensive tracking"
       />
 
-      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      {/* Stats Skeleton */}
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      )}
 
       <TabContainer
         activeTab={activeTab}
@@ -90,17 +100,17 @@ export function CoursesPage(): JSX.Element {
           {
             value: 'overview',
             label: 'Overview',
-            content: <Overview />,
+            content: <Overview isLoading={isLoading} />,
           },
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics />,
+            content: <Analytics isLoading={isLoading} />,
           },
           {
             value: 'settings',
             label: 'Settings',
-            content: <Settings />,
+            content: <Settings isLoading={isLoading} />,
           },
         ]}
       />

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { StudentResult, ResultAnalytics, ResultFilters } from '../types';
 
 // Mock data
@@ -151,6 +151,12 @@ export function useResultData() {
     selectedSemester: 'all',
     selectedStatus: 'all',
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredResults = useMemo(() => {
     return mockResults.filter((result) => {
@@ -192,5 +198,7 @@ export function useResultData() {
     filters,
     updateFilters,
     resetFilters,
+    isLoading,
+    error: null,
   };
 }

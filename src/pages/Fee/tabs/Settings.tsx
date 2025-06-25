@@ -20,8 +20,13 @@ import {
   RotateCcw,
   FileText,
 } from 'lucide-react';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
 
-export function Settings(): JSX.Element {
+export function Settings({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [autoSendReminders, setAutoSendReminders] = useState(true);
   const [allowPartialPayments, setAllowPartialPayments] = useState(true);
   const [enableLateFees, setEnableLateFees] = useState(true);
@@ -52,6 +57,18 @@ export function Settings(): JSX.Element {
     setGracePeriod('15');
     setDefaultCurrency('USD');
   };
+
+  if (isLoading) {
+    return (
+      <Box className="space-y-8">
+        <SkeletonCard height={80} />
+        <div className="grid grid-cols-2 gap-8">
+          <SkeletonCard height={320} />
+          <SkeletonCard height={320} />
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box className="space-y-8">

@@ -21,8 +21,17 @@ import {
   Clock,
 } from 'lucide-react';
 import { useClassesData } from '../hooks/useClassesData';
+import {
+  SkeletonCard,
+  SkeletonText,
+  SkeletonTableRow,
+} from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [selectedPeriod, setSelectedPeriod] = useState('week');
   const [selectedGrade, setSelectedGrade] = useState('all');
   const { classes } = useClassesData();
@@ -138,18 +147,21 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Placeholder for chart */}
-            <Box className="h-64 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center border border-green-100">
-              <Box className="text-center">
-                <BarChart3 className="w-12 h-12 text-green-400 mx-auto mb-3" />
-                <Text size="3" className="text-gray-600 mb-1">
-                  Performance Trend Chart
-                </Text>
-                <Text size="2" className="text-gray-500">
-                  Chart visualization would appear here
-                </Text>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Box className="h-64 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center border border-green-100">
+                <Box className="text-center">
+                  <BarChart3 className="w-12 h-12 text-green-400 mx-auto mb-3" />
+                  <Text size="3" className="text-gray-600 mb-1">
+                    Performance Trend Chart
+                  </Text>
+                  <Text size="2" className="text-gray-500">
+                    Chart visualization would appear here
+                  </Text>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -175,48 +187,48 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Enrollment List */}
-            <Flex direction="column" gap="4">
-              {classes && classes.length > 0 ? (
-                classes.map((classItem, index) => (
-                  <Box
-                    key={classItem.id}
-                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <Flex justify="between" align="center">
-                      <Box>
-                        <Text
-                          size="2"
-                          weight="medium"
-                          className="text-gray-900 block"
-                        >
-                          {classItem.name}
-                        </Text>
-                        <Text size="1" className="text-gray-600">
-                          Grade {classItem.grade} - {classItem.section}
-                        </Text>
-                      </Box>
-                      <Box className="text-right">
-                        <Text
-                          size="2"
-                          weight="bold"
-                          className="text-purple-600 block"
-                        >
-                          {classItem.students}
-                        </Text>
-                        <Text size="1" className="text-gray-500">
-                          students
-                        </Text>
-                      </Box>
-                    </Flex>
-                  </Box>
-                ))
-              ) : (
-                <Text size="2" className="text-gray-500 text-center py-8">
-                  No classes data available
-                </Text>
-              )}
-            </Flex>
+            {isLoading ? (
+              <>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonTableRow key={i} columns={2} className="mb-3" />
+                ))}
+              </>
+            ) : (
+              <Flex direction="column" gap="4">
+                {classes && classes.length > 0 ? (
+                  classes.map((classItem, index) => (
+                    <Box
+                      key={classItem.id}
+                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <Flex justify="between" align="center">
+                        <Box>
+                          <Text
+                            size="2"
+                            weight="medium"
+                            className="text-gray-900 block"
+                          >
+                            {classItem.name}
+                          </Text>
+                          <Text size="1" className="text-gray-600">
+                            Grade {classItem.grade} - {classItem.section}
+                          </Text>
+                        </Box>
+                        <Box className="text-right">
+                          <Text size="2" className="text-gray-900 font-bold">
+                            {classItem.students} students
+                          </Text>
+                        </Box>
+                      </Flex>
+                    </Box>
+                  ))
+                ) : (
+                  <Text size="2" className="text-gray-500">
+                    No enrollment data
+                  </Text>
+                )}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
       </Grid>

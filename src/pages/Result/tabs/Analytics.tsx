@@ -21,8 +21,13 @@ import {
 import { useResultData } from '../hooks/useResultData';
 import { useResultManagement } from '../hooks/useResultManagement';
 import { SubjectAnalysisCard } from '../components/SubjectAnalysisCard';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedCourse, setSelectedCourse] = useState('all');
   const { results, analytics } = useResultData();
@@ -137,32 +142,38 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="4">
-              {analytics.subjectWiseAnalysis &&
-              analytics.subjectWiseAnalysis.length > 0 ? (
-                analytics.subjectWiseAnalysis.map((subject, index) => (
-                  <Box
-                    key={subject.subjectCode}
-                    className={`animate-in slide-in-from-left-1 duration-300`}
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <SubjectAnalysisCard subject={subject} />
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonCard key={i} height={56} className="mb-2" />
+              ))
+            ) : (
+              <Flex direction="column" gap="4">
+                {analytics.subjectWiseAnalysis &&
+                analytics.subjectWiseAnalysis.length > 0 ? (
+                  analytics.subjectWiseAnalysis.map((subject, index) => (
+                    <Box
+                      key={subject.subjectCode}
+                      className={`animate-in slide-in-from-left-1 duration-300`}
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <SubjectAnalysisCard subject={subject} />
+                    </Box>
+                  ))
+                ) : (
+                  <Box className="h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
+                    <Box className="text-center">
+                      <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+                      <Text size="3" className="text-gray-600 mb-1">
+                        Subject Analysis Chart
+                      </Text>
+                      <Text size="2" className="text-gray-500">
+                        Performance data would appear here
+                      </Text>
+                    </Box>
                   </Box>
-                ))
-              ) : (
-                <Box className="h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
-                  <Box className="text-center">
-                    <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
-                    <Text size="3" className="text-gray-600 mb-1">
-                      Subject Analysis Chart
-                    </Text>
-                    <Text size="2" className="text-gray-500">
-                      Performance data would appear here
-                    </Text>
-                  </Box>
-                </Box>
-              )}
-            </Flex>
+                )}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
 
@@ -188,7 +199,11 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {gradeDistribution && gradeDistribution.length > 0 ? (
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={3} className="mb-2" />
+              ))
+            ) : gradeDistribution && gradeDistribution.length > 0 ? (
               <Flex direction="column" gap="3">
                 {gradeDistribution.map(
                   ({ grade, count, percentage }, index) => (

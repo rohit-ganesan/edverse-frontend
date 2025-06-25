@@ -6,8 +6,13 @@ import { NoticeCard } from '../components/NoticeCard';
 import { TopNoticeItem } from '../components/TopNoticeItem';
 import { useNoticeData } from '../hooks/useNoticeData';
 import { useNoticeManagement } from '../hooks/useNoticeManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Recent(): JSX.Element {
+export function Recent({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { recentNotices, notices } = useNoticeData();
   const { handleCreateNotice } = useNoticeManagement();
 
@@ -176,7 +181,13 @@ export function Recent(): JSX.Element {
             </Box>
 
             <Box className="p-6">
-              {recentNotices.length > 0 ? (
+              {isLoading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <SkeletonCard key={i} height={80} />
+                  ))}
+                </div>
+              ) : recentNotices.length > 0 ? (
                 <Grid columns="1" gap="4">
                   {recentNotices.map((notice, index) => (
                     <NoticeCard
@@ -239,7 +250,13 @@ export function Recent(): JSX.Element {
             </Box>
 
             <Box className="p-6">
-              {topRecentNotices.length > 0 ? (
+              {isLoading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <SkeletonCard key={i} height={80} />
+                  ))}
+                </div>
+              ) : topRecentNotices.length > 0 ? (
                 <Flex direction="column" gap="3">
                   {topRecentNotices.map((notice, index) => (
                     <TopNoticeItem

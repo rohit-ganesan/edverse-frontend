@@ -28,6 +28,10 @@ import {
   Phone,
 } from 'lucide-react';
 import { useAdmissionData } from '../hooks/useAdmissionData';
+import {
+  SkeletonCard,
+  SkeletonTableRow,
+} from '../../../components/ui/Skeleton';
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -67,7 +71,11 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export function Applications(): JSX.Element {
+export function Applications({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedProgram, setSelectedProgram] = useState('all');
@@ -231,7 +239,13 @@ export function Applications(): JSX.Element {
 
         {/* Applications Table */}
         <Box className="overflow-x-auto">
-          {filteredApplications.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={6} className="mb-2" />
+              ))}
+            </div>
+          ) : filteredApplications.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

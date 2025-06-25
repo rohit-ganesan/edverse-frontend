@@ -13,9 +13,10 @@ import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
 import { useAttendanceData } from './hooks/useAttendanceData';
 import { useTabRouting } from 'lib/useTabRouting';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 export function AttendancePage(): JSX.Element {
-  const { stats } = useAttendanceData();
+  const { stats, isLoading } = useAttendanceData();
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -89,7 +90,16 @@ export function AttendancePage(): JSX.Element {
         description="Monitor student attendance with real-time tracking and comprehensive reporting"
       />
 
-      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      {/* Stats Skeleton */}
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      )}
 
       <TabContainer
         activeTab={activeTab}
@@ -98,27 +108,27 @@ export function AttendancePage(): JSX.Element {
           {
             value: 'overview',
             label: 'Overview',
-            content: <Overview />,
+            content: <Overview isLoading={isLoading} />,
           },
           {
             value: 'live-tracking',
             label: 'Live Tracking',
-            content: <LiveTracking />,
+            content: <LiveTracking isLoading={isLoading} />,
           },
           {
             value: 'records',
             label: 'Records',
-            content: <Records />,
+            content: <Records isLoading={isLoading} />,
           },
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics />,
+            content: <Analytics isLoading={isLoading} />,
           },
           {
             value: 'settings',
             label: 'Settings',
-            content: <Settings />,
+            content: <Settings isLoading={isLoading} />,
           },
         ]}
       />

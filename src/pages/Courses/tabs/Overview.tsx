@@ -2,10 +2,14 @@ import { Box, Grid, Flex, Heading, Text, Progress } from '@radix-ui/themes';
 import { RadixCard } from '../../../components/ui/RadixCard';
 import { RadixButton } from '../../../components/ui/RadixButton';
 import { Eye, GraduationCap, User, Users, Award } from 'lucide-react';
-// import { CourseCard } from '../components/CourseCard';
 import { useCoursesData } from '../hooks/useCoursesData';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
 
-export function Overview(): JSX.Element {
+export function Overview({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { courses } = useCoursesData();
 
   return (
@@ -21,7 +25,11 @@ export function Overview(): JSX.Element {
                   Active Courses
                 </Heading>
                 <Text size="3" className="text-gray-600">
-                  {courses?.length || 0} courses available
+                  {isLoading ? (
+                    <span className="inline-block w-24 h-4 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    `${courses?.length || 0} courses available`
+                  )}
                 </Text>
               </Box>
               <RadixButton
@@ -38,7 +46,11 @@ export function Overview(): JSX.Element {
           {/* Courses List */}
           <Box className="p-6">
             <Flex direction="column" gap="6">
-              {courses && courses.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonCard key={i} height={72} className="mb-2" />
+                ))
+              ) : courses && courses.length > 0 ? (
                 courses.slice(0, 3).map((course, index) => (
                   <Box
                     key={course.id}
@@ -128,84 +140,92 @@ export function Overview(): JSX.Element {
           {/* Stats List */}
           <Box className="p-6">
             <Flex direction="column" gap="5">
-              <Box className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                <Flex align="start" gap="4">
-                  <Box className="p-3 bg-purple-100 rounded-lg">
-                    <Users className="w-5 h-5 text-purple-600" />
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonCard key={i} height={56} className="mb-2" />
+                ))
+              ) : (
+                <>
+                  <Box className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                    <Flex align="start" gap="4">
+                      <Box className="p-3 bg-purple-100 rounded-lg">
+                        <Users className="w-5 h-5 text-purple-600" />
+                      </Box>
+                      <Box className="flex-1">
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900 block mb-1"
+                        >
+                          Total Enrollment
+                        </Text>
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-purple-600 block"
+                        >
+                          {courses
+                            ?.reduce(
+                              (sum, course) => sum + course.enrolledStudents,
+                              0
+                            )
+                            .toLocaleString() || '0'}
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="flex-1">
-                    <Text
-                      size="2"
-                      weight="medium"
-                      className="text-gray-900 block mb-1"
-                    >
-                      Total Enrollment
-                    </Text>
-                    <Text
-                      size="4"
-                      weight="bold"
-                      className="text-purple-600 block"
-                    >
-                      {courses
-                        ?.reduce(
-                          (sum, course) => sum + course.enrolledStudents,
-                          0
-                        )
-                        .toLocaleString() || '0'}
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
 
-              <Box className="p-4 bg-orange-50 rounded-lg border border-orange-100">
-                <Flex align="start" gap="4">
-                  <Box className="p-3 bg-orange-100 rounded-lg">
-                    <Award className="w-5 h-5 text-orange-600" />
+                  <Box className="p-4 bg-orange-50 rounded-lg border border-orange-100">
+                    <Flex align="start" gap="4">
+                      <Box className="p-3 bg-orange-100 rounded-lg">
+                        <Award className="w-5 h-5 text-orange-600" />
+                      </Box>
+                      <Box className="flex-1">
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900 block mb-1"
+                        >
+                          Avg Completion
+                        </Text>
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-orange-600 block"
+                        >
+                          78%
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="flex-1">
-                    <Text
-                      size="2"
-                      weight="medium"
-                      className="text-gray-900 block mb-1"
-                    >
-                      Avg Completion
-                    </Text>
-                    <Text
-                      size="4"
-                      weight="bold"
-                      className="text-orange-600 block"
-                    >
-                      78%
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
 
-              <Box className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <Flex align="start" gap="4">
-                  <Box className="p-3 bg-green-100 rounded-lg">
-                    <User className="w-5 h-5 text-green-600" />
+                  <Box className="p-4 bg-green-50 rounded-lg border border-green-100">
+                    <Flex align="start" gap="4">
+                      <Box className="p-3 bg-green-100 rounded-lg">
+                        <User className="w-5 h-5 text-green-600" />
+                      </Box>
+                      <Box className="flex-1">
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900 block mb-1"
+                        >
+                          Active Instructors
+                        </Text>
+                        <Text
+                          size="4"
+                          weight="bold"
+                          className="text-green-600 block"
+                        >
+                          {courses
+                            ? new Set(courses.map((c) => c.instructor)).size
+                            : 0}
+                        </Text>
+                      </Box>
+                    </Flex>
                   </Box>
-                  <Box className="flex-1">
-                    <Text
-                      size="2"
-                      weight="medium"
-                      className="text-gray-900 block mb-1"
-                    >
-                      Active Instructors
-                    </Text>
-                    <Text
-                      size="4"
-                      weight="bold"
-                      className="text-green-600 block"
-                    >
-                      {courses
-                        ? new Set(courses.map((c) => c.instructor)).size
-                        : 0}
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
+                </>
+              )}
             </Flex>
 
             <Box className="mt-6 pt-5 border-t border-gray-100">

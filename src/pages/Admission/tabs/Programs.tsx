@@ -27,6 +27,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { useAdmissionData } from '../hooks/useAdmissionData';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -50,7 +51,11 @@ const getCapacityColor = (current: number, max: number) => {
   return 'green';
 };
 
-export function Programs(): JSX.Element {
+export function Programs({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -207,7 +212,13 @@ export function Programs(): JSX.Element {
 
         {/* Programs Table */}
         <Box className="overflow-x-auto">
-          {filteredPrograms.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <SkeletonCard key={i} height={80} />
+              ))}
+            </div>
+          ) : filteredPrograms.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

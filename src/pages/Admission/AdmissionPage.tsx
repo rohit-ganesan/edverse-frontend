@@ -21,9 +21,10 @@ import { Programs } from './tabs/Programs';
 import { Settings } from './tabs/Settings';
 import { useAdmissionData } from './hooks/useAdmissionData';
 import { useTabRouting } from '../../lib/useTabRouting';
+import { SkeletonCard } from '../../components/ui/Skeleton';
 
 export function AdmissionPage(): JSX.Element {
-  const { stats } = useAdmissionData();
+  const { stats, isLoading } = useAdmissionData();
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -131,7 +132,15 @@ export function AdmissionPage(): JSX.Element {
         ]}
       />
 
-      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      )}
 
       <TabContainer
         activeTab={activeTab}
@@ -140,27 +149,27 @@ export function AdmissionPage(): JSX.Element {
           {
             value: 'overview',
             label: 'Overview',
-            content: <Overview />,
+            content: <Overview isLoading={isLoading} />,
           },
           {
             value: 'applications',
             label: 'Applications',
-            content: <Applications />,
+            content: <Applications isLoading={isLoading} />,
           },
           {
             value: 'programs',
             label: 'Programs',
-            content: <Programs />,
+            content: <Programs isLoading={isLoading} />,
           },
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics />,
+            content: <Analytics isLoading={isLoading} />,
           },
           {
             value: 'settings',
             label: 'Settings',
-            content: <Settings />,
+            content: <Settings isLoading={isLoading} />,
           },
         ]}
       />

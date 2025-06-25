@@ -14,8 +14,13 @@ import { RadixButton } from 'components/ui/RadixButton';
 import { Search, Download, Filter, Calendar, User } from 'lucide-react';
 import { useAttendanceData } from '../hooks/useAttendanceData';
 import { useSessionManagement } from '../hooks/useSessionManagement';
+import { SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Records(): JSX.Element {
+export function Records({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedDate, setSelectedDate] = useState('2024-01-15');
@@ -117,7 +122,13 @@ export function Records(): JSX.Element {
 
         {/* Records Table */}
         <Box className="overflow-x-auto">
-          {filteredRecords && filteredRecords.length > 0 ? (
+          {isLoading ? (
+            <>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={8} className="mb-2" />
+              ))}
+            </>
+          ) : filteredRecords && filteredRecords.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

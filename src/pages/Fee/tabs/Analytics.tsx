@@ -20,8 +20,16 @@ import {
   TrendingDown,
 } from 'lucide-react';
 import { useFeeData } from '../hooks/useFeeData';
+import {
+  SkeletonCard,
+  SkeletonTableRow,
+} from '../../../components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { payments, stats } = useFeeData();
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -131,17 +139,21 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
-              <Box className="text-center">
-                <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
-                <Text size="3" className="text-gray-600 mb-1">
-                  Collection Trend Chart
-                </Text>
-                <Text size="2" className="text-gray-500">
-                  Chart visualization would appear here
-                </Text>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
+                <Box className="text-center">
+                  <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+                  <Text size="3" className="text-gray-600 mb-1">
+                    Collection Trend Chart
+                  </Text>
+                  <Text size="2" className="text-gray-500">
+                    Chart visualization would appear here
+                  </Text>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -167,53 +179,65 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="4">
-              {[
-                {
-                  status: 'Completed',
-                  count: payments.filter((p) => p.status === 'completed')
-                    .length,
-                  color: 'bg-green-500',
-                },
-                {
-                  status: 'Pending',
-                  count: payments.filter((p) => p.status === 'pending').length,
-                  color: 'bg-yellow-500',
-                },
-                {
-                  status: 'Failed',
-                  count: payments.filter((p) => p.status === 'failed').length,
-                  color: 'bg-red-500',
-                },
-                {
-                  status: 'Refunded',
-                  count: payments.filter((p) => p.status === 'refunded').length,
-                  color: 'bg-blue-500',
-                },
-              ].map((item, index) => (
-                <Box
-                  key={index}
-                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Flex justify="between" align="center">
-                    <Box className="flex items-center gap-3">
-                      <Box className={`w-3 h-3 rounded-full ${item.color}`} />
-                      <Text size="2" weight="medium" className="text-gray-900">
-                        {item.status}
-                      </Text>
-                    </Box>
-                    <Box className="flex items-center gap-2">
-                      <Text size="2" className="text-gray-600">
-                        {item.count} payments
-                      </Text>
-                      <Text size="1" className="text-gray-500">
-                        ({Math.round((item.count / payments.length) * 100)}%)
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Box>
-              ))}
-            </Flex>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={2} className="mb-2" />
+              ))
+            ) : (
+              <Flex direction="column" gap="4">
+                {[
+                  {
+                    status: 'Completed',
+                    count: payments.filter((p) => p.status === 'completed')
+                      .length,
+                    color: 'bg-green-500',
+                  },
+                  {
+                    status: 'Pending',
+                    count: payments.filter((p) => p.status === 'pending')
+                      .length,
+                    color: 'bg-yellow-500',
+                  },
+                  {
+                    status: 'Failed',
+                    count: payments.filter((p) => p.status === 'failed').length,
+                    color: 'bg-red-500',
+                  },
+                  {
+                    status: 'Refunded',
+                    count: payments.filter((p) => p.status === 'refunded')
+                      .length,
+                    color: 'bg-blue-500',
+                  },
+                ].map((item, index) => (
+                  <Box
+                    key={index}
+                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <Flex justify="between" align="center">
+                      <Box className="flex items-center gap-3">
+                        <Box className={`w-3 h-3 rounded-full ${item.color}`} />
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900"
+                        >
+                          {item.status}
+                        </Text>
+                      </Box>
+                      <Box className="flex items-center gap-2">
+                        <Text size="2" className="text-gray-600">
+                          {item.count} payments
+                        </Text>
+                        <Text size="1" className="text-gray-500">
+                          ({Math.round((item.count / payments.length) * 100)}%)
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </Box>
+                ))}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
       </Grid>
@@ -237,14 +261,18 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="text-center">
-              <Text size="8" weight="bold" className="text-orange-600 block">
-                {stats.collectionRate}%
-              </Text>
-              <Text size="2" className="text-gray-600 mt-2">
-                ${stats.totalFeesCollected.toLocaleString()} collected
-              </Text>
-            </Box>
+            {isLoading ? (
+              <SkeletonCard height={128} />
+            ) : (
+              <Box className="text-center">
+                <Text size="8" weight="bold" className="text-orange-600 block">
+                  {stats.collectionRate}%
+                </Text>
+                <Text size="2" className="text-gray-600 mt-2">
+                  ${stats.totalFeesCollected.toLocaleString()} collected
+                </Text>
+              </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -265,14 +293,18 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="text-center">
-              <Text size="8" weight="bold" className="text-teal-600 block">
-                12
-              </Text>
-              <Text size="2" className="text-gray-600 mt-2">
-                days average
-              </Text>
-            </Box>
+            {isLoading ? (
+              <SkeletonCard height={128} />
+            ) : (
+              <Box className="text-center">
+                <Text size="8" weight="bold" className="text-teal-600 block">
+                  12
+                </Text>
+                <Text size="2" className="text-gray-600 mt-2">
+                  days average
+                </Text>
+              </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -293,14 +325,18 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Box className="text-center">
-              <Text size="6" weight="bold" className="text-rose-600 block">
-                Online
-              </Text>
-              <Text size="2" className="text-gray-600 mt-2">
-                45% of all payments
-              </Text>
-            </Box>
+            {isLoading ? (
+              <SkeletonCard height={128} />
+            ) : (
+              <Box className="text-center">
+                <Text size="6" weight="bold" className="text-rose-600 block">
+                  Online
+                </Text>
+                <Text size="2" className="text-gray-600 mt-2">
+                  45% of all payments
+                </Text>
+              </Box>
+            )}
           </Box>
         </RadixCard>
       </Grid>

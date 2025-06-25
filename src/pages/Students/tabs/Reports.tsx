@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useStudentData } from '../hooks/useStudentData';
 import { useStudentManagement } from '../hooks/useStudentManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 interface ReportType {
   id: string;
@@ -93,7 +94,11 @@ const reportTypes: ReportType[] = [
   },
 ];
 
-export function Reports(): JSX.Element {
+export function Reports({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { students } = useStudentData();
   const { handleExportStudents } = useStudentManagement();
   const [selectedReportType, setSelectedReportType] = useState('student-list');
@@ -494,7 +499,13 @@ export function Reports(): JSX.Element {
 
         {/* Reports Table */}
         <Box className="overflow-x-auto">
-          {filteredReports.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonCard key={i} height={80} />
+              ))}
+            </div>
+          ) : filteredReports.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

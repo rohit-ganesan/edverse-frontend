@@ -4,8 +4,13 @@ import { RadixButton } from 'components/ui/RadixButton';
 import { Eye, Trophy, Award, GraduationCap } from 'lucide-react';
 import { useResultData } from '../hooks/useResultData';
 import { useResultManagement } from '../hooks/useResultManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Overview(): JSX.Element {
+export function Overview({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { results, analytics } = useResultData();
   const { getGradeColor } = useResultManagement();
 
@@ -22,7 +27,11 @@ export function Overview(): JSX.Element {
                   Recent Results
                 </Heading>
                 <Text size="3" className="text-gray-600">
-                  {results?.length || 0} results published
+                  {isLoading ? (
+                    <span className="inline-block w-24 h-4 bg-gray-200 rounded animate-pulse" />
+                  ) : (
+                    `${results?.length || 0} results published`
+                  )}
                 </Text>
               </Box>
               <RadixButton
@@ -39,7 +48,11 @@ export function Overview(): JSX.Element {
           {/* Results List */}
           <Box className="p-6">
             <Flex direction="column" gap="4">
-              {results && results.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <SkeletonCard key={i} height={56} className="mb-2" />
+                ))
+              ) : results && results.length > 0 ? (
                 results.slice(0, 5).map((result, index) => (
                   <Box
                     key={result.id}
@@ -163,7 +176,12 @@ export function Overview(): JSX.Element {
           {/* Top Performers List */}
           <Box className="p-5">
             <Flex direction="column" gap="3">
-              {analytics.topPerformers && analytics.topPerformers.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonCard key={i} height={40} className="mb-2" />
+                ))
+              ) : analytics.topPerformers &&
+                analytics.topPerformers.length > 0 ? (
                 analytics.topPerformers.map((student, index) => (
                   <Box
                     key={student.id}

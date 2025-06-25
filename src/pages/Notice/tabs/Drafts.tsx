@@ -5,8 +5,13 @@ import { FileText, Plus, Edit, Trash2, Send, Save } from 'lucide-react';
 import { NoticeCard } from '../components/NoticeCard';
 import { useNoticeData } from '../hooks/useNoticeData';
 import { useNoticeManagement } from '../hooks/useNoticeManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Drafts(): JSX.Element {
+export function Drafts({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { draftNotices } = useNoticeData();
   const {
     handleCreateNotice,
@@ -168,7 +173,13 @@ export function Drafts(): JSX.Element {
         </Box>
 
         <Box className="p-6">
-          {draftNotices.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <SkeletonCard key={i} height={80} />
+              ))}
+            </div>
+          ) : draftNotices.length > 0 ? (
             <Grid columns="1" gap="4">
               {draftNotices.map((notice, index) => (
                 <RadixCard

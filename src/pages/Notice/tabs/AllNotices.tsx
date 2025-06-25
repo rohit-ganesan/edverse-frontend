@@ -15,10 +15,15 @@ import { NoticeCard } from '../components/NoticeCard';
 import { ImprovedNoticeCard } from '../components/ImprovedNoticeCard';
 import { useNoticeData } from '../hooks/useNoticeData';
 import { useNoticeManagement } from '../hooks/useNoticeManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 const NOTICES_PER_PAGE = 10;
 
-export function AllNotices(): JSX.Element {
+export function AllNotices({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { notices, pinnedNotices, filters, updateFilter, resetFilters } =
@@ -223,7 +228,13 @@ export function AllNotices(): JSX.Element {
 
         {/* Scrollable Content Container */}
         <Box className="h-[600px] overflow-hidden flex flex-col">
-          {currentNotices.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <SkeletonCard key={i} height={96} />
+              ))}
+            </div>
+          ) : currentNotices.length > 0 ? (
             <>
               {/* Scrollable Notice List */}
               <Box className="flex-1 overflow-y-auto p-6 space-y-3">

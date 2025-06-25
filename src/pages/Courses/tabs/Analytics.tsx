@@ -23,8 +23,13 @@ import {
   GraduationCap,
 } from 'lucide-react';
 import { useCoursesData } from '../hooks/useCoursesData';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const { courses } = useCoursesData();
@@ -142,18 +147,21 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Placeholder for chart */}
-            <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
-              <Box className="text-center">
-                <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
-                <Text size="3" className="text-gray-600 mb-1">
-                  Enrollment Trend Chart
-                </Text>
-                <Text size="2" className="text-gray-500">
-                  Chart visualization would appear here
-                </Text>
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
+                <Box className="text-center">
+                  <BarChart3 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+                  <Text size="3" className="text-gray-600 mb-1">
+                    Enrollment Trend Chart
+                  </Text>
+                  <Text size="2" className="text-gray-500">
+                    Chart visualization would appear here
+                  </Text>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
         </RadixCard>
 
@@ -179,47 +187,52 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            {/* Completion List */}
-            <Flex direction="column" gap="4">
-              {courses && courses.length > 0 ? (
-                courses.map((course, index) => {
-                  const completionRate = Math.floor(Math.random() * 30) + 70; // Mock completion rate
-                  return (
-                    <Box
-                      key={course.id}
-                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <Flex justify="between" align="center" className="mb-2">
-                        <Box>
-                          <Text
-                            size="2"
-                            weight="medium"
-                            className="text-gray-900 block"
-                          >
-                            {course.name}
-                          </Text>
-                          <Text size="1" className="text-gray-600">
-                            {course.code} • {course.instructor}
-                          </Text>
-                        </Box>
-                        <Text
-                          size="2"
-                          weight="bold"
-                          className="text-purple-600"
-                        >
-                          {completionRate}%
-                        </Text>
-                      </Flex>
-                      <Progress value={completionRate} className="h-2" />
-                    </Box>
-                  );
-                })
-              ) : (
-                <Text size="2" className="text-gray-500 text-center py-8">
-                  No courses data available
-                </Text>
-              )}
-            </Flex>
+            {isLoading ? (
+              <>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonTableRow key={i} columns={2} className="mb-3" />
+                ))}
+              </>
+            ) : (
+              <Flex direction="column" gap="4">
+                {courses && courses.length > 0 ? (
+                  courses.map((course, index) => {
+                    const completionRate = Math.floor(Math.random() * 30) + 70; // Mock completion rate
+                    return (
+                      <Box
+                        key={course.id}
+                        className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <Flex justify="between" align="center" className="mb-2">
+                          <Box>
+                            <Text
+                              size="2"
+                              weight="medium"
+                              className="text-gray-900 block"
+                            >
+                              {course.name}
+                            </Text>
+                            <Text size="1" className="text-gray-600">
+                              {course.code}
+                            </Text>
+                          </Box>
+                          <Box className="text-right">
+                            <Text size="2" className="text-gray-900 font-bold">
+                              {completionRate}%
+                            </Text>
+                          </Box>
+                        </Flex>
+                        <Progress value={completionRate} className="h-2" />
+                      </Box>
+                    );
+                  })
+                ) : (
+                  <Text size="2" className="text-gray-500">
+                    No completion data
+                  </Text>
+                )}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
       </Grid>

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   FeeStructure,
   Payment,
@@ -342,6 +342,13 @@ const mockCollectionTrends: CollectionTrend[] = [
 ];
 
 export function useFeeData() {
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    setIsLoading(true);
+    const timeout = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const stats = useMemo((): FeeStats => {
     const totalFeesAssigned = mockFeeAssignments.reduce(
       (sum, fa) => sum + fa.finalAmount,
@@ -413,7 +420,7 @@ export function useFeeData() {
     reminders: mockReminders,
     stats,
     dashboardData,
-    isLoading: false,
+    isLoading,
     error: null,
   };
 }

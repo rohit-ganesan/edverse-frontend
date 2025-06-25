@@ -13,11 +13,25 @@ import {
 } from 'lucide-react';
 import { useAttendanceData } from '../hooks/useAttendanceData';
 import { useSessionManagement } from '../hooks/useSessionManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function LiveTracking(): JSX.Element {
+export function LiveTracking({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { activeSession, students, attendanceRecords } = useAttendanceData();
   const { handleMarkAttendance, handleStartSession, handleEndSession } =
     useSessionManagement();
+
+  if (isLoading) {
+    return (
+      <Box className="space-y-8">
+        <SkeletonCard height={120} />
+        <SkeletonCard height={320} />
+      </Box>
+    );
+  }
 
   if (!activeSession) {
     return (

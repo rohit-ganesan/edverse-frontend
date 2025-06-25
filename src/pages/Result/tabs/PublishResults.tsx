@@ -16,8 +16,13 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useResultManagement } from '../hooks/useResultManagement';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function PublishResults(): JSX.Element {
+export function PublishResults({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [autoNotify, setAutoNotify] = useState(true);
   const [requireApproval, setRequireApproval] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -55,6 +60,18 @@ export function PublishResults(): JSX.Element {
     setEmailNotifications(true);
     setBatchPublishing(false);
   };
+
+  if (isLoading) {
+    return (
+      <Box className="space-y-8">
+        <SkeletonCard height={80} />
+        <div className="grid grid-cols-2 gap-8">
+          <SkeletonCard height={320} />
+          <SkeletonCard height={320} />
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box className="space-y-8">

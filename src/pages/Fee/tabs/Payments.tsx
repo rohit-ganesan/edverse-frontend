@@ -30,6 +30,10 @@ import {
   Plus,
 } from 'lucide-react';
 import { useFeeData } from '../hooks/useFeeData';
+import {
+  SkeletonCard,
+  SkeletonTableRow,
+} from '../../../components/ui/Skeleton';
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -83,7 +87,11 @@ const getMethodIcon = (method: string) => {
   }
 };
 
-export function Payments(): JSX.Element {
+export function Payments({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedMethod, setSelectedMethod] = useState('all');
@@ -240,7 +248,13 @@ export function Payments(): JSX.Element {
 
         {/* Payments Table */}
         <Box className="overflow-x-auto">
-          {filteredPayments.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={6} className="mb-2" />
+              ))}
+            </div>
+          ) : filteredPayments.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

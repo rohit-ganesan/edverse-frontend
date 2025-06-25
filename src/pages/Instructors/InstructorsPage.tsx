@@ -12,9 +12,10 @@ import { Departments } from './tabs/Departments';
 import { Analytics } from './tabs/Analytics';
 import { Reports } from './tabs/Reports';
 import { useTabRouting } from 'lib/useTabRouting';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 export function InstructorsPage(): JSX.Element {
-  const { stats } = useInstructorData();
+  const { stats, isLoading } = useInstructorData();
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -90,22 +91,22 @@ export function InstructorsPage(): JSX.Element {
     {
       value: 'all-instructors',
       label: 'All Instructors',
-      content: <AllInstructors />,
+      content: <AllInstructors isLoading={isLoading} />,
     },
     {
       value: 'departments',
       label: 'Departments',
-      content: <Departments />,
+      content: <Departments isLoading={isLoading} />,
     },
     {
       value: 'analytics',
       label: 'Analytics',
-      content: <Analytics />,
+      content: <Analytics isLoading={isLoading} />,
     },
     {
       value: 'reports',
       label: 'Reports',
-      content: <Reports />,
+      content: <Reports isLoading={isLoading} />,
     },
   ];
 
@@ -117,7 +118,15 @@ export function InstructorsPage(): JSX.Element {
         actions={headerActions}
       />
 
-      <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} height={120} />
+          ))}
+        </div>
+      ) : (
+        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+      )}
 
       <TabContainer
         tabs={tabItems}

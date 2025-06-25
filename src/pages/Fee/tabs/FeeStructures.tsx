@@ -28,6 +28,7 @@ import {
   Copy,
 } from 'lucide-react';
 import { useFeeData } from '../hooks/useFeeData';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -63,7 +64,11 @@ const getCategoryColor = (category: string) => {
   }
 };
 
-export function FeeStructures(): JSX.Element {
+export function FeeStructures({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -220,7 +225,13 @@ export function FeeStructures(): JSX.Element {
 
         {/* Fee Structures Table */}
         <Box className="overflow-x-auto">
-          {filteredFeeStructures.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <SkeletonCard key={i} height={80} />
+              ))}
+            </div>
+          ) : filteredFeeStructures.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
                 <Table.Row className="bg-gray-50/50">

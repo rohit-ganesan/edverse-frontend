@@ -20,8 +20,13 @@ import {
   Save,
   RotateCcw,
 } from 'lucide-react';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
-export function Settings(): JSX.Element {
+export function Settings({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const [autoEnrollment, setAutoEnrollment] = useState(true);
   const [allowWaitlist, setAllowWaitlist] = useState(true);
   const [requirePrerequisites, setRequirePrerequisites] = useState(true);
@@ -48,6 +53,18 @@ export function Settings(): JSX.Element {
     setPassingGrade('70');
     setDefaultCredits('3');
   };
+
+  if (isLoading) {
+    return (
+      <Box className="space-y-8">
+        <SkeletonCard height={80} />
+        <div className="grid grid-cols-2 gap-8">
+          <SkeletonCard height={320} />
+          <SkeletonCard height={320} />
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box className="space-y-8">

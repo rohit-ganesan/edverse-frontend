@@ -18,8 +18,13 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useStudentData } from '../hooks/useStudentData';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
-export function Analytics(): JSX.Element {
+export function Analytics({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}): JSX.Element {
   const { stats } = useStudentData();
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
   const [selectedCourse, setSelectedCourse] = useState('all');
@@ -125,41 +130,51 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="4">
-              {stats.gradeDistribution.map((item, index) => (
-                <Box
-                  key={index}
-                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Flex justify="between" align="center">
-                    <Box className="flex items-center gap-3">
-                      <Box
-                        className={`w-3 h-3 rounded-full ${
-                          item.grade.startsWith('A')
-                            ? 'bg-green-500'
-                            : item.grade.startsWith('B')
-                              ? 'bg-blue-500'
-                              : item.grade.startsWith('C')
-                                ? 'bg-yellow-500'
-                                : 'bg-red-500'
-                        }`}
-                      />
-                      <Text size="2" weight="medium" className="text-gray-900">
-                        Grade {item.grade}
-                      </Text>
-                    </Box>
-                    <Box className="flex items-center gap-2">
-                      <Text size="2" className="text-gray-600">
-                        {item.count} students
-                      </Text>
-                      <Text size="1" className="text-gray-500">
-                        ({item.percentage.toFixed(1)}%)
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Box>
-              ))}
-            </Flex>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <SkeletonTableRow key={i} columns={2} className="mb-2" />
+              ))
+            ) : (
+              <Flex direction="column" gap="4">
+                {stats.gradeDistribution.map((item, index) => (
+                  <Box
+                    key={index}
+                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <Flex justify="between" align="center">
+                      <Box className="flex items-center gap-3">
+                        <Box
+                          className={`w-3 h-3 rounded-full ${
+                            item.grade.startsWith('A')
+                              ? 'bg-green-500'
+                              : item.grade.startsWith('B')
+                                ? 'bg-blue-500'
+                                : item.grade.startsWith('C')
+                                  ? 'bg-yellow-500'
+                                  : 'bg-red-500'
+                          }`}
+                        />
+                        <Text
+                          size="2"
+                          weight="medium"
+                          className="text-gray-900"
+                        >
+                          Grade {item.grade}
+                        </Text>
+                      </Box>
+                      <Box className="flex items-center gap-2">
+                        <Text size="2" className="text-gray-600">
+                          {item.count} students
+                        </Text>
+                        <Text size="1" className="text-gray-500">
+                          ({item.percentage.toFixed(1)}%)
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </Box>
+                ))}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
 
@@ -180,39 +195,43 @@ export function Analytics(): JSX.Element {
           </Box>
 
           <Box className="p-6">
-            <Flex direction="column" gap="4">
-              {stats.attendanceDistribution.map((item, index) => (
-                <Box key={index}>
-                  <Flex justify="between" align="center" className="mb-2">
-                    <Text size="2" weight="medium" className="text-gray-700">
-                      {item.range}
-                    </Text>
-                    <Box className="flex items-center gap-2">
-                      <Text size="2" className="text-gray-600">
-                        {item.count} students
+            {isLoading ? (
+              <SkeletonCard height={256} />
+            ) : (
+              <Flex direction="column" gap="4">
+                {stats.attendanceDistribution.map((item, index) => (
+                  <Box key={index}>
+                    <Flex justify="between" align="center" className="mb-2">
+                      <Text size="2" weight="medium" className="text-gray-700">
+                        {item.range}
                       </Text>
-                      <Text size="1" className="text-gray-500">
-                        ({item.percentage.toFixed(1)}%)
-                      </Text>
+                      <Box className="flex items-center gap-2">
+                        <Text size="2" className="text-gray-600">
+                          {item.count} students
+                        </Text>
+                        <Text size="1" className="text-gray-500">
+                          ({item.percentage.toFixed(1)}%)
+                        </Text>
+                      </Box>
+                    </Flex>
+                    <Box className="w-full bg-gray-200 rounded-full h-2">
+                      <Box
+                        className={`h-2 rounded-full ${
+                          item.range.includes('95-100')
+                            ? 'bg-green-500'
+                            : item.range.includes('85-94')
+                              ? 'bg-blue-500'
+                              : item.range.includes('75-84')
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500'
+                        }`}
+                        style={{ width: `${item.percentage}%` }}
+                      />
                     </Box>
-                  </Flex>
-                  <Box className="w-full bg-gray-200 rounded-full h-2">
-                    <Box
-                      className={`h-2 rounded-full ${
-                        item.range.includes('95-100')
-                          ? 'bg-green-500'
-                          : item.range.includes('85-94')
-                            ? 'bg-blue-500'
-                            : item.range.includes('75-84')
-                              ? 'bg-yellow-500'
-                              : 'bg-red-500'
-                      }`}
-                      style={{ width: `${item.percentage}%` }}
-                    />
                   </Box>
-                </Box>
-              ))}
-            </Flex>
+                ))}
+              </Flex>
+            )}
           </Box>
         </RadixCard>
       </Grid>
