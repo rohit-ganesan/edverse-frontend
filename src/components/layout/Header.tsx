@@ -219,7 +219,7 @@ export function Header({
         {/* Right Section - Notifications and User */}
         <Flex align="center" gap="4">
           {/* Notifications */}
-          <Flex align="center" gap="4">
+          <Flex align="center" gap="1">
             <Box className="relative">
               <Button
                 variant="ghost"
