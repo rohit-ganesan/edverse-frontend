@@ -24,12 +24,12 @@ export function TabContainer({
     <Tabs.Root value={activeTab} onValueChange={onTabChange}>
       {/* Tab Navigation */}
       <Box className={`mb-6 ${className}`}>
-        <Tabs.List className="bg-white shadow-md border rounded-lg p-1">
+        <Tabs.List className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 rounded-lg p-1">
           {tabs.map((tab) => (
             <Tabs.Trigger
               key={tab.value}
               value={tab.value}
-              className="data-[state=active]:bg-gray-200 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm px-4 py-2 rounded-md font-medium transition-all"
+              className="data-[state=active]:bg-gray-200 dark:data-[state=active]:bg-gray-700 data-[state=active]:text-gray-900 dark:data-[state=active]:text-gray-100 data-[state=active]:shadow-sm px-4 py-2 rounded-md font-medium transition-all text-gray-700 dark:text-gray-300"
             >
               {tab.label}
             </Tabs.Trigger>

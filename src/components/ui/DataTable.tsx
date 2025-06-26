@@ -71,6 +71,9 @@ export interface DataTableProps<T> {
   // Loading & Error states
   isLoading?: boolean;
   error?: string | null;
+
+  // Selected Row
+  selectedRowKey?: string;
 }
 
 export function DataTable<T>({
@@ -94,6 +97,7 @@ export function DataTable<T>({
   onSearch,
   isLoading = false,
   error,
+  selectedRowKey,
 }: DataTableProps<T>): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState(sortOptions[0]?.value || '');
@@ -161,6 +165,36 @@ export function DataTable<T>({
     console.log('Export data:', processedData);
   };
 
+  function defaultRenderer(key: string, value: any) {
+    switch (key) {
+      case 'name':
+      case 'student':
+      case 'class':
+      case 'teacher':
+        return (
+          <Text className="text-gray-900 dark:text-gray-100">{value}</Text>
+        );
+      case 'section':
+      case 'id':
+        return (
+          <Text className="text-gray-500 dark:text-gray-400">{value}</Text>
+        );
+      case 'email':
+      case 'contact':
+        return (
+          <Text className="text-gray-700 dark:text-gray-100">{value}</Text>
+        );
+      case 'phone':
+        return (
+          <Text className="text-gray-500 dark:text-gray-400">{value}</Text>
+        );
+      default:
+        return (
+          <Text className="text-gray-900 dark:text-gray-100">{value}</Text>
+        );
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -179,21 +213,24 @@ export function DataTable<T>({
 
   return (
     <Box className="space-y-8">
-      <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
+      <RadixCard className="p-0 shadow-xl border-0 bg-white dark:bg-gray-800 overflow-hidden">
         {/* Header Section */}
-        <Box className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-gray-100">
+        <Box className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-gray-100 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 dark:border-b dark:border-gray-800">
           <Flex justify="between" align="center" className="mb-6">
             <Flex align="center" gap="3">
               {icon && (
-                <Box className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Box className="w-10 h-10 bg-purple-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                   {icon}
                 </Box>
               )}
               <Box>
-                <Heading size="5" className="text-gray-900 mb-1">
+                <Heading
+                  size="5"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   {title}
                 </Heading>
-                <Text size="3" className="text-gray-600">
+                <Text size="3" className="text-gray-600 dark:text-gray-400">
                   {subtitle || `${processedData.length} records found`}
                 </Text>
               </Box>
@@ -295,18 +332,18 @@ export function DataTable<T>({
           {processedData.length > 0 ? (
             <Table.Root variant="surface" className="w-full">
               <Table.Header>
-                <Table.Row className="bg-gray-50/50">
+                <Table.Row className="bg-gray-50/50 dark:bg-gray-900/80">
                   {columns.map((column) => (
                     <Table.ColumnHeaderCell
                       key={column.key}
-                      className="py-4 px-6 text-left"
+                      className="py-4 px-6 text-left text-gray-700 dark:text-gray-300"
                     >
                       <Flex align="center" gap="2">
                         {column.icon}
                         <Text
                           size="2"
                           weight="medium"
-                          className="text-gray-700"
+                          className="text-gray-700 dark:text-gray-300"
                         >
                           {column.label}
                         </Text>
@@ -314,8 +351,12 @@ export function DataTable<T>({
                     </Table.ColumnHeaderCell>
                   ))}
                   {actions.length > 0 && (
-                    <Table.ColumnHeaderCell className="py-4 px-6 text-left">
-                      <Text size="2" weight="medium" className="text-gray-700">
+                    <Table.ColumnHeaderCell className="py-4 px-6 text-left text-gray-700 dark:text-gray-300">
+                      <Text
+                        size="2"
+                        weight="medium"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
                         Actions
                       </Text>
                     </Table.ColumnHeaderCell>
@@ -326,14 +367,26 @@ export function DataTable<T>({
                 {processedData.map((item, index) => (
                   <Table.Row
                     key={getRowKey(item, index) || `row-${index}`}
-                    className={`hover:bg-gray-50/50 transition-colors animate-in slide-in-from-bottom-1 duration-300 ${
-                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
-                    }`}
+                    className={[
+                      'hover:bg-gray-50/50 dark:hover:bg-gray-700 transition-colors animate-in slide-in-from-bottom-1 duration-300',
+                      index % 2 === 0
+                        ? 'bg-white dark:bg-gray-800'
+                        : 'bg-gray-50/30 dark:bg-gray-900/60',
+                      selectedRowKey === getRowKey(item, index) &&
+                        'bg-blue-50 dark:bg-blue-900',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {columns.map((column) => (
                       <Table.Cell key={column.key} className="py-4 px-6">
-                        {column.render(item, index)}
+                        {column.render
+                          ? column.render(item, index)
+                          : defaultRenderer(
+                              column.key,
+                              (item as Record<string, any>)[column.key]
+                            )}
                       </Table.Cell>
                     ))}
                     {actions.length > 0 && (

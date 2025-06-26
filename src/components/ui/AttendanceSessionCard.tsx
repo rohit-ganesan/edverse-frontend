@@ -46,8 +46,10 @@ export function AttendanceSessionCard({
   // Data integrity checks
   if (!session?.id || !session?.className) {
     return (
-      <Box className={`p-4 bg-gray-50 rounded-lg ${className}`}>
-        <Text size="2" className="text-gray-500">
+      <Box
+        className={`p-4 bg-gray-50 dark:bg-gray-800 rounded-lg ${className}`}
+      >
+        <Text size="2" className="text-gray-500 dark:text-gray-400">
           Invalid session data
         </Text>
       </Box>
@@ -77,13 +79,17 @@ export function AttendanceSessionCard({
   };
 
   return (
-    <Box className={`p-4 bg-gray-50 rounded-lg ${className}`}>
+    <Box className={`p-4 bg-gray-50 dark:bg-gray-800 rounded-lg ${className}`}>
       <Flex justify="between" align="start" className="mb-2">
         <Box>
-          <Text size="3" weight="medium" className="text-gray-900">
+          <Text
+            size="3"
+            weight="medium"
+            className="text-gray-900 dark:text-gray-100"
+          >
             {safeSession.className}
           </Text>
-          <Text size="2" className="text-gray-600">
+          <Text size="2" className="text-gray-600 dark:text-gray-400">
             {safeSession.time} • {safeSession.location}
           </Text>
         </Box>
@@ -92,7 +98,7 @@ export function AttendanceSessionCard({
         </Badge>
       </Flex>
       <Flex justify="between" align="center">
-        <Text size="2" className="text-gray-600">
+        <Text size="2" className="text-gray-600 dark:text-gray-400">
           {safeSession.presentCount}/{safeSession.totalStudents} present •{' '}
           {safeSession.attendanceRate}% rate
         </Text>

@@ -72,13 +72,16 @@ export function Settings({
     <Box className="space-y-8">
       {/* Settings Header */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-        <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+        <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 border-b border-blue-100 dark:border-gray-700">
           <Flex justify="between" align="center">
             <Box>
-              <Heading size="5" className="text-gray-900 mb-1">
+              <Heading
+                size="5"
+                className="text-gray-900 dark:text-gray-100 mb-1"
+              >
                 Classes Settings
               </Heading>
-              <Text size="3" className="text-gray-600">
+              <Text size="3" className="text-gray-600 dark:text-gray-400">
                 Configure class scheduling preferences and management policies
               </Text>
             </Box>
@@ -109,16 +112,19 @@ export function Settings({
       <Grid columns="2" gap="8">
         {/* General Settings */}
         <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-          <Box className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
+          <Box className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-emerald-900 dark:to-green-900 border-b border-green-100 dark:border-gray-700">
             <Flex align="center" gap="3">
-              <Box className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <SettingsIcon className="w-5 h-5 text-green-600" />
+              <Box className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                <SettingsIcon className="w-5 h-5 text-green-600 dark:text-green-300" />
               </Box>
               <Box>
-                <Heading size="4" className="text-gray-900 mb-1">
+                <Heading
+                  size="4"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   General Settings
                 </Heading>
-                <Text size="2" className="text-gray-600">
+                <Text size="2" className="text-gray-600 dark:text-gray-400">
                   Basic class management configuration
                 </Text>
               </Box>
@@ -133,11 +139,11 @@ export function Settings({
                   <Text
                     size="2"
                     weight="medium"
-                    className="text-gray-900 block"
+                    className="text-gray-900 dark:text-gray-100 block"
                   >
                     Auto-create schedule
                   </Text>
-                  <Text size="1" className="text-gray-600">
+                  <Text size="1" className="text-gray-600 dark:text-gray-400">
                     Automatically generate class schedules based on preferences
                   </Text>
                 </Box>
@@ -154,11 +160,11 @@ export function Settings({
                   <Text
                     size="2"
                     weight="medium"
-                    className="text-gray-900 block"
+                    className="text-gray-900 dark:text-gray-100 block"
                   >
                     Allow overlapping classes
                   </Text>
-                  <Text size="1" className="text-gray-600">
+                  <Text size="1" className="text-gray-600 dark:text-gray-400">
                     Permit scheduling of overlapping class sessions
                   </Text>
                 </Box>
@@ -175,11 +181,11 @@ export function Settings({
                   <Text
                     size="2"
                     weight="medium"
-                    className="text-gray-900 block"
+                    className="text-gray-900 dark:text-gray-100 block"
                   >
                     Require schedule approval
                   </Text>
-                  <Text size="1" className="text-gray-600">
+                  <Text size="1" className="text-gray-600 dark:text-gray-400">
                     New schedules need administrator approval
                   </Text>
                 </Box>
@@ -196,11 +202,11 @@ export function Settings({
                   <Text
                     size="2"
                     weight="medium"
-                    className="text-gray-900 block"
+                    className="text-gray-900 dark:text-gray-100 block"
                   >
                     Enable notifications
                   </Text>
-                  <Text size="1" className="text-gray-600">
+                  <Text size="1" className="text-gray-600 dark:text-gray-400">
                     Send notifications for schedule changes
                   </Text>
                 </Box>
@@ -216,16 +222,19 @@ export function Settings({
 
         {/* Schedule Settings */}
         <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-          <Box className="p-6 bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100">
+          <Box className="p-6 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900 dark:to-violet-900 border-b border-purple-100 dark:border-gray-700">
             <Flex align="center" gap="3">
-              <Box className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-purple-600" />
+              <Box className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-purple-600 dark:text-purple-300" />
               </Box>
               <Box>
-                <Heading size="4" className="text-gray-900 mb-1">
+                <Heading
+                  size="4"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   Schedule Settings
                 </Heading>
-                <Text size="2" className="text-gray-600">
+                <Text size="2" className="text-gray-600 dark:text-gray-400">
                   Configure timing and duration preferences
                 </Text>
               </Box>
@@ -239,11 +248,14 @@ export function Settings({
                 <Text
                   size="2"
                   weight="medium"
-                  className="text-gray-900 mb-2 block"
+                  className="text-gray-900 dark:text-gray-100 mb-2 block"
                 >
                   Default class duration (minutes)
                 </Text>
-                <Text size="1" className="text-gray-600 mb-3 block">
+                <Text
+                  size="1"
+                  className="text-gray-600 dark:text-gray-400 mb-3 block"
+                >
                   Standard duration for new class sessions
                 </Text>
                 <TextField.Root
@@ -259,11 +271,14 @@ export function Settings({
                 <Text
                   size="2"
                   weight="medium"
-                  className="text-gray-900 mb-2 block"
+                  className="text-gray-900 dark:text-gray-100 mb-2 block"
                 >
                   Break time between classes (minutes)
                 </Text>
-                <Text size="1" className="text-gray-600 mb-3 block">
+                <Text
+                  size="1"
+                  className="text-gray-600 dark:text-gray-400 mb-3 block"
+                >
                   Minimum gap between consecutive classes
                 </Text>
                 <TextField.Root
@@ -279,11 +294,14 @@ export function Settings({
                 <Text
                   size="2"
                   weight="medium"
-                  className="text-gray-900 mb-2 block"
+                  className="text-gray-900 dark:text-gray-100 mb-2 block"
                 >
                   Maximum students per class
                 </Text>
-                <Text size="1" className="text-gray-600 mb-3 block">
+                <Text
+                  size="1"
+                  className="text-gray-600 dark:text-gray-400 mb-3 block"
+                >
                   Default capacity limit for new classes
                 </Text>
                 <TextField.Root
@@ -300,16 +318,19 @@ export function Settings({
 
       {/* Class Types Configuration */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-        <Box className="p-6 bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100">
+        <Box className="p-6 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900 dark:to-amber-900 border-b border-orange-100 dark:border-gray-700">
           <Flex align="center" gap="3">
-            <Box className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-orange-600" />
+            <Box className="w-10 h-10 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-orange-600 dark:text-orange-300" />
             </Box>
             <Box>
-              <Heading size="4" className="text-gray-900 mb-1">
+              <Heading
+                size="4"
+                className="text-gray-900 dark:text-gray-100 mb-1"
+              >
                 Class Types Configuration
               </Heading>
-              <Text size="2" className="text-gray-600">
+              <Text size="2" className="text-gray-600 dark:text-gray-400">
                 Configure available class types and their settings
               </Text>
             </Box>
@@ -322,11 +343,15 @@ export function Settings({
             <Box className="p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
               <Flex align="center" gap="3" className="mb-3">
                 <BookOpen className="w-6 h-6 text-orange-600" />
-                <Text size="2" weight="medium" className="text-gray-900">
+                <Text
+                  size="2"
+                  weight="medium"
+                  className="text-gray-900 dark:text-gray-100"
+                >
                   Lecture
                 </Text>
               </Flex>
-              <Text size="1" className="text-gray-600 mb-4">
+              <Text size="1" className="text-gray-600 dark:text-gray-400 mb-4">
                 Traditional classroom lectures
               </Text>
               <Flex justify="between" align="center">
@@ -341,11 +366,15 @@ export function Settings({
             <Box className="p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
               <Flex align="center" gap="3" className="mb-3">
                 <Users className="w-6 h-6 text-blue-600" />
-                <Text size="2" weight="medium" className="text-gray-900">
+                <Text
+                  size="2"
+                  weight="medium"
+                  className="text-gray-900 dark:text-gray-100"
+                >
                   Lab Session
                 </Text>
               </Flex>
-              <Text size="1" className="text-gray-600 mb-4">
+              <Text size="1" className="text-gray-600 dark:text-gray-400 mb-4">
                 Hands-on laboratory sessions
               </Text>
               <Flex justify="between" align="center">
@@ -360,11 +389,15 @@ export function Settings({
             <Box className="p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
               <Flex align="center" gap="3" className="mb-3">
                 <Calendar className="w-6 h-6 text-purple-600" />
-                <Text size="2" weight="medium" className="text-gray-900">
+                <Text
+                  size="2"
+                  weight="medium"
+                  className="text-gray-900 dark:text-gray-100"
+                >
                   Tutorial
                 </Text>
               </Flex>
-              <Text size="1" className="text-gray-600 mb-4">
+              <Text size="1" className="text-gray-600 dark:text-gray-400 mb-4">
                 Small group tutorial sessions
               </Text>
               <Flex justify="between" align="center">
@@ -380,16 +413,19 @@ export function Settings({
 
       {/* Room & Location Settings */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-        <Box className="p-6 bg-gradient-to-r from-cyan-50 to-blue-50 border-b border-cyan-100">
+        <Box className="p-6 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900 dark:to-blue-900 border-b border-cyan-100 dark:border-gray-700">
           <Flex align="center" gap="3">
-            <Box className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center">
-              <MapPin className="w-5 h-5 text-cyan-600" />
+            <Box className="w-10 h-10 bg-cyan-100 dark:bg-cyan-900 rounded-lg flex items-center justify-center">
+              <MapPin className="w-5 h-5 text-cyan-600 dark:text-cyan-300" />
             </Box>
             <Box>
-              <Heading size="4" className="text-gray-900 mb-1">
+              <Heading
+                size="4"
+                className="text-gray-900 dark:text-gray-100 mb-1"
+              >
                 Room & Location Settings
               </Heading>
-              <Text size="2" className="text-gray-600">
+              <Text size="2" className="text-gray-600 dark:text-gray-400">
                 Configure default rooms and location preferences
               </Text>
             </Box>
@@ -402,11 +438,14 @@ export function Settings({
               <Text
                 size="2"
                 weight="medium"
-                className="text-gray-900 mb-2 block"
+                className="text-gray-900 dark:text-gray-100 mb-2 block"
               >
                 Default classroom
               </Text>
-              <Text size="1" className="text-gray-600 mb-3 block">
+              <Text
+                size="1"
+                className="text-gray-600 dark:text-gray-400 mb-3 block"
+              >
                 Default room assignment for new classes
               </Text>
               <Select.Root
@@ -429,11 +468,14 @@ export function Settings({
               <Text
                 size="2"
                 weight="medium"
-                className="text-gray-900 mb-2 block"
+                className="text-gray-900 dark:text-gray-100 mb-2 block"
               >
                 Room booking priority
               </Text>
-              <Text size="1" className="text-gray-600 mb-3 block">
+              <Text
+                size="1"
+                className="text-gray-600 dark:text-gray-400 mb-3 block"
+              >
                 Priority level for automatic room booking
               </Text>
               <Select.Root defaultValue="medium" size="2">
@@ -451,16 +493,19 @@ export function Settings({
 
       {/* Notification Settings */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-        <Box className="p-6 bg-gradient-to-r from-pink-50 to-rose-50 border-b border-pink-100">
+        <Box className="p-6 bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900 dark:to-rose-900 border-b border-pink-100 dark:border-gray-700">
           <Flex align="center" gap="3">
-            <Box className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-              <Bell className="w-5 h-5 text-pink-600" />
+            <Box className="w-10 h-10 bg-pink-100 dark:bg-pink-900 rounded-lg flex items-center justify-center">
+              <Bell className="w-5 h-5 text-pink-600 dark:text-pink-300" />
             </Box>
             <Box>
-              <Heading size="4" className="text-gray-900 mb-1">
+              <Heading
+                size="4"
+                className="text-gray-900 dark:text-gray-100 mb-1"
+              >
                 Notification Settings
               </Heading>
-              <Text size="2" className="text-gray-600">
+              <Text size="2" className="text-gray-600 dark:text-gray-400">
                 Configure when and how notifications are sent
               </Text>
             </Box>
@@ -473,11 +518,14 @@ export function Settings({
               <Text
                 size="2"
                 weight="medium"
-                className="text-gray-900 mb-2 block"
+                className="text-gray-900 dark:text-gray-100 mb-2 block"
               >
                 Notify before class (minutes)
               </Text>
-              <Text size="1" className="text-gray-600 mb-3 block">
+              <Text
+                size="1"
+                className="text-gray-600 dark:text-gray-400 mb-3 block"
+              >
                 Send reminder notifications before class starts
               </Text>
               <TextField.Root defaultValue="15" size="2" placeholder="15" />
@@ -487,11 +535,14 @@ export function Settings({
               <Text
                 size="2"
                 weight="medium"
-                className="text-gray-900 mb-2 block"
+                className="text-gray-900 dark:text-gray-100 mb-2 block"
               >
                 Notification method
               </Text>
-              <Text size="1" className="text-gray-600 mb-3 block">
+              <Text
+                size="1"
+                className="text-gray-600 dark:text-gray-400 mb-3 block"
+              >
                 Preferred method for sending notifications
               </Text>
               <Select.Root defaultValue="email" size="2">

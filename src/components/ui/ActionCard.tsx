@@ -24,40 +24,52 @@ interface ActionCardProps {
 
 const variantStyles = {
   info: {
-    cardClass: 'bg-blue-50 border-l-4 border-blue-500 shadow-sm',
-    titleClass: 'text-blue-900',
-    descClass: 'text-blue-700',
-    buttonClass: 'bg-blue-600 hover:bg-blue-700 text-white',
+    cardClass:
+      'bg-blue-50 border-l-4 border-blue-500 shadow-sm dark:bg-gray-800 dark:border-blue-700',
+    titleClass: 'text-blue-900 dark:text-blue-200',
+    descClass: 'text-blue-700 dark:text-blue-300',
+    buttonClass:
+      'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800',
   },
   success: {
-    cardClass: 'bg-green-50 border-l-4 border-green-500 shadow-sm',
-    titleClass: 'text-green-900',
-    descClass: 'text-green-700',
-    buttonClass: 'bg-green-600 hover:bg-green-700 text-white',
+    cardClass:
+      'bg-green-50 border-l-4 border-green-500 shadow-sm dark:bg-gray-800 dark:border-green-700',
+    titleClass: 'text-green-900 dark:text-green-200',
+    descClass: 'text-green-700 dark:text-green-300',
+    buttonClass:
+      'bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-800',
   },
   warning: {
-    cardClass: 'bg-orange-50 border-l-4 border-orange-500 shadow-sm',
-    titleClass: 'text-orange-900',
-    descClass: 'text-orange-700',
-    buttonClass: 'bg-orange-600 hover:bg-orange-700 text-white',
+    cardClass:
+      'bg-orange-50 border-l-4 border-orange-500 shadow-sm dark:bg-gray-800 dark:border-orange-700',
+    titleClass: 'text-orange-900 dark:text-orange-200',
+    descClass: 'text-orange-700 dark:text-orange-300',
+    buttonClass:
+      'bg-orange-600 hover:bg-orange-700 text-white dark:bg-orange-700 dark:hover:bg-orange-800',
   },
   error: {
-    cardClass: 'bg-red-50 border-l-4 border-red-500 shadow-sm',
-    titleClass: 'text-red-900',
-    descClass: 'text-red-700',
-    buttonClass: 'bg-red-600 hover:bg-red-700 text-white',
+    cardClass:
+      'bg-red-50 border-l-4 border-red-500 shadow-sm dark:bg-gray-800 dark:border-red-700',
+    titleClass: 'text-red-900 dark:text-red-200',
+    descClass: 'text-red-700 dark:text-red-300',
+    buttonClass:
+      'bg-red-600 hover:bg-red-700 text-white dark:bg-red-700 dark:hover:bg-red-800',
   },
   primary: {
-    cardClass: 'bg-purple-50 border-l-4 border-purple-500 shadow-sm',
-    titleClass: 'text-purple-900',
-    descClass: 'text-purple-700',
-    buttonClass: 'bg-purple-600 hover:bg-purple-700 text-white',
+    cardClass:
+      'bg-purple-50 border-l-4 border-purple-500 shadow-sm dark:bg-gray-800 dark:border-purple-700',
+    titleClass: 'text-purple-900 dark:text-purple-200',
+    descClass: 'text-purple-700 dark:text-purple-300',
+    buttonClass:
+      'bg-purple-600 hover:bg-purple-700 text-white dark:bg-purple-700 dark:hover:bg-purple-800',
   },
   secondary: {
-    cardClass: 'bg-gray-50 border-l-4 border-gray-500 shadow-sm',
-    titleClass: 'text-gray-900',
-    descClass: 'text-gray-700',
-    buttonClass: 'bg-gray-600 hover:bg-gray-700 text-white',
+    cardClass:
+      'bg-gray-50 border-l-4 border-gray-500 shadow-sm dark:bg-gray-800 dark:border-gray-700',
+    titleClass: 'text-gray-900 dark:text-gray-200',
+    descClass: 'text-gray-700 dark:text-gray-300',
+    buttonClass:
+      'bg-gray-600 hover:bg-gray-700 text-white dark:bg-gray-700 dark:hover:bg-gray-800',
   },
 };
 
@@ -78,7 +90,7 @@ export function ActionCard({
       <Flex justify="between" align="start" gap="4">
         <Flex align="start" gap="3" className="flex-1 min-w-0">
           {IconComponent && (
-            <Box className="w-12 h-12 bg-white bg-opacity-60 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+            <Box className="w-12 h-12 bg-white bg-opacity-60 rounded-full flex items-center justify-center flex-shrink-0 mt-1 dark:bg-gray-900 dark:bg-opacity-80">
               <IconComponent className={`w-6 h-6 ${styles.titleClass}`} />
             </Box>
           )}

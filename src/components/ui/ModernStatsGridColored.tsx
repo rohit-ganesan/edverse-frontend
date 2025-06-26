@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Flex, Text, Heading, Grid } from '@radix-ui/themes';
 import { LucideIcon } from 'lucide-react';
+import { cn } from 'lib/utils';
 
 /**
  * Configuration for a single colored stat item
@@ -120,40 +121,70 @@ export function ModernStatsGridColored({
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="rounded-lg shadow-lg overflow-hidden bg-white"
+            className={cn(
+              'rounded-lg shadow-lg overflow-hidden',
+              'bg-gradient-to-br',
+              stat.gradient.from,
+              stat.gradient.to,
+              'bg-white',
+              'dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900'
+            )}
             style={{ border: 'none', outline: 'none' }}
           >
-            <Box
-              className={`p-6 bg-gradient-to-br ${stat.gradient.from} ${stat.gradient.to}`}
-            >
+            <Box className="p-6">
               <Flex justify="between" align="start">
                 <Box>
-                  <Text size="2" className="text-gray-600 mb-1">
+                  <Text
+                    size="2"
+                    className="text-gray-600 dark:text-gray-300 mb-1"
+                  >
                     {stat.title}
                   </Text>
-                  <Heading size="6" className="text-gray-900 mb-2">
+                  <Heading
+                    size="6"
+                    className="text-gray-900 dark:text-gray-100 mb-2"
+                  >
                     {getStatValue(stat.value)}
                   </Heading>
                   {stat.trend ? (
                     <Flex align="center" gap="1">
                       <stat.trend.icon
-                        className={`w-3 h-3 ${stat.trend.color}`}
+                        className={cn(
+                          'w-3 h-3',
+                          stat.trend.value.startsWith('-')
+                            ? 'text-red-500 dark:text-red-400'
+                            : 'text-green-500 dark:text-green-400'
+                        )}
                       />
                       <Text
                         size="1"
-                        className={`${stat.trend.color} font-medium`}
+                        className={cn(
+                          'font-medium',
+                          stat.trend.value.startsWith('-')
+                            ? 'text-red-500 dark:text-red-400'
+                            : 'text-green-500 dark:text-green-400'
+                        )}
                       >
                         {stat.trend.value}
                       </Text>
                     </Flex>
                   ) : stat.subtitle ? (
-                    <Text size="1" className="text-gray-600 font-medium">
+                    <Text
+                      size="1"
+                      className="text-gray-600 dark:text-gray-400 font-medium"
+                    >
                       {stat.subtitle}
                     </Text>
                   ) : null}
                 </Box>
-                <Box className={`p-3 ${stat.iconBgColor} rounded-lg`}>
-                  <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
+                <Box
+                  className={cn(
+                    'p-3 rounded-lg',
+                    stat.iconBgColor,
+                    'dark:bg-gray-700'
+                  )}
+                >
+                  <stat.icon className={cn('w-6 h-6', stat.iconColor)} />
                 </Box>
               </Flex>
             </Box>

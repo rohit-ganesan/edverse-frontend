@@ -126,12 +126,12 @@ export function ModernActivityItem({
           ${sizeStyle.gap} 
           ${sizeStyle.padding} 
           rounded-lg 
-          hover:bg-gray-50 
+          hover:bg-gray-50 dark:hover:bg-gray-700
           transition-all 
           duration-200 
           border 
-          border-gray-100 
-          hover:border-gray-200
+          border-gray-100 dark:border-gray-700
+          hover:border-gray-200 dark:hover:border-gray-600
           hover:shadow-sm
           ${isClickable ? 'cursor-pointer' : ''}
         `}
@@ -146,7 +146,7 @@ export function ModernActivityItem({
             flex 
             items-center 
             justify-center 
-            ${showStatusRing ? `${statusStyle.bgColor} ring-2 ${statusStyle.ringColor}` : 'bg-gray-100'}
+            ${showStatusRing ? `${statusStyle.bgColor} dark:bg-gray-700` : 'bg-gray-100 dark:bg-gray-700'}
             shadow-sm
           `}
           >
@@ -154,7 +154,7 @@ export function ModernActivityItem({
               <User
                 className={`
                 ${sizeStyle.icon} 
-                ${showStatusRing ? statusStyle.textColor : 'text-gray-500'}
+                ${showStatusRing ? statusStyle.textColor + ' dark:text-gray-200' : 'text-gray-500 dark:text-gray-300'}
               `}
               />
             )}
@@ -162,8 +162,8 @@ export function ModernActivityItem({
 
           {/* Live Status Dot for Active Items */}
           {status === 'active' && (
-            <Box className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-              <Box className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+            <Box className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center">
+              <Box className="w-1.5 h-1.5 bg-white dark:bg-gray-200 rounded-full animate-pulse" />
             </Box>
           )}
         </Box>
@@ -172,20 +172,20 @@ export function ModernActivityItem({
         <Box className="flex-1 min-w-0">
           <Flex align="center" gap="2" className="mb-1">
             <Text
-              className={`${sizeStyle.name} font-semibold text-gray-900 block truncate`}
+              className={`${sizeStyle.name} font-semibold text-gray-900 dark:text-gray-100 block truncate`}
             >
               {name}
             </Text>
             {timestamp && (
               <Text
-                className={`${sizeStyle.description} text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded-md text-xs flex-shrink-0`}
+                className={`${sizeStyle.description} text-blue-600 dark:text-blue-200 font-medium bg-blue-50 dark:bg-blue-900 px-2 py-1 rounded-md text-xs flex-shrink-0`}
               >
                 ✓ {timestamp}
               </Text>
             )}
           </Flex>
           <Text
-            className={`${sizeStyle.description} text-gray-600 block line-clamp-2 font-medium`}
+            className={`${sizeStyle.description} text-gray-600 dark:text-gray-400 block line-clamp-2 font-medium`}
           >
             {description}
           </Text>

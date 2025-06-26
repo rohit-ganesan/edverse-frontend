@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Box, Flex, Text } from '@radix-ui/themes';
 import { RadixTextField } from 'components/ui/RadixTextField';
@@ -40,6 +40,26 @@ export function Header({
   const location = useLocation();
   const [searchValue, setSearchValue] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close the user menu when clicking outside the profile/menu container
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showUserMenu &&
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   // Defensive checks for contexts
   if (!authContext) {
@@ -227,7 +247,7 @@ export function Header({
           </Flex>
 
           {/* User Profile */}
-          <Box className="relative">
+          <Box className="relative" ref={containerRef}>
             <Button
               variant="ghost"
               size="2"

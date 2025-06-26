@@ -79,7 +79,7 @@ export function ModernCard({
         p-0
         shadow-xl
         border-0
-        bg-white
+        bg-white dark:bg-gray-800
         overflow-hidden
         transition-all
         duration-300
@@ -115,16 +115,24 @@ export function ModernCard({
 
       {/* Header */}
       {hasHeader && (
-        <Box className={`p-6 ${headerGradientClasses[headerGradient]}`}>
+        <Box
+          className={`p-6 ${headerGradientClasses[headerGradient]} dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 dark:border-b dark:border-gray-800`}
+        >
           <Flex justify="between" align="center" gap="4">
             <Box className="min-w-0 flex-1">
               {title && (
-                <Heading size="5" className="text-gray-900 mb-1 truncate">
+                <Heading
+                  size="5"
+                  className="text-gray-900 dark:text-gray-100 mb-1 truncate"
+                >
                   {title}
                 </Heading>
               )}
               {subtitle && (
-                <Text size="3" className="text-gray-600 line-clamp-2">
+                <Text
+                  size="3"
+                  className="text-gray-600 dark:text-gray-400 line-clamp-2"
+                >
                   {subtitle}
                 </Text>
               )}

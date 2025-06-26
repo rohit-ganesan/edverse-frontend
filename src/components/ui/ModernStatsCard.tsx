@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Box, Flex, Text } from '@radix-ui/themes';
+import { Box, Flex, Text, Heading } from '@radix-ui/themes';
 import { RadixCard } from './RadixCard';
 
 interface ModernStatsCardProps {
@@ -15,6 +15,11 @@ interface ModernStatsCardProps {
   variant?: 'default' | 'glass' | 'solid';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  title?: string;
+  subtitle?: string;
+  headerActions?: ReactNode;
+  headerGradient?: string;
+  hasHeader?: boolean;
 }
 
 const iconColorClasses = {
@@ -71,6 +76,11 @@ export function ModernStatsCard({
   variant = 'default',
   size = 'md',
   className = '',
+  title,
+  subtitle,
+  headerActions,
+  headerGradient,
+  hasHeader = true,
 }: ModernStatsCardProps): JSX.Element {
   const sizeConfig = sizeClasses[size];
   const colorConfig = iconColorClasses[iconColor];
@@ -111,7 +121,7 @@ export function ModernStatsCard({
         shadow-lg 
         hover:shadow-xl 
         border-0 
-        bg-white 
+        bg-white dark:bg-gray-800
         overflow-hidden 
         transition-all 
         duration-300 
@@ -126,7 +136,7 @@ export function ModernStatsCard({
             className={`
               ${sizeConfig.icon} 
               ${colorConfig.bg} 
-              dark:bg-opacity-20
+              dark:bg-gray-700
               rounded-xl 
               flex 
               items-center 
@@ -138,7 +148,9 @@ export function ModernStatsCard({
               ${colorConfig.ring}
             `}
           >
-            <Box className={`${sizeConfig.iconSize} ${colorConfig.text}`}>
+            <Box
+              className={`${sizeConfig.iconSize} ${colorConfig.text} dark:text-gray-200`}
+            >
               {icon}
             </Box>
           </Box>
@@ -148,7 +160,7 @@ export function ModernStatsCard({
             {/* Value and trend section */}
             <Flex justify="between" align="start" className="mb-2">
               <Text
-                className={`${sizeConfig.value} font-bold text-gray-900 dark:text-white leading-none`}
+                className={`${sizeConfig.value} font-bold text-gray-900 dark:text-gray-100 leading-none`}
               >
                 {safeValue()}
               </Text>
@@ -156,12 +168,12 @@ export function ModernStatsCard({
                 <Box
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     getTrendDirection()
-                      ? 'bg-green-50 text-green-700 ring-1 ring-green-200'
-                      : 'bg-red-50 text-red-700 ring-1 ring-red-200'
+                      ? 'bg-green-50 text-green-700 ring-1 ring-green-200 dark:bg-green-900 dark:text-green-200 dark:ring-green-800'
+                      : 'bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-900 dark:text-red-200 dark:ring-red-800'
                   }`}
                 >
                   <Flex align="center" gap="1">
-                    <span>{getTrendDirection() ? '↗' : '↘'}</span>
+                    <span>{getTrendDirection() ? '\u2197' : '\u2198'}</span>
                     <span>{getTrendValue()}</span>
                   </Flex>
                 </Box>
@@ -177,6 +189,35 @@ export function ModernStatsCard({
           </Box>
         </Flex>
       </Box>
+      {hasHeader && (
+        <Box
+          className={`p-6 ${headerGradient} dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 dark:border-b dark:border-gray-800`}
+        >
+          <Flex justify="between" align="center" gap="4">
+            <Box className="min-w-0 flex-1">
+              {title && (
+                <Heading
+                  size="5"
+                  className="text-gray-900 dark:text-gray-100 mb-1 truncate"
+                >
+                  {title}
+                </Heading>
+              )}
+              {subtitle && (
+                <Text
+                  size="3"
+                  className="text-gray-600 dark:text-gray-400 line-clamp-2"
+                >
+                  {subtitle}
+                </Text>
+              )}
+            </Box>
+            {headerActions && (
+              <Box className="flex-shrink-0">{headerActions}</Box>
+            )}
+          </Flex>
+        </Box>
+      )}
     </RadixCard>
   );
 }

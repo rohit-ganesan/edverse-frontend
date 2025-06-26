@@ -76,7 +76,7 @@ export function ModernProgressBar({
         p-0 
         shadow-xl 
         border-0 
-        bg-white 
+        bg-white dark:bg-gray-800
         overflow-hidden 
         transition-all 
         duration-300 
@@ -86,23 +86,33 @@ export function ModernProgressBar({
     >
       {/* Header */}
       {(title || subtitle) && (
-        <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+        <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 dark:bg-gray-900 dark:border-gray-800">
           <Flex justify="between" align="center" className="mb-3" gap="4">
             <Box className="min-w-0 flex-1">
               {title && (
-                <Heading size="5" className="text-gray-900 mb-1 truncate">
+                <Heading
+                  size="5"
+                  className="text-gray-900 dark:text-gray-100 mb-1 truncate"
+                >
                   {title}
                 </Heading>
               )}
               {subtitle && (
-                <Text size="3" className="text-gray-600 line-clamp-2">
+                <Text
+                  size="3"
+                  className="text-gray-600 dark:text-gray-400 line-clamp-2"
+                >
                   {subtitle}
                 </Text>
               )}
             </Box>
             {showPercentage && (
               <Box className="flex-shrink-0">
-                <Text size="3" weight="bold" className="text-green-600">
+                <Text
+                  size="3"
+                  weight="bold"
+                  className="text-green-600 dark:text-green-300"
+                >
                   {percentage}% Attended
                 </Text>
               </Box>
@@ -115,7 +125,7 @@ export function ModernProgressBar({
       <Box className="p-6">
         {/* Progress Bar */}
         <Box
-          className={`relative w-full bg-gray-200 ${variantClasses[variant]} ${heightClasses[height]} mb-4 overflow-hidden`}
+          className={`relative w-full bg-gray-200 dark:bg-gray-700 ${variantClasses[variant]} ${heightClasses[height]} mb-4 overflow-hidden`}
         >
           {segments.map((segment, index) => {
             const segmentPercentage = (segment.value / total) * 100;

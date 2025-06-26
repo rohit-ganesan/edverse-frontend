@@ -74,10 +74,14 @@ export function AllStudents({
             </Text>
           </Box>
           <Box>
-            <Text size="2" weight="medium" className="text-gray-900 block">
+            <Text
+              size="2"
+              weight="medium"
+              className="text-gray-900 dark:text-gray-100 block"
+            >
               {student.name}
             </Text>
-            <Text size="1" className="text-gray-500 block">
+            <Text size="1" className="text-gray-500 dark:text-gray-400 block">
               {student.rollNumber}
             </Text>
           </Box>
@@ -89,10 +93,10 @@ export function AllStudents({
       label: 'Class',
       render: (student) => (
         <Box>
-          <Text size="2" className="text-gray-700 block">
+          <Text size="2" className="text-gray-700 dark:text-gray-100 block">
             {student.class}
           </Text>
-          <Text size="1" className="text-gray-500">
+          <Text size="1" className="text-gray-500 dark:text-gray-400">
             Section {student.section}
           </Text>
         </Box>
@@ -141,10 +145,10 @@ export function AllStudents({
       label: 'Contact',
       render: (student) => (
         <Box>
-          <Text size="1" className="text-gray-700 block">
+          <Text size="1" className="text-gray-700 dark:text-gray-100 block">
             {student.parentEmail}
           </Text>
-          <Text size="1" className="text-gray-500">
+          <Text size="1" className="text-gray-500 dark:text-gray-400">
             {student.parentPhone}
           </Text>
         </Box>

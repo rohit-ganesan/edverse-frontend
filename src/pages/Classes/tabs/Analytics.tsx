@@ -44,13 +44,16 @@ export function Analytics({
     <Box className="space-y-8">
       {/* Analytics Header with Filters */}
       <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-        <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+        <Box className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 border-b border-blue-100 dark:border-gray-700">
           <Flex justify="between" align="center" className="mb-6">
             <Box>
-              <Heading size="5" className="text-gray-900 mb-1">
+              <Heading
+                size="5"
+                className="text-gray-900 dark:text-gray-100 mb-1"
+              >
                 Classes Analytics
               </Heading>
-              <Text size="3" className="text-gray-600">
+              <Text size="3" className="text-gray-600 dark:text-gray-400">
                 Comprehensive insights into class performance and engagement
               </Text>
             </Box>
@@ -127,13 +130,16 @@ export function Analytics({
       <Grid columns="2" gap="8">
         {/* Class Performance Chart */}
         <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-          <Box className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
+          <Box className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-emerald-900 dark:to-green-900 border-b border-green-100 dark:border-gray-700">
             <Flex justify="between" align="center">
               <Box>
-                <Heading size="4" className="text-gray-900 mb-1">
+                <Heading
+                  size="4"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   Class Performance
                 </Heading>
-                <Text size="2" className="text-gray-600">
+                <Text size="2" className="text-gray-600 dark:text-gray-400">
                   Average student performance across classes
                 </Text>
               </Box>
@@ -167,13 +173,16 @@ export function Analytics({
 
         {/* Enrollment Trends */}
         <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-          <Box className="p-6 bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100">
+          <Box className="p-6 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900 dark:to-violet-900 border-b border-purple-100 dark:border-gray-700">
             <Flex justify="between" align="center">
               <Box>
-                <Heading size="4" className="text-gray-900 mb-1">
+                <Heading
+                  size="4"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   Enrollment Trends
                 </Heading>
-                <Text size="2" className="text-gray-600">
+                <Text size="2" className="text-gray-600 dark:text-gray-400">
                   Student enrollment by class
                 </Text>
               </Box>
@@ -199,23 +208,29 @@ export function Analytics({
                   classes.map((classItem, index) => (
                     <Box
                       key={classItem.id}
-                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                       <Flex justify="between" align="center">
                         <Box>
                           <Text
                             size="2"
                             weight="medium"
-                            className="text-gray-900 block"
+                            className="text-gray-900 dark:text-gray-100 block"
                           >
                             {classItem.name}
                           </Text>
-                          <Text size="1" className="text-gray-600">
+                          <Text
+                            size="1"
+                            className="text-gray-600 dark:text-gray-400"
+                          >
                             Grade {classItem.grade} - {classItem.section}
                           </Text>
                         </Box>
                         <Box className="text-right">
-                          <Text size="2" className="text-gray-900 font-bold">
+                          <Text
+                            size="2"
+                            className="text-gray-900 dark:text-gray-100 font-bold"
+                          >
                             {classItem.students} students
                           </Text>
                         </Box>
@@ -237,16 +252,19 @@ export function Analytics({
       <Grid columns="3" gap="6">
         {/* Average Class Size */}
         <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-          <Box className="p-6 bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-blue-100">
+          <Box className="p-6 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-cyan-900 dark:to-blue-900 border-b border-blue-100 dark:border-gray-700">
             <Flex align="center" gap="3">
               <Box className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Users className="w-5 h-5 text-blue-600" />
               </Box>
               <Box>
-                <Heading size="4" className="text-gray-900 mb-1">
+                <Heading
+                  size="4"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   Average Class Size
                 </Heading>
-                <Text size="2" className="text-gray-600">
+                <Text size="2" className="text-gray-600 dark:text-gray-400">
                   Students per class
                 </Text>
               </Box>
@@ -262,7 +280,7 @@ export function Analytics({
                   )
                 : 0}
             </Text>
-            <Text size="2" className="text-gray-600">
+            <Text size="2" className="text-gray-600 dark:text-gray-400">
               students on average
             </Text>
           </Box>
@@ -270,16 +288,19 @@ export function Analytics({
 
         {/* Subject Distribution */}
         <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-          <Box className="p-6 bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100">
+          <Box className="p-6 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900 dark:to-amber-900 border-b border-orange-100 dark:border-gray-700">
             <Flex align="center" gap="3">
               <Box className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-orange-600" />
               </Box>
               <Box>
-                <Heading size="4" className="text-gray-900 mb-1">
+                <Heading
+                  size="4"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   Subject Distribution
                 </Heading>
-                <Text size="2" className="text-gray-600">
+                <Text size="2" className="text-gray-600 dark:text-gray-400">
                   Most popular subjects
                 </Text>
               </Box>
@@ -291,10 +312,13 @@ export function Analytics({
               {['Mathematics', 'Science', 'English', 'History'].map(
                 (subject, index) => (
                   <Flex key={subject} justify="between" align="center">
-                    <Text size="2" className="text-gray-900">
+                    <Text size="2" className="text-gray-900 dark:text-gray-100">
                       {subject}
                     </Text>
-                    <Text size="2" className="text-orange-600 font-medium">
+                    <Text
+                      size="2"
+                      className="text-orange-600 dark:text-orange-400 font-medium"
+                    >
                       {Math.floor(Math.random() * 5) + 3} classes
                     </Text>
                   </Flex>
@@ -306,16 +330,19 @@ export function Analytics({
 
         {/* Schedule Efficiency */}
         <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
-          <Box className="p-6 bg-gradient-to-r from-green-50 to-teal-50 border-b border-green-100">
+          <Box className="p-6 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 border-b border-green-100 dark:border-gray-700">
             <Flex align="center" gap="3">
               <Box className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <Clock className="w-5 h-5 text-green-600" />
               </Box>
               <Box>
-                <Heading size="4" className="text-gray-900 mb-1">
+                <Heading
+                  size="4"
+                  className="text-gray-900 dark:text-gray-100 mb-1"
+                >
                   Schedule Efficiency
                 </Heading>
-                <Text size="2" className="text-gray-600">
+                <Text size="2" className="text-gray-600 dark:text-gray-400">
                   Time utilization
                 </Text>
               </Box>
@@ -326,7 +353,7 @@ export function Analytics({
             <Text size="6" weight="bold" className="text-green-600 block mb-2">
               87%
             </Text>
-            <Text size="2" className="text-gray-600">
+            <Text size="2" className="text-gray-600 dark:text-gray-400">
               classroom utilization
             </Text>
             <Box className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">

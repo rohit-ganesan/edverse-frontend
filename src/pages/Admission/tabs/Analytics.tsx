@@ -20,10 +20,7 @@ import {
   Award,
 } from 'lucide-react';
 import { useAdmissionData } from '../hooks/useAdmissionData';
-import {
-  SkeletonCard,
-  SkeletonTableRow,
-} from '../../../components/ui/Skeleton';
+import { SkeletonCard } from '../../../components/ui/Skeleton';
 
 export function Analytics({
   isLoading = false,

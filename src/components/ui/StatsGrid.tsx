@@ -35,9 +35,11 @@ export function StatsGrid({
           {Array.from({ length: parseInt(columns) }).map((_, index) => (
             <Box
               key={index}
-              className="h-24 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center"
+              className="h-24 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center dark:bg-gray-800 dark:border-gray-700"
             >
-              <span className="text-gray-400 text-sm">No data</span>
+              <span className="text-gray-400 text-sm dark:text-gray-500">
+                No data
+              </span>
             </Box>
           ))}
         </Grid>
