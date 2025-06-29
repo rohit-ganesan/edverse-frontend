@@ -184,7 +184,7 @@ export function Recent({
               {isLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <SkeletonCard key={i} height={80} />
+                    <SkeletonCard key={i} height="80px" />
                   ))}
                 </div>
               ) : recentNotices.length > 0 ? (
@@ -253,7 +253,7 @@ export function Recent({
               {isLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <SkeletonCard key={i} height={80} />
+                    <SkeletonCard key={i} height="80px" />
                   ))}
                 </div>
               ) : topRecentNotices.length > 0 ? (

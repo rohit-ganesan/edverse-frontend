@@ -27,8 +27,8 @@ export function LiveTracking({
   if (isLoading) {
     return (
       <Box className="space-y-8">
-        <SkeletonCard height={120} />
-        <SkeletonCard height={320} />
+        <SkeletonCard height="120px" />
+        <SkeletonCard height="320px" />
       </Box>
     );
   }

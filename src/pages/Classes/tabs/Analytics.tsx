@@ -154,7 +154,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={256} />
+              <SkeletonCard height="256px" />
             ) : (
               <Box className="h-64 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center border border-green-100">
                 <Box className="text-center">

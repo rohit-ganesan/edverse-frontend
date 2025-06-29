@@ -246,7 +246,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={256} />
+              <SkeletonCard height="256px" />
             ) : (
               <Flex direction="column" gap="4">
                 {[
@@ -322,7 +322,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={256} />
+              <SkeletonCard height="256px" />
             ) : (
               <Flex direction="column" gap="4">
                 {[
@@ -450,7 +450,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={256} />
+              <SkeletonCard height="256px" />
             ) : (
               <Flex direction="column" gap="3">
                 {Object.entries(analytics.statusStats).map(
@@ -514,7 +514,7 @@ export function Analytics({
 
         <Box className="p-6">
           {isLoading ? (
-            <SkeletonCard height={256} />
+            <SkeletonCard height="256px" />
           ) : (
             <Grid columns="3" gap="4">
               {analytics.topPerformers.map((instructor) => (
@@ -570,7 +570,7 @@ export function Analytics({
 
         <Box className="p-6">
           {isLoading ? (
-            <SkeletonCard height={256} />
+            <SkeletonCard height="256px" />
           ) : (
             <Grid columns="3" gap="4">
               {analytics.recentHires.map((instructor) => (

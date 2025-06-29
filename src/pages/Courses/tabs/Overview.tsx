@@ -48,7 +48,7 @@ export function Overview({
             <Flex direction="column" gap="6">
               {isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
-                  <SkeletonCard key={i} height={72} className="mb-2" />
+                  <SkeletonCard key={i} height="72px" className="mb-2" />
                 ))
               ) : courses && courses.length > 0 ? (
                 courses.slice(0, 3).map((course, index) => (
@@ -142,7 +142,7 @@ export function Overview({
             <Flex direction="column" gap="5">
               {isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
-                  <SkeletonCard key={i} height={56} className="mb-2" />
+                  <SkeletonCard key={i} height="56px" className="mb-2" />
                 ))
               ) : (
                 <>

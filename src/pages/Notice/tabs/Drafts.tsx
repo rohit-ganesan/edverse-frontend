@@ -176,7 +176,7 @@ export function Drafts({
           {isLoading ? (
             <div className="space-y-4">
               {Array.from({ length: 2 }).map((_, i) => (
-                <SkeletonCard key={i} height={80} />
+                <SkeletonCard key={i} height="80px" />
               ))}
             </div>
           ) : draftNotices.length > 0 ? (

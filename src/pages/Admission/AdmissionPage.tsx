@@ -135,7 +135,7 @@ export function AdmissionPage(): JSX.Element {
       {isLoading ? (
         <div className="grid grid-cols-4 gap-6 mb-8">
           {[...Array(4)].map((_, i) => (
-            <SkeletonCard key={i} height={120} />
+            <SkeletonCard key={i} height="120px" />
           ))}
         </div>
       ) : (

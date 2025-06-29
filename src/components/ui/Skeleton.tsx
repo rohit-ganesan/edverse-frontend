@@ -1,36 +1,42 @@
 import React from 'react';
-import { cn } from '../../lib/utils';
+import { Skeleton as RadixSkeleton } from '@radix-ui/themes';
 
-interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  width?: string | number;
-  height?: string | number;
-  borderRadius?: string | number;
+interface SkeletonProps
+  extends Omit<React.ComponentProps<typeof RadixSkeleton>, 'width' | 'height'> {
+  width?: string;
+  height?: string;
+  borderRadius?: string;
   className?: string;
   animate?: boolean;
 }
 
 /**
- * Generic Skeleton loader component
+ * Generic Skeleton loader component (Radix UI)
  */
 export function Skeleton({
   width = '100%',
   height = '1rem',
   borderRadius = '0.375rem',
   className = '',
-  animate = true,
+  animate = true, // Radix always animates, so this is ignored
   ...props
-}: SkeletonProps): JSX.Element {
+}: SkeletonProps & {
+  width?: string | number;
+  height?: string | number;
+  borderRadius?: string | number;
+}): JSX.Element {
   return (
-    <div
-      className={cn(
-        'bg-gray-200 dark:bg-gray-700',
-        animate ? 'animate-pulse' : '',
-        className
-      )}
+    <RadixSkeleton
+      width={typeof width === 'number' ? `${width}px` : width}
+      height={typeof height === 'number' ? `${height}px` : height}
+      className={className}
       style={{
-        width,
-        height,
-        borderRadius,
+        borderRadius: borderRadius
+          ? typeof borderRadius === 'number'
+            ? `${borderRadius}px`
+            : borderRadius
+          : undefined,
+        ...props.style,
       }}
       {...props}
     />
@@ -55,11 +61,20 @@ export function SkeletonCircle({
   size = 40,
   ...rest
 }: { size?: number } & SkeletonProps) {
-  return <Skeleton width={size} height={size} borderRadius={9999} {...rest} />;
+  return (
+    <Skeleton
+      width={`${size}px`}
+      height={`${size}px`}
+      borderRadius="9999px"
+      {...rest}
+    />
+  );
 }
 
-export function SkeletonCard({ height = 120, ...rest }: SkeletonProps) {
-  return <Skeleton width="100%" height={height} borderRadius={16} {...rest} />;
+export function SkeletonCard({ height = '120px', ...rest }: SkeletonProps) {
+  return (
+    <Skeleton width="100%" height={height} borderRadius="16px" {...rest} />
+  );
 }
 
 export function SkeletonTableRow({

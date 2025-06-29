@@ -50,9 +50,11 @@ export function Overview({
           <Box className="p-4">
             <Flex direction="column" gap="4">
               {isLoading ? (
-                Array.from({ length: 3 }).map((_, i) => (
-                  <SkeletonCard key={i} height={72} className="mb-2" />
-                ))
+                <div className="grid grid-cols-4 gap-6 mb-8">
+                  {[...Array(4)].map((_, i) => (
+                    <SkeletonCard key={i} height="120px" />
+                  ))}
+                </div>
               ) : classes && classes.length > 0 ? (
                 classes.slice(0, 3).map((classItem, index) => (
                   <Box
@@ -154,9 +156,11 @@ export function Overview({
           <Box className="p-4">
             <Flex direction="column" gap="4">
               {isLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <SkeletonCard key={i} height={56} className="mb-2" />
-                ))
+                <div className="grid grid-cols-4 gap-6 mb-8">
+                  {[...Array(4)].map((_, i) => (
+                    <SkeletonCard key={i} height="120px" />
+                  ))}
+                </div>
               ) : classes && classes.length > 0 ? (
                 classes.slice(0, 4).map((classItem, index) => (
                   <Box

@@ -64,10 +64,10 @@ export function PublishResults({
   if (isLoading) {
     return (
       <Box className="space-y-8">
-        <SkeletonCard height={80} />
+        <SkeletonCard height="80px" />
         <div className="grid grid-cols-2 gap-8">
-          <SkeletonCard height={320} />
-          <SkeletonCard height={320} />
+          <SkeletonCard height="320px" />
+          <SkeletonCard height="320px" />
         </div>
       </Box>
     );

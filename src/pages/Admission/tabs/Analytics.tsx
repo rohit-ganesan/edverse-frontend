@@ -132,7 +132,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={256} />
+              <SkeletonCard height="256px" />
             ) : (
               <Box className="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg flex items-center justify-center border border-blue-100">
                 <Box className="text-center">
@@ -226,7 +226,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={128} />
+              <SkeletonCard height="128px" />
             ) : (
               <Box className="text-center">
                 <Text size="8" weight="bold" className="text-orange-600 block">
@@ -259,7 +259,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={128} />
+              <SkeletonCard height="128px" />
             ) : (
               <Box className="text-center">
                 <Text size="8" weight="bold" className="text-teal-600 block">
@@ -291,7 +291,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={128} />
+              <SkeletonCard height="128px" />
             ) : (
               <Box className="text-center">
                 <Text size="8" weight="bold" className="text-rose-600 block">

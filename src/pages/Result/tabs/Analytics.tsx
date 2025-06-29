@@ -144,7 +144,7 @@ export function Analytics({
           <Box className="p-6">
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <SkeletonCard key={i} height={56} className="mb-2" />
+                <SkeletonCard key={i} height="56px" className="mb-2" />
               ))
             ) : (
               <Flex direction="column" gap="4">

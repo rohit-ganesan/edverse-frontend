@@ -52,7 +52,7 @@ export function Overview({
             <Flex direction="column" gap="4">
               {isLoading ? (
                 Array.from({ length: 2 }).map((_, i) => (
-                  <SkeletonCard key={i} height={56} className="mb-2" />
+                  <SkeletonCard key={i} height="56px" className="mb-2" />
                 ))
               ) : attendanceSessions && attendanceSessions.length > 0 ? (
                 attendanceSessions.map((session, index) => (
@@ -111,7 +111,7 @@ export function Overview({
             <Flex direction="column" gap="3">
               {isLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <SkeletonCard key={i} height={32} className="mb-2" />
+                  <SkeletonCard key={i} height="32px" className="mb-2" />
                 ))
               ) : attendanceRecords && attendanceRecords.length > 0 ? (
                 attendanceRecords

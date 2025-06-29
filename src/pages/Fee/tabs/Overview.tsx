@@ -104,7 +104,7 @@ export function Overview({
       {isLoading ? (
         <div className="grid grid-cols-3 gap-6 mb-8">
           {Array.from({ length: 3 }).map((_, i) => (
-            <SkeletonCard key={i} height={120} />
+            <SkeletonCard key={i} height="120px" />
           ))}
         </div>
       ) : (
@@ -435,7 +435,7 @@ export function Overview({
           {isLoading ? (
             <div className="space-y-4 mt-8">
               {Array.from({ length: 4 }).map((_, i) => (
-                <SkeletonCard key={i} height={64} />
+                <SkeletonCard key={i} height="64px" />
               ))}
             </div>
           ) : recentPayments.length > 0 ? (

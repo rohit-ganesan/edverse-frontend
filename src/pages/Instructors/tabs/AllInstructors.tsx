@@ -206,7 +206,7 @@ export function AllInstructors({
       {isLoading ? (
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <SkeletonCard key={i} height={96} />
+            <SkeletonCard key={i} height="96px" />
           ))}
         </div>
       ) : (

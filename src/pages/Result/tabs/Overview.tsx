@@ -50,7 +50,7 @@ export function Overview({
             <Flex direction="column" gap="4">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <SkeletonCard key={i} height={56} className="mb-2" />
+                  <SkeletonCard key={i} height="56px" className="mb-2" />
                 ))
               ) : results && results.length > 0 ? (
                 results.slice(0, 5).map((result, index) => (
@@ -178,7 +178,7 @@ export function Overview({
             <Flex direction="column" gap="3">
               {isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
-                  <SkeletonCard key={i} height={40} className="mb-2" />
+                  <SkeletonCard key={i} height="40px" className="mb-2" />
                 ))
               ) : analytics.topPerformers &&
                 analytics.topPerformers.length > 0 ? (

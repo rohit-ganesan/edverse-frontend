@@ -218,7 +218,7 @@ export function Analytics({
             <Box className="p-6">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, index) => (
-                  <SkeletonCard key={index} height={40} />
+                  <SkeletonCard key={index} height="40px" />
                 ))
               ) : (
                 <Flex direction="column" gap="3">
@@ -269,7 +269,7 @@ export function Analytics({
             <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
               <Box className="p-6">
                 {isLoading ? (
-                  <SkeletonCard height={256} />
+                  <SkeletonCard height="256px" />
                 ) : (
                   <Flex direction="column" align="center" gap="3">
                     <BarChart3 className="w-12 h-12 text-gray-400" />

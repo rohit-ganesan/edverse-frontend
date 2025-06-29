@@ -196,7 +196,7 @@ export function Analytics({
 
           <Box className="p-6">
             {isLoading ? (
-              <SkeletonCard height={256} />
+              <SkeletonCard height="256px" />
             ) : (
               <Flex direction="column" gap="4">
                 {stats.attendanceDistribution.map((item, index) => (

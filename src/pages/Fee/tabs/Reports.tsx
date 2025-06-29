@@ -439,7 +439,7 @@ export function Reports({
           {isLoading ? (
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
-                <SkeletonCard key={i} height={80} />
+                <SkeletonCard key={i} height="80px" />
               ))}
             </div>
           ) : filteredReports.length > 0 ? (
