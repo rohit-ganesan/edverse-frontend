@@ -21,11 +21,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useClassesData } from '../hooks/useClassesData';
-import {
-  SkeletonCard,
-  SkeletonText,
-  SkeletonTableRow,
-} from 'components/ui/Skeleton';
+import { SkeletonCard, SkeletonTableRow } from 'components/ui/Skeleton';
 
 export function Analytics({
   isLoading = false,

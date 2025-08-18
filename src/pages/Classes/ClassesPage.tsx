@@ -11,7 +11,7 @@ import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
 import { useClassesData } from './hooks/useClassesData';
 import { useTabRouting } from 'lib/useTabRouting';
-import { SkeletonCard, SkeletonText } from 'components/ui/Skeleton';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 export function ClassesPage(): JSX.Element {
   const { stats, isLoading } = useClassesData();
