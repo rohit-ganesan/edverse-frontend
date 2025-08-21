@@ -1,11 +1,10 @@
-import { User } from 'firebase/auth';
+import { User } from '@supabase/supabase-js';
 
 export interface UserProfile {
-  firstName?: string;
-  lastName?: string;
+  first_name?: string;
+  last_name?: string;
   address?: string;
   role?: string;
-  menuOrder?: string[]; // Array of menu item IDs in user's preferred order
 }
 
 export interface AuthContextType {
@@ -27,8 +26,8 @@ export interface AuthFormData {
   email: string;
   password: string;
   confirmPassword?: string;
-  firstName?: string;
-  lastName?: string;
+  first_name?: string;
+  last_name?: string;
   role?: string;
 }
 

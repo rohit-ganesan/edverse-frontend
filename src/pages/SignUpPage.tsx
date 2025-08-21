@@ -6,7 +6,7 @@ import { SignUpForm } from 'features/auth/components/SignUpForm';
 import { useAuth } from 'features/auth/AuthContext';
 
 export function SignUpPage(): JSX.Element {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -19,6 +19,18 @@ export function SignUpPage(): JSX.Element {
       navigate(from, { replace: true });
     }
   }, [user, navigate, from]);
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Container className="min-h-screen bg-gray-50">
@@ -36,6 +48,18 @@ export function SignUpPage(): JSX.Element {
           <Text size="4" color="gray">
             Start your learning journey today
           </Text>
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-blue-900 mb-2">
+                  Development Mode
+                </h3>
+                <p className="text-xs text-blue-700">
+                  Using Supabase authentication system
+                </p>
+              </div>
+            </div>
+          )}
         </Box>
         <SignUpForm />
       </Flex>

@@ -3,21 +3,40 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
   ReactNode,
 } from 'react';
-import {
-  User,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { auth, db } from 'lib/firebase';
-import { AuthContextType, UserProfile } from 'types/auth';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from 'lib/supabase';
 import { logError, ErrorContext } from 'lib/errorUtils';
+
+// Types for Auth (using PostgreSQL snake_case convention)
+export interface UserProfile {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  address: string;
+  role: 'Administrator' | 'Instructor' | 'Student' | 'Parent';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  userProfile: UserProfile | null;
+  session: Session | null;
+  loading: boolean;
+  signUp: (
+    email: string,
+    password: string,
+    profile?: Partial<UserProfile>
+  ) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -28,65 +47,90 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user profile from Firestore
-  const loadUserProfile = async (userId: string): Promise<void> => {
-    if (!userId) {
-      console.error('loadUserProfile: userId is required');
-      setUserProfile(null);
-      return;
-    }
+  // Create default profile for new users
+  const createDefaultProfile = useCallback(
+    async (userId: string): Promise<void> => {
+      const user = await supabase.auth.getUser();
+      if (!user.data.user?.email) return;
 
-    if (!db) {
-      console.error('loadUserProfile: Firestore database is not initialized');
-      setUserProfile(null);
-      return;
-    }
+      const defaultProfile: Partial<UserProfile> = {
+        id: userId,
+        email: user.data.user.email,
+        first_name: '',
+        last_name: '',
+        address: '',
+        role: 'Administrator', // Default role - can be changed
+      };
 
-    try {
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (userDoc.exists()) {
-        const profileData = userDoc.data();
-        if (profileData) {
-          setUserProfile(profileData as UserProfile);
-        } else {
-          console.warn('loadUserProfile: Profile data is empty');
-          setUserProfile(null);
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .insert([defaultProfile])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setUserProfile(data as UserProfile);
         }
-      } else {
-        // Create default profile for new users
-        const defaultProfile: UserProfile = {
-          firstName: '',
-          lastName: '',
-          address: '',
-          role: 'Administrator',
-        };
-        await setDoc(doc(db, 'users', userId), defaultProfile);
-        setUserProfile(defaultProfile);
+      } catch (error) {
+        console.error('Error creating default profile:', error);
       }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-      setUserProfile(null);
-    }
-  };
+    },
+    []
+  );
 
+  // Load user profile from PostgreSQL
+  const loadUserProfile = useCallback(
+    async (userId: string): Promise<void> => {
+      if (!userId) {
+        console.error('loadUserProfile: userId is required');
+        setUserProfile(null);
+        return;
+      }
+
+      try {
+        const { data: profile, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // No rows found - create default profile
+            console.log('Creating default profile for new user');
+            await createDefaultProfile(userId);
+          } else {
+            throw error;
+          }
+          return;
+        }
+
+        if (profile) {
+          setUserProfile(profile as UserProfile);
+        }
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+        setUserProfile(null);
+      }
+    },
+    [createDefaultProfile]
+  );
+
+  // Initialize auth state
   useEffect(() => {
-    if (!auth) {
-      console.error('AuthProvider: Firebase auth is not initialized');
-      setLoading(false);
-      return;
-    }
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log(
-        'Auth state changed:',
-        user ? `User: ${user.email || 'Unknown email'}` : 'No user'
-      );
-      setUser(user);
-
-      if (user?.uid) {
-        await loadUserProfile(user.uid);
+      if (session?.user?.id) {
+        loadUserProfile(session.user.id);
       } else {
         setUserProfile(null);
       }
@@ -94,8 +138,30 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       setLoading(false);
     });
 
-    return unsubscribe;
-  }, []);
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log(
+        'Auth state changed:',
+        event,
+        session?.user?.email || 'No user'
+      );
+
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user?.id) {
+        await loadUserProfile(session.user.id);
+      } else {
+        setUserProfile(null);
+      }
+
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [loadUserProfile]);
 
   const signUp = async (
     email: string,
@@ -106,28 +172,24 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       throw new Error('Email and password are required');
     }
 
-    if (!auth) {
-      throw new Error('Firebase auth is not initialized');
-    }
-
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      const { data, error } = await supabase.auth.signUp({
         email,
-        password
-      );
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            first_name: profile?.first_name || '',
+            last_name: profile?.last_name || '',
+          },
+        },
+      });
 
-      // If profile data is provided, save it to Firestore
-      if (profile && userCredential?.user?.uid && db) {
-        const userProfile: UserProfile = {
-          firstName: profile.firstName || '',
-          lastName: profile.lastName || '',
-          address: profile.address || '',
-          role: profile.role || 'Student',
-        };
+      if (error) throw error;
 
-        await setDoc(doc(db, 'users', userCredential.user.uid), userProfile);
-        setUserProfile(userProfile);
+      // If user is created and confirmed, create profile
+      if (data.user && !data.user.email_confirmed_at) {
+        console.log('User created, please check email for confirmation');
       }
     } catch (error: unknown) {
       const context: ErrorContext = {
@@ -148,12 +210,15 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       throw new Error('Email and password are required');
     }
 
-    if (!auth) {
-      throw new Error('Firebase auth is not initialized');
-    }
-
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      console.log('Successfully signed in:', data.user?.email);
     } catch (error: unknown) {
       const context: ErrorContext = {
         component: 'AuthContext',
@@ -169,13 +234,17 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   };
 
   const signInWithGoogle = async (): Promise<void> => {
-    if (!auth) {
-      throw new Error('Firebase auth is not initialized');
-    }
-
     try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+
+      console.log('Google OAuth initiated:', data);
     } catch (error: unknown) {
       const context: ErrorContext = {
         component: 'AuthContext',
@@ -190,17 +259,24 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   };
 
   const signOut = async (): Promise<void> => {
-    if (!auth) {
-      throw new Error('Firebase auth is not initialized');
-    }
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
 
-    await firebaseSignOut(auth);
+      // Clear local state
+      setUser(null);
+      setUserProfile(null);
+      setSession(null);
+    } catch (error: unknown) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
   };
 
   const updateUserProfile = async (
     profile: Partial<UserProfile>
   ): Promise<void> => {
-    if (!user?.uid) {
+    if (!user?.id) {
       throw new Error('No user logged in');
     }
 
@@ -208,20 +284,24 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       throw new Error('Profile data is required');
     }
 
-    if (!db) {
-      throw new Error('Firestore database is not initialized');
-    }
-
     try {
-      await updateDoc(doc(db, 'users', user.uid), profile);
-      setUserProfile((prev) =>
-        prev ? { ...prev, ...profile } : (profile as UserProfile)
-      );
+      const { data, error } = await supabase
+        .from('users')
+        .update(profile)
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setUserProfile(data as UserProfile);
+      }
     } catch (error: unknown) {
       const context: ErrorContext = {
         component: 'AuthContext',
         action: 'updateUserProfile',
-        userId: user.uid,
+        userId: user.id,
       };
       const appError = logError(error, context);
 
@@ -234,6 +314,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const value: AuthContextType = {
     user,
     userProfile,
+    session,
     loading,
     signUp,
     signIn,

@@ -1,44 +1,56 @@
-// No React import needed with new JSX transform
-import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Container, Flex, Box, Heading, Text } from '@radix-ui/themes';
-import { LoginForm } from 'features/auth/components/LoginForm';
 import { useAuth } from 'features/auth/AuthContext';
+import { LoginForm } from 'features/auth/components/LoginForm';
+import { Navigate } from 'react-router-dom';
 
 export function LoginPage(): JSX.Element {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { user, loading } = useAuth();
 
-  // Get the intended destination from location state, default to dashboard
-  const from = location.state?.from?.pathname || '/dashboard';
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Redirect to intended destination if already authenticated
-  useEffect(() => {
-    if (user) {
-      navigate(from, { replace: true });
-    }
-  }, [user, navigate, from]);
+  // If already authenticated, redirect to dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
-    <Container className="min-h-screen bg-gray-50">
-      <Flex
-        direction="column"
-        align="center"
-        justify="center"
-        className="min-h-screen py-12"
-        gap="8"
-      >
-        <Box className="text-center">
-          <Heading size="8" className="text-blue-600 mb-2">
-            EdVerse
-          </Heading>
-          <Text size="4" color="gray">
-            Welcome back to your learning journey
-          </Text>
-        </Box>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome to EdVerse
+            </h1>
+            <p className="text-gray-600">
+              Your comprehensive learning management system
+            </p>
+          </div>
+        </div>
+
         <LoginForm />
-      </Flex>
-    </Container>
+
+        {process.env.NODE_ENV === 'development' && (
+          <div className="text-center mt-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-blue-900 mb-2">
+                Development Mode
+              </h3>
+              <p className="text-xs text-blue-700">
+                Using Supabase authentication system
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

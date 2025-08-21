@@ -135,17 +135,12 @@ export function Header({
 
   // Safe user display name
   const getUserDisplayName = (): string => {
-    if (userProfile?.firstName && userProfile?.lastName) {
-      return `${userProfile.firstName} ${userProfile.lastName}`;
-    }
-
-    if (user?.displayName) {
-      return user.displayName;
+    if (userProfile?.first_name && userProfile?.last_name) {
+      return `${userProfile.first_name} ${userProfile.last_name}`;
     }
 
     if (user?.email) {
-      const emailPrefix = user.email.split('@')[0];
-      return emailPrefix || 'User';
+      return user.email.split('@')[0]; // Use email username as fallback
     }
 
     return 'User';

@@ -1,213 +1,183 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heading, Text, Flex, Box } from '@radix-ui/themes';
-import { Button } from 'components/ui/RadixButton';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import { RadixButton } from 'components/ui/RadixButton';
 import { RadixTextField } from 'components/ui/RadixTextField';
-import { RadixCard } from 'components/ui/RadixCard';
-import { RadixSeparator } from 'components/ui/RadixSeparator';
-import { useAuth } from 'features/auth/AuthContext';
-import { AuthFormData } from 'types/auth';
-import { logError, ErrorContext } from 'lib/errorUtils';
-import { loginSchema, validateWithSchema } from 'lib/validation';
-import { AlertTriangle } from 'lucide-react';
+import { Toast } from 'components/ui/Toast';
 
-export function LoginForm(): JSX.Element {
-  const [formData, setFormData] = useState<AuthFormData>({
-    email: '',
-    password: '',
-  });
+interface LoginFormProps {
+  onSuccess?: () => void;
+}
+
+export function LoginForm({ onSuccess }: LoginFormProps): JSX.Element {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
 
-  const { signIn, signInWithGoogle, user } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get the intended destination from location state, default to dashboard
-  const from = location.state?.from?.pathname || '/dashboard';
+  // Get the intended destination or default to dashboard
+  const from = (location.state as any)?.from?.pathname || '/dashboard';
 
-  // Redirect to intended destination when user is authenticated
-  useEffect(() => {
-    if (user) {
-      navigate(from, { replace: true });
-    }
-  }, [user, navigate, from]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const isFormValid = (): boolean => {
-    return !!(formData.email?.trim() && formData.password?.trim());
-  };
-
-  const validateForm = (): string | null => {
-    const validation = validateWithSchema(loginSchema, formData);
-    if (!validation.success && validation.errors) {
-      // Return the first error message
-      const firstError = Object.values(validation.errors)[0];
-      return firstError || 'Please check your input.';
-    }
-    return null;
-  };
-
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-
-    // Client-side validation
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      setLoading(false);
-      return;
-    }
+    setError(null);
 
     try {
-      await signIn(formData.email, formData.password);
-    } catch (err: unknown) {
-      const context: ErrorContext = {
-        component: 'LoginForm',
-        action: 'signIn',
-      };
-      const appError = logError(err, context);
-      setError(appError.userFriendlyMessage);
+      await signIn(email, password);
+      console.log('Successfully signed in with Supabase');
+
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate(from, { replace: true });
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'An error occurred during login');
+      setShowToast(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleSignIn = async (): Promise<void> => {
+  const handleGoogleSignIn = async () => {
     setLoading(true);
-    setError('');
+    setError(null);
 
     try {
       await signInWithGoogle();
-    } catch (err: unknown) {
-      const context: ErrorContext = {
-        component: 'LoginForm',
-        action: 'signInWithGoogle',
-      };
-      const appError = logError(err, context);
-      setError(appError.userFriendlyMessage);
+      console.log('Successfully initiated Google OAuth with Supabase');
+
+      // Supabase will redirect to /auth/callback automatically
+    } catch (err: any) {
+      console.error('Google sign-in error:', err);
+      setError(err.message || 'An error occurred during Google sign-in');
+      setShowToast(true);
     } finally {
-      setLoading(false);
+      // Keep loading state since we're redirecting for OAuth
     }
   };
 
   return (
-    <Box className="w-full max-w-lg mx-auto">
-      <RadixCard size="3" className="p-6 w-full">
-        <Flex direction="column" gap="6">
-          <Box className="text-center">
-            <Heading size="6" className="mb-2">
-              Sign in to your account
-            </Heading>
-          </Box>
-
-          {error && (
-            <Box className="p-4 rounded-lg bg-red-50 border border-red-200">
-              <Flex align="center" gap="2">
-                <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                <Text size="2" className="text-red-800 font-medium">
-                  {error}
-                </Text>
-              </Flex>
-            </Box>
-          )}
+    <>
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
+            <p className="text-sm text-gray-600 mt-2">
+              Using Supabase Auth
+              {process.env.NODE_ENV === 'development' && (
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                  DEV
+                </span>
+              )}
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit}>
-            <Flex direction="column" gap="4">
+            <div className="mb-4">
               <RadixTextField
-                name="email"
+                placeholder="Email address"
                 type="email"
-                label="Email address"
-                value={formData.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                size="3"
-                placeholder="Enter your email"
-              />
-
-              <RadixTextField
-                name="password"
-                type="password"
-                label="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                size="3"
-                placeholder="Enter your password"
-              />
-
-              <Button
-                type="submit"
-                size="3"
+                disabled={loading}
                 className="w-full"
-                loading={loading}
-                disabled={!isFormValid() || loading}
+              />
+            </div>
+
+            <div className="mb-6">
+              <RadixTextField
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                className="w-full"
+              />
+            </div>
+
+            <div className="flex items-center justify-between mb-6">
+              <RadixButton
+                type="submit"
+                disabled={loading || !email || !password}
+                className="w-full bg-blue-500 hover:bg-blue-700"
               >
-                Sign in
-              </Button>
-            </Flex>
+                {loading ? 'Signing In...' : 'Sign In'}
+              </RadixButton>
+            </div>
           </form>
 
-          <Box>
-            <Flex align="center" gap="3" className="mb-4">
-              <RadixSeparator className="flex-1" />
-              <Text size="2" color="gray">
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">
                 Or continue with
-              </Text>
-              <RadixSeparator className="flex-1" />
-            </Flex>
+              </span>
+            </div>
+          </div>
 
-            <Button
-              onClick={handleGoogleSignIn}
-              variant="outline"
-              size="3"
-              className="w-full"
-              disabled={loading}
-            >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Sign in with Google
-            </Button>
-          </Box>
+          <RadixButton
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            variant="outline"
+            className="w-full"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="currentColor"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+            {loading ? 'Connecting...' : 'Sign in with Google'}
+          </RadixButton>
 
-          <Box className="text-center">
-            <Text size="2" color="gray">
-              Don&apos;t have an account?{' '}
-              <Link
-                to="/signup"
-                className="font-medium text-blue-600 hover:text-blue-500"
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <button
+                onClick={() => navigate('/signup')}
+                className="text-blue-500 hover:text-blue-700 font-medium"
+                disabled={loading}
               >
                 Sign up
-              </Link>
-            </Text>
-          </Box>
-        </Flex>
-      </RadixCard>
-    </Box>
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {showToast && error && (
+        <Toast
+          open={showToast}
+          onOpenChange={setShowToast}
+          title="Login Error"
+          description={error}
+          variant="error"
+        />
+      )}
+    </>
   );
 }

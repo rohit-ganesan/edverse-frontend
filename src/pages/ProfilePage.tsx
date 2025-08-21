@@ -20,8 +20,8 @@ export function ProfilePage(): JSX.Element {
 
   // Initialize form data with safe defaults - must be called before conditional returns
   const [formData, setFormData] = useState({
-    firstName: userProfile?.firstName || '',
-    lastName: userProfile?.lastName || '',
+    firstName: userProfile?.first_name || '',
+    lastName: userProfile?.last_name || '',
     address: userProfile?.address || '',
     role: userProfile?.role || 'Administrator',
   });
@@ -47,12 +47,12 @@ export function ProfilePage(): JSX.Element {
 
   // Safe getters for user data
   const getUserDisplayName = (): string => {
-    if (userProfile?.firstName && userProfile?.lastName) {
-      return `${userProfile.firstName} ${userProfile.lastName}`;
+    if (userProfile?.first_name && userProfile?.last_name) {
+      return `${userProfile.first_name} ${userProfile.last_name}`;
     }
 
-    if (user?.displayName) {
-      return user.displayName;
+    if (user?.email) {
+      return user.email.split('@')[0]; // Use email username as fallback
     }
 
     return 'User';
@@ -93,7 +93,14 @@ export function ProfilePage(): JSX.Element {
 
     setLoading(true);
     try {
-      await updateUserProfile(formData);
+      // Transform camelCase form data to snake_case for database
+      const profileData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        address: formData.address,
+        role: formData.role,
+      };
+      await updateUserProfile(profileData);
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -105,8 +112,8 @@ export function ProfilePage(): JSX.Element {
   const handleCancel = (): void => {
     // Reset form data to current profile values
     setFormData({
-      firstName: userProfile?.firstName || '',
-      lastName: userProfile?.lastName || '',
+      firstName: userProfile?.first_name || '',
+      lastName: userProfile?.last_name || '',
       address: userProfile?.address || '',
       role: userProfile?.role || 'Administrator',
     });
@@ -116,8 +123,8 @@ export function ProfilePage(): JSX.Element {
   const handleStartEditing = (): void => {
     // Refresh form data when starting to edit
     setFormData({
-      firstName: userProfile?.firstName || '',
-      lastName: userProfile?.lastName || '',
+      firstName: userProfile?.first_name || '',
+      lastName: userProfile?.last_name || '',
       address: userProfile?.address || '',
       role: userProfile?.role || 'Administrator',
     });
@@ -137,7 +144,16 @@ export function ProfilePage(): JSX.Element {
       return (userProfile as any)[profileField] || '';
     }
 
-    return userProfile?.[field] || '';
+    // Map formData field names to userProfile field names
+    const fieldMap: Record<string, string> = {
+      firstName: 'first_name',
+      lastName: 'last_name',
+      address: 'address',
+      role: 'role',
+    };
+
+    const profileFieldName = fieldMap[field] || field;
+    return (userProfile as any)?.[profileFieldName] || '';
   };
 
   return (

@@ -9,7 +9,7 @@ import {
   XCircle,
   RefreshCw,
 } from 'lucide-react';
-import { useApiCall, ApiService } from 'lib/api';
+import { SupabaseApiService, useSupabaseQuery } from 'lib/supabase/api';
 import { useAuth } from 'features/auth/AuthContext';
 import { useState, useRef, useEffect, useMemo } from 'react';
 
@@ -95,7 +95,7 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
     loading,
     error,
     refetch,
-  } = useApiCall(() => ApiService.getUserNotifications(), [user]);
+  } = useSupabaseQuery(() => SupabaseApiService.getNotifications(), [user]);
 
   // Use fallback data if there's an error or no data - memoized to prevent re-renders
   const displayNotifications = useMemo(() => {

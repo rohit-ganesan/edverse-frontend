@@ -1,0 +1,21 @@
+# Copy this to your .env.local file after replacing with your actual Supabase values
+
+# Firebase Configuration (Current - keep during migration)
+REACT_APP_FIREBASE_API_KEY=AIzaSyDNKy9_3rm8vm6zPoOWYu_K4oebdeV6k9Y
+REACT_APP_FIREBASE_AUTH_DOMAIN=edverse-f1640.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=edverse-f1640
+REACT_APP_FIREBASE_STORAGE_BUCKET=edverse-f1640.firebasestorage.app
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=392040621349
+REACT_APP_FIREBASE_APP_ID=1:392040621349:web:5e73db9b52a538cc1966cc
+REACT_APP_FIREBASE_MEASUREMENT_ID=G-XBWQNHQKXD
+
+# Supabase Configuration - Get these from your Supabase dashboard
+# Go to: https://app.supabase.com/project/fqyzfpbrlkenhrnnlalb/settings/api
+REACT_APP_SUPABASE_URL=https://fqyzfpbrlkenhrnnlalb.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeXpmcGJybGtlbmhybm5sYWxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExNTU4NTksImV4cCI6MjA2NjczMTg1OX0.tpOY1H_KAfXTZ9xtUu9vkBuzl7nZMbu9yMvRVcu782I
+
+# Environment
+NODE_ENV=development
+
+# Feature flag for gradual migration (set to true when ready to test Supabase)
+REACT_APP_USE_SUPABASE=true

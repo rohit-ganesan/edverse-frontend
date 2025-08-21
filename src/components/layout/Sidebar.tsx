@@ -174,26 +174,9 @@ export function Sidebar({
 
   // Load saved menu order from user profile on component mount
   useEffect(() => {
-    if (userProfile?.menuOrder && userProfile.menuOrder.length > 0) {
-      try {
-        const reorderedItems = userProfile.menuOrder
-          .map((id: string) => defaultMenuItems.find((item) => item.id === id))
-          .filter((item): item is MenuItem => item !== undefined);
-
-        // Add any new items that weren't in the saved order
-        const savedIds = new Set(userProfile.menuOrder);
-        const newItems = defaultMenuItems.filter(
-          (item) => !savedIds.has(item.id)
-        );
-
-        setMenuItems([...reorderedItems, ...newItems]);
-      } catch (error) {
-        console.error('Error loading menu order from profile:', error);
-        setMenuItems(defaultMenuItems);
-      }
-    } else {
-      setMenuItems(defaultMenuItems);
-    }
+    // TODO: Implement menuOrder functionality in Supabase schema if needed
+    // For now, just use default menu items
+    setMenuItems(defaultMenuItems);
   }, [userProfile]);
 
   // Save menu order to user profile
@@ -204,8 +187,11 @@ export function Sidebar({
     }
 
     try {
-      const orderIds = items.map((item) => item.id);
-      await updateUserProfile({ menuOrder: orderIds });
+      // TODO: Implement menuOrder saving in Supabase schema if needed
+      console.log(
+        'Menu order would be saved:',
+        items.map((item) => item.id)
+      );
     } catch (error) {
       console.error('Error saving menu order to profile:', error);
     }
