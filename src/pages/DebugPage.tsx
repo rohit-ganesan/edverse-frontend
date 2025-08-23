@@ -50,15 +50,20 @@ export function DebugPage(): JSX.Element {
       // Test 3: Database Connection
       addResult('🗄️ Testing database connection...');
       try {
-        const { data, error } = await supabase
-          .from('users')
+        const { error } = await supabase
+          .from('public.users')
           .select('count')
           .limit(1);
 
         if (error) {
           addResult(`❌ Database error: ${error.message}`);
+          addResult(`❌ Error code: ${error.code}`);
+          addResult(`❌ Error details: ${error.details}`);
           if (error.code === 'PGRST301') {
-            addResult('💡 Hint: Check if RLS policies are properly configured');
+            addResult(
+              '💡 RLS Policy Issue: Users table exists but RLS policies block access'
+            );
+            addResult('🔧 Fix: Configure RLS policies in Supabase Dashboard');
           }
         } else {
           addResult('✅ Database connection successful');
@@ -67,12 +72,43 @@ export function DebugPage(): JSX.Element {
         addResult(`❌ Database connection failed: ${dbError.message}`);
       }
 
+      // Test 3.5: Test specific user profile query
+      if (user) {
+        addResult('👤 Testing user profile query...');
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('public.users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (profileError) {
+            addResult(`❌ Profile query error: ${profileError.message}`);
+            addResult(`❌ Profile error code: ${profileError.code}`);
+            if (profileError.code === 'PGRST301') {
+              addResult(
+                '🚨 CONFIRMED: RLS policies are blocking user profile access'
+              );
+              addResult(
+                '🔧 SOLUTION: Add RLS policy: CREATE POLICY "Users can view own profile" ON users FOR SELECT USING (auth.uid() = id);'
+              );
+            }
+          } else if (profile) {
+            addResult(`✅ Profile query successful: ${profile.email}`);
+          } else {
+            addResult('⚠️ Profile query returned no data');
+          }
+        } catch (profileError: any) {
+          addResult(`❌ Profile query failed: ${profileError.message}`);
+        }
+      }
+
       // Test 4: User Profile Check
       if (user) {
         addResult('👤 Testing user profile...');
         try {
           const { data: profile, error: profileError } = await supabase
-            .from('users')
+            .from('public.users')
             .select('*')
             .eq('id', user.id)
             .single();
@@ -115,18 +151,50 @@ export function DebugPage(): JSX.Element {
         addResult(`❌ RLS test error: ${rlsError.message}`);
       }
 
-      // Test 6: Network Connectivity
+      // Test 6: Session Timing Test
+      addResult('⏰ Testing session timing...');
+
+      // Test current session state
+      const { data: sessionData, error: sessionCheckError } =
+        await supabase.auth.getSession();
+      addResult(`Current session exists: ${!!sessionData.session}`);
+      addResult(`Current user ID: ${sessionData.session?.user?.id || 'NULL'}`);
+
+      if (sessionCheckError) {
+        addResult(`Session error: ${sessionCheckError.message}`);
+      }
+
+      // Test 7: Environment Variables
+      addResult('🔧 Testing environment variables...');
+      addResult(
+        `SUPABASE_URL: ${process.env.REACT_APP_SUPABASE_URL || 'MISSING'}`
+      );
+      addResult(
+        `SUPABASE_ANON_KEY: ${process.env.REACT_APP_SUPABASE_ANON_KEY ? 'SET' : 'MISSING'}`
+      );
+
+      // Test 7: Network Connectivity
       addResult('🌐 Testing network connectivity...');
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_SUPABASE_URL}/rest/v1/`,
-          {
-            headers: {
-              apikey: process.env.REACT_APP_SUPABASE_ANON_KEY!,
-              Authorization: `Bearer ${process.env.REACT_APP_SUPABASE_ANON_KEY!}`,
-            },
-          }
-        );
+        const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+        const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !supabaseKey) {
+          addResult(
+            '❌ Environment variables missing - this explains the timeout!'
+          );
+          addResult(
+            '🔧 Solution: Restart dev server to pick up .env.local changes'
+          );
+          return;
+        }
+
+        const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+        });
 
         if (response.ok) {
           addResult('✅ Network connectivity working');

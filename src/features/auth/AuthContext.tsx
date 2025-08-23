@@ -53,32 +53,64 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   // Create default profile for new users
   const createDefaultProfile = useCallback(
     async (userId: string): Promise<void> => {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user?.email) return;
-
-      const defaultProfile: Partial<UserProfile> = {
-        id: userId,
-        email: user.data.user.email,
-        first_name: '',
-        last_name: '',
-        address: '',
-        role: 'Administrator', // Default role - can be changed
-      };
+      console.log('📝 Creating default profile for userId:', userId);
 
       try {
+        const user = await supabase.auth.getUser();
+        if (!user.data.user?.email) {
+          console.error('❌ No email found for user during profile creation');
+          setUserProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        const defaultProfile: Partial<UserProfile> = {
+          id: userId,
+          email: user.data.user.email,
+          first_name: user.data.user.user_metadata?.first_name || '',
+          last_name: user.data.user.user_metadata?.last_name || '',
+          address: '',
+          role: 'Administrator', // Default role - can be changed
+        };
+
+        console.log('💾 Inserting default profile:', defaultProfile);
+
         const { data, error } = await supabase
           .from('users')
           .insert([defaultProfile])
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Failed to create default profile:', error);
+          console.error('❌ Profile creation error details:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+          });
+          setUserProfile(null);
+          setLoading(false);
+          return;
+        }
 
         if (data) {
+          console.log('✅ Default profile created successfully:', data);
           setUserProfile(data as UserProfile);
+        } else {
+          console.warn('⚠️ Profile creation succeeded but no data returned');
+          setUserProfile(null);
         }
+
+        setLoading(false);
       } catch (error) {
-        console.error('Error creating default profile:', error);
+        console.error('❌ Unexpected error creating default profile:', error);
+        console.error('❌ Error details:', {
+          name: (error as Error)?.name,
+          message: (error as Error)?.message,
+          stack: (error as Error)?.stack,
+        });
+        setUserProfile(null);
+        setLoading(false);
       }
     },
     []
@@ -88,35 +120,114 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const loadUserProfile = useCallback(
     async (userId: string): Promise<void> => {
       if (!userId) {
-        console.error('loadUserProfile: userId is required');
+        console.error('❌ loadUserProfile: userId is required');
         setUserProfile(null);
+        setLoading(false);
         return;
       }
 
+      console.log('🔍 Loading user profile for:', userId);
+
       try {
-        const { data: profile, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', userId)
-          .single();
+        console.log('📡 Making Supabase query to users table...');
+
+        let profile: any = null;
+        let error: any = null;
+
+        // Try direct REST API call since Supabase client has issues
+        try {
+          const response = await fetch(
+            `${process.env.REACT_APP_SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,
+            {
+              headers: {
+                apikey: process.env.REACT_APP_SUPABASE_ANON_KEY!,
+                Authorization: `Bearer ${process.env.REACT_APP_SUPABASE_ANON_KEY!}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const profiles = await response.json();
+          profile = profiles[0] || null;
+          error =
+            profiles.length === 0
+              ? { code: 'PGRST116', message: 'No rows found' }
+              : null;
+
+          console.log('📡 Direct API query completed:', {
+            hasData: !!profile,
+            hasError: !!error,
+            errorCode: error?.code,
+            errorMessage: error?.message,
+          });
+        } catch (fetchError: any) {
+          console.error('❌ Direct API fetch failed:', fetchError);
+          // Fall back to original Supabase client as backup
+          const supabaseResult = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single();
+          profile = supabaseResult.data;
+          error = supabaseResult.error;
+        }
 
         if (error) {
+          console.error('❌ Profile query error:', error);
+
           if (error.code === 'PGRST116') {
             // No rows found - create default profile
-            console.log('Creating default profile for new user');
+            console.log(
+              '📝 No profile found, creating default profile for new user'
+            );
             await createDefaultProfile(userId);
+            return; // createDefaultProfile handles setLoading(false)
+          } else if (error.code === '42P01') {
+            // Table doesn't exist
+            console.error('❌ Database table "users" does not exist');
+            setUserProfile(null);
+            setLoading(false);
+            return;
+          } else if (error.code === 'PGRST301') {
+            // RLS policy violation
+            console.error(
+              '❌ Row Level Security policy violation - user cannot access their profile'
+            );
+            console.log(
+              '💡 This usually means RLS policies need to be configured in Supabase'
+            );
+            setUserProfile(null);
+            setLoading(false);
+            return;
           } else {
-            throw error;
+            console.error('❌ Unexpected database error:', error);
+            setUserProfile(null);
+            setLoading(false);
+            return;
           }
-          return;
-        }
-
-        if (profile) {
+        } else if (profile) {
+          console.log('✅ Profile loaded successfully:', profile.email);
           setUserProfile(profile as UserProfile);
+          setLoading(false);
+        } else {
+          // No profile and no error - shouldn't happen but handle it
+          console.warn('⚠️ No profile returned and no error - this is unusual');
+          setUserProfile(null);
+          setLoading(false);
         }
       } catch (error) {
-        console.error('Error loading user profile:', error);
+        console.error('❌ Unexpected error loading user profile:', error);
+        console.error('❌ Error details:', {
+          name: (error as Error)?.name,
+          message: (error as Error)?.message,
+          stack: (error as Error)?.stack,
+        });
         setUserProfile(null);
+        setLoading(false);
       }
     },
     [createDefaultProfile]
@@ -124,26 +235,74 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   // Initialize auth state
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    console.log('🔄 AuthContext: Initializing auth state...');
 
-      if (session?.user?.id) {
-        loadUserProfile(session.user.id);
-      } else {
-        setUserProfile(null);
-      }
-
+    // Set a timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      console.warn(
+        '⚠️ Auth loading timeout after 5 seconds - forcing loading to false'
+      );
+      console.warn(
+        '💡 This suggests a database connection or RLS policy issue'
+      );
       setLoading(false);
-    });
+    }, 5000); // 5 second timeout
+
+    // Listen for email verification completion from other tabs
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'auth_verification_complete') {
+        console.log(
+          '📧 Email verification completed in another tab, refreshing session...'
+        );
+        // Refresh the session to get the updated user data
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user?.id) {
+            console.log('✅ Session refreshed after email verification');
+            setSession(session);
+            setUser(session.user);
+            loadUserProfile(session.user.id);
+          }
+        });
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Get initial session
+    supabase.auth
+      .getSession()
+      .then(({ data: { session }, error }) => {
+        console.log('🔍 Auth session result:', { session: !!session, error });
+
+        clearTimeout(loadingTimeout); // Clear timeout since we got a response
+
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user?.id) {
+          console.log(
+            '👤 User found, loading profile for:',
+            session.user.email
+          );
+          loadUserProfile(session.user.id);
+        } else {
+          console.log('❌ No authenticated user found');
+          setUserProfile(null);
+          setLoading(false); // Set loading to false when no user
+        }
+      })
+      .catch((error) => {
+        console.error('❌ Auth initialization failed:', error);
+        clearTimeout(loadingTimeout);
+        setLoading(false);
+      });
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log(
-        'Auth state changed:',
+        '🔄 Auth state changed:',
         event,
         session?.user?.email || 'No user'
       );
@@ -151,16 +310,31 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       setSession(session);
       setUser(session?.user ?? null);
 
-      if (session?.user?.id) {
-        await loadUserProfile(session.user.id);
-      } else {
-        setUserProfile(null);
+      try {
+        if (session?.user?.id) {
+          console.log('👤 User session found, loading profile...');
+          await loadUserProfile(session.user.id);
+        } else {
+          console.log('❌ No user session, clearing profile');
+          setUserProfile(null);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('❌ Error in auth state change handler:', error);
+        setLoading(false);
       }
 
-      setLoading(false);
+      // For sign out events, ensure immediate redirect
+      if (event === 'SIGNED_OUT') {
+        console.log('🚪 Sign out event detected - user should be redirected');
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(loadingTimeout);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [loadUserProfile]);
 
   const signUp = async (
@@ -187,9 +361,28 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
       if (error) throw error;
 
+      console.log('Signup response:', {
+        user: data.user,
+        identities: data.user?.identities,
+        session: data.session,
+      });
+
+      // Check if user already exists
+      if (
+        data.user &&
+        data.user.identities &&
+        data.user.identities.length === 0
+      ) {
+        throw new Error(
+          'An account with this email address already exists. Please sign in instead.'
+        );
+      }
+
       // If user is created and confirmed, create profile
       if (data.user && !data.user.email_confirmed_at) {
         console.log('User created, please check email for confirmation');
+      } else if (data.user && data.user.email_confirmed_at) {
+        console.log('User created and confirmed');
       }
     } catch (error: unknown) {
       const context: ErrorContext = {
@@ -216,9 +409,24 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Sign in error:', error);
+
+        // Handle specific email confirmation error
+        if (error.message?.includes('Email not confirmed')) {
+          throw new Error(
+            "Please check your email and click the verification link before signing in. If you can't find the email, please sign up again."
+          );
+        }
+
+        throw error;
+      }
 
       console.log('Successfully signed in:', data.user?.email);
+      console.log(
+        'Email confirmed:',
+        data.user?.email_confirmed_at ? 'Yes' : 'No'
+      );
     } catch (error: unknown) {
       const context: ErrorContext = {
         component: 'AuthContext',
@@ -260,16 +468,35 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   const signOut = async (): Promise<void> => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      console.log('🚪 Signing out user...');
 
-      // Clear local state
+      // Clear local state immediately to trigger redirect
       setUser(null);
       setUserProfile(null);
       setSession(null);
+      setLoading(false);
+
+      console.log('🧹 Local state cleared immediately');
+
+      // Then call Supabase signOut
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.warn(
+          '⚠️ Supabase signOut error (but local state cleared):',
+          error
+        );
+      } else {
+        console.log('✅ Successfully signed out from Supabase');
+      }
+
+      console.log('🚪 Sign out complete - user should be redirected');
     } catch (error: unknown) {
-      console.error('Error signing out:', error);
-      throw error;
+      console.error('❌ Error signing out:', error);
+      // Even if there's an error, ensure local state is cleared
+      setUser(null);
+      setUserProfile(null);
+      setSession(null);
+      setLoading(false);
     }
   };
 

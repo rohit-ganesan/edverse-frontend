@@ -6,10 +6,14 @@ export default function AuthCallbackPage(): JSX.Element {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log('🔄 Processing auth callback...');
+        console.log('Current URL:', window.location.href);
+
         // Parse the URL hash for auth tokens (email verification, password reset, etc.)
         const hashParams = new URLSearchParams(
           window.location.hash.substring(1)
@@ -17,10 +21,41 @@ export default function AuthCallbackPage(): JSX.Element {
         const accessToken = hashParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token');
         const type = hashParams.get('type');
+        const tokenHash = hashParams.get('token_hash');
 
-        console.log('Auth callback type:', type);
+        console.log('🔍 Auth callback details:', {
+          type,
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken,
+          hasTokenHash: !!tokenHash,
+        });
+
+        // Function to show success and notify other tabs
+        const showSuccessAndNotify = (userEmail: string) => {
+          console.log(
+            '✅ Email verification successful, showing success message'
+          );
+
+          // Notify other tabs about verification completion
+          try {
+            localStorage.setItem(
+              'auth_verification_complete',
+              Date.now().toString()
+            );
+          } catch (e) {
+            console.log('📱 Cross-tab communication failed');
+          }
+
+          // Show success message
+          setSuccess(
+            `Email verified successfully for ${userEmail}! You can now close this tab.`
+          );
+          setLoading(false);
+        };
 
         if (accessToken && refreshToken) {
+          console.log('✅ Found auth tokens, setting session...');
+
           // Set the session from the tokens
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -28,47 +63,92 @@ export default function AuthCallbackPage(): JSX.Element {
           });
 
           if (error) {
-            console.error('Auth callback error:', error);
+            console.error('❌ Auth callback error:', error);
             setError('Authentication failed. Please try again.');
             return;
           }
 
           if (data.session) {
-            console.log('Authentication successful:', data.session.user.email);
+            console.log(
+              '✅ Authentication successful:',
+              data.session.user.email
+            );
+            console.log(
+              '📧 Email confirmed:',
+              data.session.user.email_confirmed_at ? 'Yes' : 'No'
+            );
 
             // Check if this is email verification
             if (type === 'signup' || type === 'email_confirmation') {
-              console.log('Email verification successful');
-              // Clean up the URL
-              window.history.replaceState({}, document.title, '/dashboard');
+              showSuccessAndNotify(data.session.user.email || 'your email');
+              return;
             }
 
-            // Redirect to dashboard on successful auth
-            navigate('/dashboard', { replace: true });
+            // For other auth types, redirect normally
+            setTimeout(() => {
+              console.log('🚀 Redirecting to dashboard...');
+              navigate('/dashboard', { replace: true });
+            }, 1000);
           } else {
-            console.log('No session created, redirecting to login');
+            console.log('❌ No session created, redirecting to login');
             navigate('/login', { replace: true });
+          }
+        } else if (tokenHash) {
+          // Handle token_hash based verification (newer Supabase format)
+          console.log('🔍 Found token_hash, verifying...');
+
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: (type as any) || 'signup',
+          });
+
+          if (error) {
+            console.error('❌ Token verification error:', error);
+            setError('Email verification failed. Please try again.');
+            return;
+          }
+
+          if (data.session) {
+            console.log(
+              '✅ Token verification successful:',
+              data.session.user.email
+            );
+            console.log(
+              '📧 Email confirmed:',
+              data.session.user.email_confirmed_at ? 'Yes' : 'No'
+            );
+
+            showSuccessAndNotify(data.session.user.email || 'your email');
+            return;
+          } else {
+            console.log('❌ No session from token verification');
+            setError(
+              'Email verification completed, but session creation failed. Please try logging in.'
+            );
+            setTimeout(() => navigate('/login', { replace: true }), 2000);
           }
         } else {
           // No tokens in URL, check for existing session
+          console.log('🔍 No tokens found, checking existing session...');
+
           const { data, error } = await supabase.auth.getSession();
 
           if (error) {
-            console.error('Session check error:', error);
+            console.error('❌ Session check error:', error);
             setError('Authentication failed. Please try again.');
             return;
           }
 
           if (data.session) {
-            console.log('Existing session found:', data.session.user.email);
+            console.log('✅ Existing session found:', data.session.user.email);
             navigate('/dashboard', { replace: true });
           } else {
-            console.log('No session found, redirecting to login');
+            console.log('❌ No session found, redirecting to login');
             navigate('/login', { replace: true });
           }
         }
       } catch (err) {
-        console.error('Unexpected error during auth callback:', err);
+        console.error('❌ Unexpected error during auth callback:', err);
         setError('An unexpected error occurred. Please try again.');
       } finally {
         setLoading(false);
@@ -81,12 +161,56 @@ export default function AuthCallbackPage(): JSX.Element {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Completing Authentication...
+            Verifying Email...
           </h2>
-          <p className="text-gray-600">Please wait while we sign you in.</p>
+          <p className="text-gray-600 mb-4">
+            Please wait while we complete your email verification.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md bg-white rounded-lg shadow-lg p-8">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-8 h-8 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Email Verified!
+          </h2>
+          <p className="text-gray-600 mb-6">{success}</p>
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Go to Dashboard
+            </button>
+            <button
+              onClick={() => window.close()}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Close Tab
+            </button>
+          </div>
         </div>
       </div>
     );

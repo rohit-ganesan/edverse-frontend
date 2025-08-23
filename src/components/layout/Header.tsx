@@ -77,9 +77,11 @@ export function Header({
 
   const handleSignOut = async (): Promise<void> => {
     try {
+      console.log('🔘 Header: Sign out button clicked');
       await signOut();
+      console.log('✅ Header: Sign out completed successfully');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('❌ Header: Error signing out:', error);
     }
   };
 

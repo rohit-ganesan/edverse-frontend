@@ -50,6 +50,9 @@ export function SignUpForm({ onSuccess }: SignUpFormProps): JSX.Element {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastVariant, setToastVariant] = useState<
+    'success' | 'error' | 'warning'
+  >('success');
 
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -113,16 +116,25 @@ export function SignUpForm({ onSuccess }: SignUpFormProps): JSX.Element {
       setToastMessage(
         'Account created successfully! Please check your email for verification.'
       );
+      setToastVariant('success');
       setShowToast(true);
 
-      // User might need to verify email first
-      setToastMessage(
-        'Account created successfully! Please check your email for verification.'
-      );
-      setShowToast(true);
+      // Navigate to login after successful signup
+      setTimeout(() => {
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          navigate('/login');
+        }
+      }, 2000); // Give user time to read the success message
     } catch (err: any) {
       console.error('Sign up error:', err);
-      setToastMessage(err.message || 'An error occurred during sign up');
+      const errorMessage = err.message || 'An error occurred during sign up';
+      setToastMessage(errorMessage);
+
+      // Use warning toast for existing email, error toast for other issues
+      const isExistingEmailError = errorMessage.includes('already exists');
+      setToastVariant(isExistingEmailError ? 'warning' : 'error');
       setShowToast(true);
     } finally {
       setLoading(false);
@@ -309,9 +321,15 @@ export function SignUpForm({ onSuccess }: SignUpFormProps): JSX.Element {
         <Toast
           open={showToast}
           onOpenChange={setShowToast}
-          title={toastMessage.includes('successfully') ? 'Success' : 'Error'}
+          title={
+            toastVariant === 'success'
+              ? 'Success'
+              : toastVariant === 'warning'
+                ? 'Account Already Exists'
+                : 'Error'
+          }
           description={toastMessage}
-          variant={toastMessage.includes('successfully') ? 'success' : 'error'}
+          variant={toastVariant}
         />
       )}
     </>

@@ -29,6 +29,7 @@ import { AdminsPage } from 'pages/AdminsPage';
 import { SupportPage } from 'pages/SupportPage';
 import { SettingsPage } from 'pages/SettingsPage';
 import AuthCallbackPage from 'pages/AuthCallbackPage';
+import { EmailVerificationPage } from 'pages/EmailVerificationPage';
 
 export function AppRoutes(): JSX.Element {
   return (
@@ -38,6 +39,7 @@ export function AppRoutes(): JSX.Element {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/auth/verify" element={<EmailVerificationPage />} />
         <Route path="/debug" element={<DebugPage />} />
 
         {/* Protected routes */}

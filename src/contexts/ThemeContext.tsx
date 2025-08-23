@@ -40,7 +40,7 @@ export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
 
   const isDark = theme === 'dark';
 
-  // Initialize theme from localStorage and system preference
+  // Initialize theme from localStorage, default to light
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -50,15 +50,12 @@ export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
           setTheme(savedTheme);
           return;
         }
-        // Check system preference
-        if (
-          window.matchMedia &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches
-        ) {
-          setTheme('dark');
-        }
+        // Always default to light theme (ignore system preference)
+        setTheme('light');
       } catch (error) {
-        console.warn('Error accessing localStorage or matchMedia:', error);
+        console.warn('Error accessing localStorage:', error);
+        // Fallback to light theme on error
+        setTheme('light');
       }
     }
   }, []);

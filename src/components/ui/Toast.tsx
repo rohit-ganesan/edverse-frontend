@@ -33,13 +33,14 @@ ToastViewport.displayName = ToastPrimitive.Viewport.displayName;
 export const ToastRoot = forwardRef<
   React.ElementRef<typeof ToastPrimitive.Root>,
   ComponentProps<typeof ToastPrimitive.Root> & {
-    variant?: 'default' | 'success' | 'error';
+    variant?: 'default' | 'success' | 'error' | 'warning';
   }
 >(({ className = '', variant = 'default', ...props }, ref) => {
   const variantStyles = {
     default: 'bg-white border-gray-200 text-gray-900',
     success: 'bg-green-50 border-green-200 text-green-900',
     error: 'bg-red-50 border-red-200 text-red-900',
+    warning: 'bg-yellow-50 border-yellow-200 text-yellow-900',
   };
 
   return (
@@ -124,7 +125,7 @@ ToastClose.displayName = ToastPrimitive.Close.displayName;
 interface ToastProps {
   title?: string;
   description: string;
-  variant?: 'default' | 'success' | 'error';
+  variant?: 'default' | 'success' | 'error' | 'warning';
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -142,6 +143,10 @@ export function Toast({
         return <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />;
       case 'error':
         return <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />;
+      case 'warning':
+        return (
+          <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0" />
+        );
       default:
         return <Info className="h-5 w-5 text-blue-600 flex-shrink-0" />;
     }
