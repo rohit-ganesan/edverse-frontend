@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { RadixButton } from 'components/ui/RadixButton';
-import { RadixTextField } from 'components/ui/RadixTextField';
-import { RadixCard } from 'components/ui/RadixCard';
-import { RadixRadioGroup } from 'components/ui/RadixRadioGroup';
-import { Toast } from 'components/ui/Toast';
+import { RadixButton } from '../../../components/ui/RadixButton';
+import { RadixTextField } from '../../../components/ui/RadixTextField';
+import { RadixCard } from '../../../components/ui/RadixCard';
+import { RadixRadioGroup } from '../../../components/ui/RadixRadioGroup';
+import { Toast } from '../../../components/ui/Toast';
 import { AlertTriangle } from 'lucide-react';
 
 const ROLE_OPTIONS = [
