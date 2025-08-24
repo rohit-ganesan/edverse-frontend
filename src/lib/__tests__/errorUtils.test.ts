@@ -1,166 +1,151 @@
-import { logError, getFirebaseErrorMessage, ErrorContext } from '../errorUtils';
+import { logError, getSupabaseErrorMessage, ErrorContext } from '../errorUtils';
 
-describe('Error Utilities', () => {
-  describe('getFirebaseErrorMessage', () => {
-    it('should return user-friendly message for known Firebase error codes', () => {
-      const error = { code: 'auth/invalid-credential' };
-      const result = getFirebaseErrorMessage(error);
-      expect(result).toBe(
-        'Invalid email or password. Please check your credentials and try again.'
-      );
-    });
-
-    it('should return user-friendly message for email-already-in-use error', () => {
-      const error = { code: 'auth/email-already-in-use' };
-      const result = getFirebaseErrorMessage(error);
-      expect(result).toBe(
-        'An account with this email already exists. Try signing in instead.'
-      );
-    });
-
-    it('should handle string error codes', () => {
-      const result = getFirebaseErrorMessage('auth/weak-password');
-      expect(result).toBe('Password should be at least 6 characters long.');
-    });
-
-    it('should extract error code from Firebase error message', () => {
-      const error = { message: 'Firebase: Error (auth/user-not-found).' };
-      const result = getFirebaseErrorMessage(error);
-      expect(result).toBe('No account found with this email address.');
-    });
-
-    it('should return generic message for unknown error codes', () => {
-      const error = { code: 'auth/unknown-error' };
-      const result = getFirebaseErrorMessage(error);
-      expect(result).toBe('An unexpected error occurred. Please try again.');
-    });
-
-    it('should handle errors without code or message', () => {
-      const result = getFirebaseErrorMessage({});
-      expect(result).toBe('An unexpected error occurred. Please try again.');
-    });
+describe('getSupabaseErrorMessage', () => {
+  it('should return user-friendly message for known Supabase error messages', () => {
+    const error = { message: 'User not found' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe('No account found with this email address.');
   });
 
-  describe('logError', () => {
-    beforeEach(() => {
-      // Mock console.error to avoid cluttering test output
-      jest.spyOn(console, 'error').mockImplementation(() => {});
-    });
+  it('should return user-friendly message for authentication errors', () => {
+    const error = { message: 'Invalid login credentials' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe(
+      'Invalid email or password. Please check your credentials and try again.'
+    );
+  });
 
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
+  it('should extract error message from Supabase error object', () => {
+    const error = { message: 'Invalid login credentials' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe(
+      'Invalid email or password. Please check your credentials and try again.'
+    );
+  });
 
-    it('should log Error objects with proper structure', () => {
-      const error = new Error('Test error');
-      const context: ErrorContext = {
-        component: 'TestComponent',
-        action: 'testAction',
-      };
+  it('should handle string errors', () => {
+    const error = 'User not found';
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe('No account found with this email address.');
+  });
 
-      const result = logError(error, context);
+  it('should handle null/undefined errors', () => {
+    const result = getSupabaseErrorMessage(null);
+    expect(result).toBe('An unexpected error occurred. Please try again.');
+  });
 
-      expect(result).toMatchObject({
-        message: 'Test error',
-        originalError: error,
-        context: expect.objectContaining({
-          component: 'TestComponent',
-          action: 'testAction',
-          timestamp: expect.any(Date),
-        }),
-        userFriendlyMessage: 'Test error',
-      });
-    });
+  it('should handle unknown errors with generic message', () => {
+    const error = { message: 'Some unknown error' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe('Some unknown error');
+  });
 
-    it('should handle string errors', () => {
-      const error = 'String error message';
-      const context: ErrorContext = {
-        component: 'TestComponent',
-        action: 'testAction',
-      };
+  it('should handle JWT errors', () => {
+    const error = { message: 'JWT expired' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe('Your session has expired. Please sign in again.');
+  });
 
-      const result = logError(error, context);
+  it('should handle permission errors', () => {
+    const error = { message: 'new row violates row-level security policy' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe('You do not have permission to perform this action.');
+  });
 
-      expect(result).toMatchObject({
-        message: 'String error message',
-        context: expect.objectContaining({
-          component: 'TestComponent',
-          action: 'testAction',
-          timestamp: expect.any(Date),
-        }),
-        userFriendlyMessage: 'String error message',
-      });
-    });
+  it('should handle network errors', () => {
+    const error = { message: 'Network error occurred' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe(
+      'Network error. Please check your internet connection and try again.'
+    );
+  });
 
-    it('should handle Firebase errors with user-friendly messages', () => {
-      const error = {
-        code: 'auth/invalid-credential',
-        message: 'Invalid credential',
-      };
-      const context: ErrorContext = {
-        component: 'LoginForm',
-        action: 'signIn',
-        userId: 'test@example.com',
-      };
+  it('should handle database constraint errors', () => {
+    const error = { message: 'duplicate key value violates unique constraint' };
+    const result = getSupabaseErrorMessage(error);
+    expect(result).toBe(
+      'This record already exists. Please use a different value.'
+    );
+  });
+});
 
-      const result = logError(error, context);
+describe('logError', () => {
+  it('should create structured error object', () => {
+    const error = new Error('Test error');
+    const context: ErrorContext = {
+      component: 'TestComponent',
+      action: 'test',
+      userId: 'test-user',
+    };
 
-      expect(result).toMatchObject({
-        code: 'auth/invalid-credential',
-        message: 'Invalid credential',
-        context: expect.objectContaining({
-          component: 'LoginForm',
-          action: 'signIn',
-          userId: 'test@example.com',
-          timestamp: expect.any(Date),
-        }),
-        userFriendlyMessage:
-          'Invalid email or password. Please check your credentials and try again.',
-      });
-    });
+    const result = logError(error, context);
 
-    it('should handle unknown error types', () => {
-      const error = null;
-      const context: ErrorContext = {
-        component: 'TestComponent',
-        action: 'testAction',
-      };
+    expect(result).toHaveProperty('message', 'Test error');
+    expect(result).toHaveProperty('context');
+    expect(result).toHaveProperty('userFriendlyMessage');
+    expect(result.context?.component).toBe('TestComponent');
+    expect(result.context?.action).toBe('test');
+    expect(result.context?.userId).toBe('test-user');
+  });
 
-      const result = logError(error, context);
+  it('should handle string errors', () => {
+    const error = 'String error message';
+    const context: ErrorContext = { component: 'TestComponent' };
 
-      expect(result).toMatchObject({
-        message: 'An unknown error occurred',
-        context: expect.objectContaining({
-          component: 'TestComponent',
-          action: 'testAction',
-          timestamp: expect.any(Date),
-        }),
-        userFriendlyMessage: 'An unexpected error occurred. Please try again.',
-      });
-    });
+    const result = logError(error, context);
 
-    it('should log to console in development environment', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+    expect(result.message).toBe('String error message');
+    expect(result.userFriendlyMessage).toBe('String error message');
+  });
 
-      const error = new Error('Test error');
-      const context: ErrorContext = {
-        component: 'TestComponent',
-        action: 'testAction',
-      };
+  it('should handle object errors', () => {
+    const error = { message: 'Object error', code: 'TEST_ERROR' };
+    const context: ErrorContext = { component: 'TestComponent' };
 
-      logError(error, context);
+    const result = logError(error, context);
 
-      expect(console.error).toHaveBeenCalledWith(
-        'Error logged:',
-        expect.objectContaining({
-          error: expect.any(Object),
-          context: expect.any(Object),
-          originalError: error,
-        })
-      );
+    expect(result.message).toBe('Object error');
+    expect(result.code).toBe('TEST_ERROR');
+  });
 
-      process.env.NODE_ENV = originalEnv;
-    });
+  it('should handle unknown error types', () => {
+    const error = null;
+    const context: ErrorContext = { component: 'TestComponent' };
+
+    const result = logError(error, context);
+
+    expect(result.message).toBe('An unexpected error occurred');
+    expect(result.userFriendlyMessage).toBe(
+      'Something went wrong. Please try again.'
+    );
+  });
+
+  it('should include timestamp in context', () => {
+    const error = new Error('Test error');
+    const context: ErrorContext = { component: 'TestComponent' };
+
+    const result = logError(error, context);
+
+    expect(result.context?.timestamp).toBeInstanceOf(Date);
+  });
+});
+
+describe('Error handling utilities', () => {
+  it('should identify network errors', () => {
+    const { isNetworkError } = require('../errorUtils');
+
+    expect(isNetworkError({ message: 'Network error' })).toBe(true);
+    expect(isNetworkError({ message: 'fetch failed' })).toBe(true);
+    expect(isNetworkError({ message: 'connection lost' })).toBe(true);
+    expect(isNetworkError({ message: 'User not found' })).toBe(false);
+  });
+
+  it('should identify authentication errors', () => {
+    const { isAuthError } = require('../errorUtils');
+
+    expect(isAuthError({ message: 'JWT expired' })).toBe(true);
+    expect(isAuthError({ message: 'Unauthorized' })).toBe(true);
+    expect(isAuthError({ message: 'Authentication failed' })).toBe(true);
+    expect(isAuthError({ message: 'Network error' })).toBe(false);
   });
 });

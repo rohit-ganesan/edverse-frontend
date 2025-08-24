@@ -1,50 +1,52 @@
 /**
- * Maps Firebase error codes to user-friendly error messages
+ * Maps Supabase error messages to user-friendly error messages
  */
-export const firebaseErrorMessages: Record<string, string> = {
+export const supabaseErrorMessages: Record<string, string> = {
   // Authentication errors
-  'auth/invalid-credential':
+  'Invalid login credentials':
     'Invalid email or password. Please check your credentials and try again.',
-  'auth/user-not-found': 'No account found with this email address.',
-  'auth/wrong-password': 'Incorrect password. Please try again.',
-  'auth/invalid-email': 'Please enter a valid email address.',
-  'auth/user-disabled':
-    'This account has been disabled. Please contact support.',
-  'auth/email-already-in-use':
+  'User not found': 'No account found with this email address.',
+  'Invalid email': 'Please enter a valid email address.',
+  'User already registered':
     'An account with this email already exists. Try signing in instead.',
-  'auth/weak-password': 'Password should be at least 6 characters long.',
-  'auth/operation-not-allowed':
-    'This sign-in method is not enabled. Please contact support.',
-  'auth/account-exists-with-different-credential':
-    'An account already exists with the same email but different sign-in credentials.',
-  'auth/credential-already-in-use':
-    'This credential is already associated with a different user account.',
-  'auth/requires-recent-login':
-    'This operation requires recent authentication. Please sign in again.',
-  'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
-  'auth/network-request-failed':
+  'Password should be at least 6 characters':
+    'Password should be at least 6 characters long.',
+  'Email not confirmed':
+    'Please check your email and click the verification link.',
+  'Too many requests': 'Too many failed attempts. Please try again later.',
+  'Network error':
     'Network error. Please check your internet connection and try again.',
-  'auth/popup-closed-by-user':
-    'Sign-in popup was closed before completing the process.',
-  'auth/popup-blocked':
-    'Sign-in popup was blocked by your browser. Please allow popups and try again.',
-  'auth/cancelled-popup-request': 'Sign-in was cancelled. Please try again.',
-  'auth/unauthorized-domain': 'This domain is not authorized for sign-in.',
+  'Invalid token': 'Your session has expired. Please sign in again.',
+  'JWT expired': 'Your session has expired. Please sign in again.',
+  'Invalid JWT': 'Your session is invalid. Please sign in again.',
 
-  // Configuration errors
-  'auth/configuration-not-found':
-    'Authentication service is not properly configured. Please contact support.',
-  'auth/api-key-not-valid':
-    'Authentication service configuration error. Please contact support.',
-  'auth/invalid-api-key':
-    'Authentication service configuration error. Please contact support.',
+  // Database errors
+  'duplicate key value violates unique constraint':
+    'This record already exists. Please use a different value.',
+  'relation "users" does not exist':
+    'Database schema error. Please contact support.',
+  'column "email" of relation "users" does not exist':
+    'Database schema error. Please contact support.',
+  'null value in column "email" violates not-null constraint':
+    'Email is required. Please provide a valid email address.',
+  'new row for relation "users" violates check constraint':
+    'Invalid data provided. Please check your input and try again.',
 
-  // Network and generic errors
-  'auth/timeout': 'The request timed out. Please try again.',
-  'auth/quota-exceeded': 'Service quota exceeded. Please try again later.',
-  'auth/app-deleted': 'The application has been deleted.',
-  'auth/app-not-authorized': 'Application is not authorized for this service.',
-  'auth/internal-error': 'An internal error occurred. Please try again.',
+  // Permission errors
+  'new row violates row-level security policy':
+    'You do not have permission to perform this action.',
+  'JWT must be a valid JWT': 'Authentication required. Please sign in.',
+  'JWT token is missing': 'Authentication required. Please sign in.',
+
+  // Generic errors
+  'Internal server error': 'An internal error occurred. Please try again.',
+  'Service unavailable':
+    'Service is temporarily unavailable. Please try again later.',
+  'Request timeout': 'The request timed out. Please try again.',
+  'Bad request': 'Invalid request. Please check your input and try again.',
+  'Not found': 'The requested resource was not found.',
+  Forbidden: 'You do not have permission to access this resource.',
+  Unauthorized: 'Authentication required. Please sign in.',
 };
 
 /**
@@ -87,7 +89,7 @@ export function logError(error: unknown, context: ErrorContext): AppError {
       message: error.message,
       originalError: error,
       context: errorContext,
-      userFriendlyMessage: getFirebaseErrorMessage(error),
+      userFriendlyMessage: getSupabaseErrorMessage(error),
     };
   } else if (typeof error === 'string') {
     appError = {
@@ -96,74 +98,167 @@ export function logError(error: unknown, context: ErrorContext): AppError {
       userFriendlyMessage: error,
     };
   } else if (error && typeof error === 'object') {
-    // Handle plain objects (like Firebase errors)
+    // Handle plain objects (like Supabase errors)
     const errorObj = error as any;
     appError = {
-      code: errorObj.code,
-      message: errorObj.message || 'An error occurred',
+      code: errorObj.code || errorObj.status,
+      message: errorObj.message || errorObj.error || 'Unknown error',
+      originalError: error as Error,
       context: errorContext,
-      userFriendlyMessage: getFirebaseErrorMessage(error),
+      userFriendlyMessage: getSupabaseErrorMessage(errorObj),
     };
   } else {
     appError = {
-      message: 'An unknown error occurred',
+      message: 'An unexpected error occurred',
       context: errorContext,
-      userFriendlyMessage: 'An unexpected error occurred. Please try again.',
+      userFriendlyMessage: 'Something went wrong. Please try again.',
     };
   }
 
-  // Log to console in development
-  if (process.env.NODE_ENV === 'development') {
-    console.error('Error logged:', {
-      error: appError,
-      context: errorContext,
-      originalError: error,
-    });
-  }
-
-  // In production, you would send this to your error tracking service
-  // e.g., Sentry, LogRocket, etc.
+  // Log the error for debugging
+  console.error('Application Error:', {
+    ...appError,
+    context: errorContext,
+  });
 
   return appError;
 }
 
 /**
- * Converts Firebase error to user-friendly message
+ * Converts Supabase error to user-friendly message
  */
-export function getFirebaseErrorMessage(error: unknown): string {
+export function getSupabaseErrorMessage(error: unknown): string {
+  if (!error) {
+    return 'An unexpected error occurred. Please try again.';
+  }
+
+  let errorMessage = '';
+
   // Handle different error formats
-  let errorCode: string | undefined;
-
   if (typeof error === 'string') {
-    errorCode = error;
-  } else if (error && typeof error === 'object' && 'code' in error) {
-    errorCode = (error as any).code;
-  } else if (error && typeof error === 'object' && 'message' in error) {
-    const message = (error as any).message;
-    if (typeof message === 'string' && message.includes('auth/')) {
-      // Extract error code from message
-      const match = message.match(/auth\/[\w-]+/);
-      errorCode = match?.[0];
+    errorMessage = error;
+  } else if (error instanceof Error) {
+    errorMessage = error.message;
+  } else if (error && typeof error === 'object') {
+    const errorObj = error as any;
+    errorMessage = errorObj.message || errorObj.error || errorObj.details || '';
+  }
+
+  // Check for exact matches in our error message mapping
+  if (errorMessage && supabaseErrorMessages[errorMessage]) {
+    return supabaseErrorMessages[errorMessage];
+  }
+
+  // Check for partial matches (case-insensitive)
+  const lowerErrorMessage = errorMessage.toLowerCase();
+  for (const [key, value] of Object.entries(supabaseErrorMessages)) {
+    if (lowerErrorMessage.includes(key.toLowerCase())) {
+      return value;
     }
   }
 
-  // Return user-friendly message or generic fallback
-  if (errorCode && firebaseErrorMessages[errorCode]) {
-    return firebaseErrorMessages[errorCode];
+  // Check for common Supabase error patterns
+  if (lowerErrorMessage.includes('jwt')) {
+    return 'Authentication required. Please sign in again.';
+  }
+  if (
+    lowerErrorMessage.includes('permission') ||
+    lowerErrorMessage.includes('forbidden')
+  ) {
+    return 'You do not have permission to perform this action.';
+  }
+  if (lowerErrorMessage.includes('not found')) {
+    return 'The requested resource was not found.';
+  }
+  if (lowerErrorMessage.includes('timeout')) {
+    return 'The request timed out. Please try again.';
+  }
+  if (lowerErrorMessage.includes('network')) {
+    return 'Network error. Please check your internet connection and try again.';
   }
 
-  // Fallback for unknown errors
-  if (error && typeof error === 'object' && 'message' in error) {
-    const message = (error as any).message;
-    if (typeof message === 'string') {
-      // Remove Firebase prefix from error messages
-      return message
-        .replace(/^Firebase:\s*/i, '')
-        .replace(/\s*\(auth\/[\w-]+\)\.?$/i, '');
-    }
-  }
+  // Remove Supabase prefix from error messages
+  const cleanMessage = errorMessage
+    .replace(/^Supabase:\s*/i, '')
+    .replace(/^Error:\s*/i, '');
 
-  return 'An unexpected error occurred. Please try again.';
+  // Return the cleaned message or a generic fallback
+  return cleanMessage || 'Something went wrong. Please try again.';
+}
+
+/**
+ * Handle async operations with error logging
+ */
+export async function handleAsyncError<T>(
+  operation: () => Promise<T>,
+  context: ErrorContext,
+  fallbackMessage = 'Operation failed'
+): Promise<T | null> {
+  try {
+    return await operation();
+  } catch (error) {
+    const appError = logError(error, context);
+    console.error(`${fallbackMessage}:`, appError);
+    return null;
+  }
+}
+
+/**
+ * Create a user-friendly error message for display
+ */
+export function createUserFriendlyError(
+  error: unknown,
+  context?: string
+): string {
+  const errorContext: ErrorContext = {
+    component: context || 'Unknown',
+    action: 'display',
+    timestamp: new Date(),
+  };
+
+  const appError = logError(error, errorContext);
+  return appError.userFriendlyMessage;
+}
+
+/**
+ * Check if error is a network error
+ */
+export function isNetworkError(error: unknown): boolean {
+  if (!error) return false;
+
+  const errorMessage =
+    typeof error === 'string'
+      ? error
+      : error instanceof Error
+        ? error.message
+        : (error as any)?.message || '';
+
+  return (
+    errorMessage.toLowerCase().includes('network') ||
+    errorMessage.toLowerCase().includes('fetch') ||
+    errorMessage.toLowerCase().includes('connection')
+  );
+}
+
+/**
+ * Check if error is an authentication error
+ */
+export function isAuthError(error: unknown): boolean {
+  if (!error) return false;
+
+  const errorMessage =
+    typeof error === 'string'
+      ? error
+      : error instanceof Error
+        ? error.message
+        : (error as any)?.message || '';
+
+  return (
+    errorMessage.toLowerCase().includes('jwt') ||
+    errorMessage.toLowerCase().includes('unauthorized') ||
+    errorMessage.toLowerCase().includes('authentication') ||
+    errorMessage.toLowerCase().includes('login')
+  );
 }
 
 /**

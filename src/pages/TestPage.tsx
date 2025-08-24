@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box, Flex, Text, Heading, Button } from '@radix-ui/themes';
 import { RadixCard } from 'components/ui/RadixCard';
-import { SupabaseApiService } from 'lib/supabase/api';
+import { supabaseAPI } from 'lib/supabase-api';
 import { useAuth } from 'features/auth/AuthContext';
 
 export function TestPage(): JSX.Element {
@@ -14,9 +14,7 @@ export function TestPage(): JSX.Element {
     setTestResult('Testing connection...');
 
     try {
-      const result = await SupabaseApiService.testConnection({
-        message: 'Hello from test page!',
-      });
+      const result = await supabaseAPI.health.testConnection();
       setTestResult(`✅ Success: ${result.message} (${result.timestamp})`);
     } catch (error: any) {
       setTestResult(`❌ Error: ${error.message}`);
@@ -31,7 +29,7 @@ export function TestPage(): JSX.Element {
     setTestResult('Testing notifications...');
 
     try {
-      const notifications = await SupabaseApiService.getNotifications();
+      const notifications = await supabaseAPI.notification.getNotifications();
       setTestResult(`✅ Notifications loaded: ${notifications.length} items`);
       console.log('Notifications:', notifications);
     } catch (error: any) {
@@ -47,7 +45,7 @@ export function TestPage(): JSX.Element {
     setTestResult('Testing dashboard stats...');
 
     try {
-      const stats = await SupabaseApiService.getDashboardStats();
+      const stats = await supabaseAPI.dashboard.getDashboardStats();
       setTestResult(`✅ Stats loaded: ${JSON.stringify(stats)}`);
       console.log('Dashboard stats:', stats);
     } catch (error: any) {
@@ -201,16 +199,26 @@ export function TestPage(): JSX.Element {
 
       <RadixCard size="2" className="p-6">
         <Heading size="4" className="mb-4">
-          Firebase Configuration
+          Supabase Configuration
         </Heading>
         <Text size="2" className="block mb-2">
-          <strong>Project ID:</strong> edverse-f1640
+          <strong>Supabase URL:</strong>{' '}
+          {process.env.REACT_APP_SUPABASE_URL ? '✅ Configured' : '❌ Missing'}
         </Text>
         <Text size="2" className="block mb-2">
-          <strong>Auth Domain:</strong> edverse-f1640.firebaseapp.com
+          <strong>Project ID:</strong>{' '}
+          {process.env.REACT_APP_SUPABASE_URL
+            ? process.env.REACT_APP_SUPABASE_URL.split('//')[1]?.split('.')[0]
+            : 'N/A'}
         </Text>
         <Text size="2" className="block mb-2">
-          <strong>Functions Region:</strong> us-central1 (default)
+          <strong>Anon Key:</strong>{' '}
+          {process.env.REACT_APP_SUPABASE_ANON_KEY
+            ? '✅ Configured'
+            : '❌ Missing'}
+        </Text>
+        <Text size="2" className="block mb-2">
+          <strong>Edge Functions:</strong> 11 functions deployed
         </Text>
         <Text size="2" className="block">
           <strong>Environment:</strong> {process.env.NODE_ENV}

@@ -9,9 +9,9 @@ import {
   XCircle,
   RefreshCw,
 } from 'lucide-react';
-import { SupabaseApiService, useSupabaseQuery } from 'lib/supabase/api';
+import { notificationAPI, useSupabaseQuery } from 'lib/supabase-api';
 import { useAuth } from 'features/auth/AuthContext';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 interface NoticeBoardProps {
   className?: string;
@@ -90,24 +90,24 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
   });
 
   // Fetch notifications from backend
+  const queryFn = useCallback(() => notificationAPI.getNotifications(), []);
   const {
     data: notifications,
     loading,
     error,
     refetch,
-  } = useSupabaseQuery(() => SupabaseApiService.getNotifications(), [user]);
+  } = useSupabaseQuery(queryFn, [user]);
 
   // Use fallback data if there's an error or no data - memoized to prevent re-renders
   const displayNotifications = useMemo(() => {
-    return notifications && notifications.length > 0
-      ? notifications
-      : error
-        ? FALLBACK_NOTIFICATIONS
-        : [];
-  }, [notifications, error]);
+    return notifications && notifications.length > 0 ? notifications : [];
+  }, [notifications]);
 
   // Get notification count
   const notificationCount = displayNotifications.length;
+
+  // Check if we should show error state
+  const shouldShowError = error && !loading && notificationCount === 0;
 
   // Handle scroll state
   const handleScroll = (): void => {
@@ -176,11 +176,6 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
           Notice Board
         </Heading>
         <Flex align="center" gap="2">
-          {error && (
-            <Text size="1" className="text-orange-600 dark:text-orange-400">
-              Using demo data
-            </Text>
-          )}
           {notificationCount > 0 && (
             <Badge
               color="blue"
@@ -223,6 +218,22 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
               ))}
             </Flex>
           </Box>
+        ) : shouldShowError ? (
+          <Box className="h-full flex items-center justify-center">
+            <Box className="text-center">
+              <AlertCircle className="w-12 h-12 text-orange-400 mx-auto mb-3" />
+              <Text size="2" className="text-gray-600 dark:text-gray-400 mb-2">
+                Unable to get notifications at this time
+              </Text>
+              <button
+                onClick={handleRefresh}
+                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                disabled={loading}
+              >
+                Try again
+              </button>
+            </Box>
+          </Box>
         ) : displayNotifications.length === 0 ? (
           <Box className="h-full flex items-center justify-center">
             <Box className="text-center">
@@ -240,7 +251,7 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
               onScroll={handleScroll}
             >
               <Flex direction="column" gap="3" className="pr-1">
-                {displayNotifications.map((notification) => {
+                {displayNotifications.map((notification: any) => {
                   // Validate notification data
                   if (!notification || !notification.id) {
                     console.warn(
@@ -281,16 +292,6 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
           </>
         )}
       </Box>
-
-      {/* Development Debug Info */}
-      {process.env.NODE_ENV === 'development' && error && (
-        <Box className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg flex-shrink-0">
-          <Text size="1" className="text-gray-600 dark:text-gray-400 font-mono">
-            Debug:{' '}
-            {typeof error === 'string' ? error : 'Unknown error occurred'}
-          </Text>
-        </Box>
-      )}
     </RadixCard>
   );
 }

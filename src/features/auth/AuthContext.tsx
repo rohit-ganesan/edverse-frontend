@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
+import { authAPI } from '../../lib/supabase-api';
 
 // Types
 export interface UserProfile {
@@ -74,8 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           throw new Error('No email found for user');
         }
 
-        const defaultProfile: Partial<UserProfile> = {
-          id: userId,
+        const userProfileData = {
           email: userData.user.email,
           first_name: userData.user.user_metadata?.first_name || '',
           last_name: userData.user.user_metadata?.last_name || '',
@@ -83,21 +83,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           role: 'Administrator', // Default role
         };
 
-        log('Inserting default profile', defaultProfile);
+        log('Creating profile via Edge Function', userProfileData);
 
-        const { data, error } = await supabase
-          .from('users')
-          .insert([defaultProfile])
-          .select()
-          .single();
+        const { data, error } =
+          await authAPI.createUserProfile(userProfileData);
 
         if (error) {
-          throw new Error(`Insert error: ${error.message}`);
+          throw new Error(`Profile creation error: ${error}`);
         }
 
         if (data) {
           setUserProfile(data as UserProfile);
-          log('Default profile created successfully', {
+          log('Default profile created successfully via Edge Function', {
             email: data.email,
             role: data.role,
           });
@@ -302,23 +299,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error('No authenticated user');
       }
 
-      log('Updating user profile', { updates });
+      log('Updating user profile via Edge Function', { updates });
 
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .update(updates)
-          .eq('id', user.id)
-          .select()
-          .single();
+        const { data, error } = await authAPI.updateUserProfile(
+          user.id,
+          updates
+        );
 
         if (error) {
-          throw error;
+          throw new Error(error);
         }
 
         if (data) {
           setUserProfile(data as UserProfile);
-          log('Profile updated successfully');
+          log('Profile updated successfully via Edge Function');
         }
       } catch (error: any) {
         log('Failed to update profile', { error: error.message });
