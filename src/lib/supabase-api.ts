@@ -152,7 +152,6 @@ export const courseAPI = {
     return callEdgeFunction('get-user-courses', { filters });
   },
 
-  // Additional course operations (will need Edge Functions)
   getCourses: async (filters?: any) => {
     return callEdgeFunction('get-courses', { filters });
   },
