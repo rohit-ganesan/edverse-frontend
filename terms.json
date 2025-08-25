@@ -1,0 +1,114 @@
+{
+    "$schema": "https://json.schemastore.org/jsonschema",
+    "meta": {
+      "project": "EdVerse",
+      "purpose": "Normalize UI vocabulary while preserving backend domain terms (tenant_*).",
+      "rules_of_engagement": [
+        "DO replace UI-visible words/labels/route titles.",
+        "DO NOT rename DB tables/columns or code identifiers that intentionally use tenant_*.",
+        "DO NOT change API payload keys, SQL, migrations, or Supabase policies unless explicitly mapped.",
+        "Prefer 'School' in the UI; keep 'tenant' in DB and internal code where it expresses isolation."
+      ]
+    },
+    "ui_replacements": [
+      {
+        "from": ["Instructor", "instructor", "Instructors", "instructors"],
+        "to": { "singular": "Teacher", "plural": "Teachers" },
+        "scope": ["ui_strings", "route_titles", "button_labels", "docs", "tooltips"],
+        "avoid": ["db_identifiers", "table_names", "enum_values", "api_contracts"]
+      },
+      {
+        "from": ["Organization", "organization", "Org", "org", "Institutions", "Institution"],
+        "to": { "singular": "School", "plural": "Schools" },
+        "scope": ["ui_strings", "route_titles", "button_labels", "docs", "tooltips"],
+        "avoid": ["db_identifiers", "table_names", "enum_values", "api_contracts", "tenant_*"]
+      },
+      {
+        "from": ["Notice Board", "Notice board", "Notices Board"],
+        "to": { "singular": "Announcements", "plural": "Announcements" },
+        "scope": ["ui_strings", "route_titles", "button_labels", "docs", "tooltips"],
+        "avoid": ["db_identifiers"]
+      },
+      {
+        "from": ["Fees", "Fee"],
+        "to": { "singular": "Fees", "plural": "Fees" },
+        "notes": "Keep 'Fees' consistent; prefer 'Payments' only where end-user intent is paying.",
+        "scope": ["ui_strings"]
+      },
+      {
+        "from": ["Syllabus", "syllabus"],
+        "to": { "singular": "Curriculum", "plural": "Curricula" },
+        "scope": ["ui_strings"],
+        "avoid": ["db_identifiers"]
+      }
+    ],
+    "technical_terms": {
+      "tenant": {
+        "ui_label": "School",
+        "db_identifier": "tenant",
+        "notes": "Use 'School' in UI, keep 'tenant_*' in DB/schema/policies and server code.",
+        "examples": [
+          { "good_ui": "Select your School", "bad_ui": "Select your Tenant" },
+          { "good_code": "tenant_id", "bad_code": "school_id" }
+        ]
+      },
+      "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "teacher": "Teacher",
+        "admissions": "Admissions",
+        "finance": "Finance",
+        "parent": "Parent",
+        "student": "Student"
+      }
+    },
+    "regex_suggestions": [
+      {
+        "name": "UI Instructor → Teacher",
+        "pattern": "(?<![A-Za-z])Instructor(s)?(?![A-Za-z])",
+        "replace": "Teacher$1",
+        "limit_to_paths": ["src/pages/**", "src/components/**", "src/app/**", "docs/**"],
+        "exclude_paths": ["**/*.sql", "supabase/**", "server/**", "src/db/**", "**/*.d.ts"]
+      },
+      {
+        "name": "UI Organization → School",
+        "pattern": "(?<![A-Za-z])(Organization|Org|organization|org)(s)?(?![A-Za-z])",
+        "replace": "School$2",
+        "limit_to_paths": ["src/pages/**", "src/components/**", "src/app/**", "docs/**"],
+        "exclude_paths": ["**/*.sql", "supabase/**", "server/**", "src/db/**", "**/*.d.ts", "**/*tenant*.*"]
+      },
+      {
+        "name": "UI Notice Board → Announcements",
+        "pattern": "(?<![A-Za-z])Notice Board(?![A-Za-z])",
+        "replace": "Announcements",
+        "limit_to_paths": ["src/**"]
+      }
+    ],
+    "i18n": {
+      "strategy": "centralize strings in en.json; reference tokens in components",
+      "example_en_json": {
+        "nav": {
+          "students": "Students",
+          "teachers": "Teachers",
+          "classes": "Classes",
+          "courses": "Courses",
+          "fees": "Fees",
+          "announcements": "Announcements",
+          "analytics": "Analytics",
+          "settings": "Settings",
+          "school": "School"
+        },
+        "labels": {
+          "school": "School",
+          "teacher": "Teacher",
+          "teachers": "Teachers",
+          "parent": "Parent",
+          "student": "Student",
+          "curriculum": "Curriculum",
+          "attendance": "Attendance",
+          "results": "Results"
+        }
+      }
+    }
+}
+  

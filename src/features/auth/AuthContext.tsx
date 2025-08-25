@@ -9,6 +9,7 @@ import React, {
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
 import { authAPI } from '../../lib/supabase-api';
+import { useAccess } from '../../context/AccessContext';
 
 // Types
 export interface UserProfile {
@@ -56,6 +57,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Get access context
+  const { initializeAccess } = useAccess();
 
   // Simple logging utility
   const log = useCallback((message: string, data?: any) => {
@@ -147,6 +151,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email: profile.email,
             role: profile.role,
           });
+
+          // Initialize access data after profile is loaded
+          try {
+            await initializeAccess();
+            log('Access data initialized successfully');
+          } catch (accessError) {
+            log('Failed to initialize access data', { error: accessError });
+          }
         }
       } catch (error: any) {
         log('Failed to load user profile', {
@@ -158,7 +170,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setLoading(false);
       }
     },
-    [log, createDefaultProfile]
+    [log, createDefaultProfile, initializeAccess]
   );
 
   // STEP 1: Basic auth state management

@@ -1,6 +1,7 @@
 // No React import needed with new JSX transform
 import { Theme } from '@radix-ui/themes';
 import { AuthProvider } from 'features/auth/AuthContext';
+import { AccessProvider } from 'context/AccessContext';
 import { ThemeProvider, useTheme } from 'contexts/ThemeContext';
 import { AppRoutes } from 'router/Routes';
 import { ToastProvider, ToastViewport } from 'components/ui/Toast';
@@ -35,9 +36,11 @@ function ThemedApp(): JSX.Element {
       appearance={theme || 'light'}
     >
       <ToastProvider swipeDirection="right">
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
+        <AccessProvider>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </AccessProvider>
         <ToastViewport />
       </ToastProvider>
     </Theme>

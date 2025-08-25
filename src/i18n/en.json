@@ -1,0 +1,168 @@
+{
+  "nav": {
+    "dashboard": "Home",
+    "students": "Students",
+    "teachers": "Teachers",
+    "classes": "Classes",
+    "courses": "Courses",
+    "fees": "Fees",
+    "announcements": "Announcements",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "school": "School",
+    "organization": "School",
+    "instructors": "Teachers",
+    "notice_board": "Announcements",
+    "syllabus": "Curriculum",
+    "admissions": "Admissions",
+    "support": "Support",
+    "whats_new": "What's New",
+    "parent_portal": "Parent Portal",
+    "join_codes": "Join Codes",
+    "payments_online": "Online Payments",
+    "audit_logs": "Audit Logs",
+    "sso_saml": "SSO/SAML",
+    "branding": "Branding",
+    "integrations": "Integrations",
+    "fees_advanced": "Advanced Fees",
+    "syllabus_advanced": "Advanced Curriculum"
+  },
+  "labels": {
+    "school": "School",
+    "teacher": "Teacher",
+    "teachers": "Teachers",
+    "instructor": "Teacher",
+    "instructors": "Teachers",
+    "parent": "Parent",
+    "student": "Student",
+    "curriculum": "Curriculum",
+    "syllabus": "Curriculum",
+    "attendance": "Attendance",
+    "results": "Results",
+    "announcements": "Announcements",
+    "notice_board": "Announcements",
+    "organization": "School",
+    "org": "School"
+  },
+  "cta": {
+    "upgrade": "Upgrade plan",
+    "learn_more": "Learn more",
+    "get_started": "Get Started",
+    "view_details": "View Details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back"
+  },
+  "locks": {
+    "growth_needed": "Available on Growth plan",
+    "scale_needed": "Available on Scale plan",
+    "enterprise_needed": "Available on Enterprise plan",
+    "upgrade_required": "Upgrade required",
+    "feature_locked": "Feature locked"
+  },
+  "plans": {
+    "free": "Free",
+    "starter": "Starter",
+    "growth": "Growth",
+    "scale": "Scale",
+    "enterprise": "Enterprise"
+  },
+  "features": {
+    "attendance": {
+      "view": "View attendance",
+      "mark": "Mark attendance",
+      "bulk_import": "Bulk import attendance"
+    },
+    "results": {
+      "view": "View results",
+      "enter": "Enter results",
+      "export": "Export results"
+    },
+    "classes": {
+      "view": "View classes",
+      "crud": "Manage classes",
+      "reschedule": "Reschedule classes"
+    },
+    "courses": {
+      "view": "View courses",
+      "crud": "Manage courses",
+      "export": "Export courses"
+    },
+    "students": {
+      "view": "View students",
+      "crud": "Manage students"
+    },
+    "fees": {
+      "view_overview": "View fees overview",
+      "structures_basic": "Basic fee structures",
+      "record_manual": "Record fees manually",
+      "online": "Online payments",
+      "reminders_email": "Email reminders",
+      "reminders_sms": "SMS reminders",
+      "reconcile": "Reconcile payments",
+      "export": "Export fees",
+      "advanced": "Advanced fee management"
+    },
+    "notices": {
+      "view": "View announcements",
+      "send": "Send announcements",
+      "analytics": "Announcement analytics"
+    },
+    "analytics": {
+      "view": "View analytics"
+    },
+    "portal": {
+      "parent": "Parent portal"
+    },
+    "api": {
+      "read": "API read access",
+      "rw": "API read/write access"
+    },
+    "auth": {
+      "sso": "SSO authentication"
+    },
+    "audit": {
+      "logs": "Audit logs"
+    },
+    "settings": {
+      "integrations": "Manage integrations",
+      "branding": "Custom branding"
+    },
+    "staff": {
+      "invite": "Invite staff members"
+    },
+    "org": {
+      "manage": "Manage school"
+    },
+    "admissions": {
+      "view": "View admissions",
+      "crud": "Manage admissions"
+    },
+    "syllabus": {
+      "advanced": "Advanced curriculum management"
+    },
+    "integrations": {
+      "view": "View integrations"
+    },
+    "support": {
+      "view": "View support"
+    },
+    "whats_new": {
+      "view": "View what's new"
+    }
+  },
+  "messages": {
+    "welcome": "Welcome to EdVerse",
+    "subtitle": "Your comprehensive learning management system",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation completed successfully",
+    "no_data": "No data available",
+    "not_found": "Page not found",
+    "unauthorized": "You are not authorized to access this feature",
+    "upgrade_prompt": "Upgrade your plan to access this feature"
+  }
+}

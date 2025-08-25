@@ -253,6 +253,53 @@ export const healthAPI = {
   },
 };
 
+// Access and Monetization API
+export const getAccessData = async (): Promise<{
+  plan: string;
+  role: string;
+  features: string[];
+  capabilities: string[];
+}> => {
+  try {
+    const response = await callEdgeFunction('get-access-data', {});
+
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to fetch access data');
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching access data:', error);
+    // Return default access data on error
+    return {
+      plan: 'free',
+      role: 'teacher',
+      features: [
+        'attendance.view',
+        'attendance.mark',
+        'results.view',
+        'classes.view',
+        'courses.view',
+        'students.view',
+        'fees.view_overview',
+        'fees.structures.basic',
+        'fees.record_manual',
+        'notices.view',
+        'notices.send',
+        'org.manage',
+        'staff.invite',
+        'settings.integrations',
+      ],
+      capabilities: [
+        'classes.view',
+        'classes.take_attendance',
+        'results.enter',
+        'notices.send',
+      ],
+    };
+  }
+};
+
 // Export all APIs
 export const supabaseAPI = {
   auth: authAPI,

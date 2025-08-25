@@ -1,145 +1,257 @@
-# EdVerse
+# EdVerse Frontend
 
-A modern React + TypeScript learning platform built with Firebase.
+A modern, comprehensive learning management system built with React, TypeScript, and Supabase.
 
-## Features
+## 🚀 Features
 
-- 🔐 **Authentication**: Email/password and Google sign-in with Firebase Auth
-- 🎨 **Modern UI**: Beautiful, responsive design with Tailwind CSS
-- 🔧 **TypeScript**: Fully typed with strict TypeScript configuration
-- 🧪 **Testing**: Jest testing setup with coverage
-- 🚀 **CI/CD**: GitHub Actions pipeline for linting and building
-- 📦 **Code Quality**: ESLint + Prettier with pre-commit hooks
+- **Modern React Architecture** - Built with React 18, TypeScript, and functional components
+- **Supabase Backend** - Real-time database, authentication, and storage
+- **Responsive Design** - Mobile-first approach with Tailwind CSS
+- **Role-Based Access** - Administrator, Instructor, and Student roles
+- **File Management** - Secure file uploads with Supabase Storage
+- **Real-time Updates** - Live notifications and data synchronization
+- **Dark Mode Support** - Complete theme switching functionality
+- **Type Safety** - Full TypeScript implementation with strict mode
 
-## Tech Stack
+## 🛠 Tech Stack
 
-- **Frontend**: React 18 + TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Firebase (Auth, Firestore, Storage)
-- **Routing**: React Router v6
-- **Testing**: Jest + React Testing Library
-- **Linting**: ESLint + Prettier
-- **CI/CD**: GitHub Actions
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **UI Components**: Radix UI primitives with custom styling
+- **State Management**: React Context + Zustand
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
+- **Deployment**: Vercel
+- **Testing**: Jest, React Testing Library
+- **Linting**: ESLint, Prettier
 
-## Getting Started
+## 📋 Prerequisites
 
-### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Supabase account and project
+- Vercel account (for deployment)
 
-- Node.js 18.x or higher
-- Yarn package manager
+## 🚀 Quick Start
 
-### Installation
+### 1. Clone the Repository
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd edverse
-   ```
+```bash
+git clone <repository-url>
+cd edverse-frontend
+```
 
-2. Install dependencies:
-   ```bash
-   yarn install
-   ```
+### 2. Install Dependencies
 
-3. Start the development server:
-   ```bash
-   yarn start
-   ```
+```bash
+npm install
+```
 
-4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 3. Environment Setup
 
-## Available Scripts
+Create a `.env.local` file in the root directory:
 
-- `yarn start` - Runs the app in development mode
-- `yarn test` - Launches the test runner
-- `yarn build` - Builds the app for production
-- `yarn lint` - Runs ESLint to check for linting errors
-- `yarn lint:fix` - Fixes auto-fixable linting errors
-- `yarn format` - Formats code with Prettier
+```env
+# Supabase Configuration
+REACT_APP_SUPABASE_URL=your_supabase_project_url
+REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-## Project Structure
+# Development Configuration
+REACT_APP_ENVIRONMENT=development
+REACT_APP_API_BASE_URL=http://localhost:54321/functions/v1
+```
+
+### 4. Start Development Server
+
+```bash
+npm start
+```
+
+The application will be available at `http://localhost:3000`
+
+## 🏗 Project Structure
 
 ```
 src/
 ├── components/          # Reusable UI components
-│   ├── ui/             # Basic UI components (Button, Input, etc.)
-│   └── ProtectedRoute.tsx
+│   ├── ui/             # Base UI components (Radix wrappers)
+│   ├── layout/         # Layout components (Header, Sidebar)
+│   └── dashboard/      # Dashboard-specific components
 ├── features/           # Feature-based modules
-│   └── auth/          # Authentication feature
-│       ├── components/ # Auth-specific components
-│       └── AuthContext.tsx
-├── lib/               # External library configurations
-│   └── firebase.ts
-├── pages/             # Page components
-├── types/             # TypeScript type definitions
-├── App.tsx
-└── index.tsx
+│   ├── auth/           # Authentication system
+│   ├── courses/        # Course management
+│   ├── students/       # Student management
+│   └── instructors/    # Instructor management
+├── pages/              # Page components
+├── lib/                # Utility libraries
+│   ├── supabase.ts     # Supabase client configuration
+│   ├── supabase-api.ts # API functions for Edge Functions
+│   └── supabase-storage.ts # Storage utilities
+├── contexts/           # React contexts
+├── types/              # TypeScript type definitions
+└── router/             # Routing configuration
 ```
 
-## Firebase Configuration
+## 🔐 Authentication
 
-The Firebase configuration is already set up in `src/lib/firebase.ts`. The following services are initialized:
+The application uses Supabase Authentication with the following features:
 
-- **Authentication**: For user management
-- **Firestore**: For database operations (ready for Phase 2)
-- **Storage**: For file uploads (ready for Phase 2)
-- **Analytics**: For usage tracking
+- **Email/Password Authentication**
+- **Password Reset Flow**
+- **Role-Based Access Control**
+- **Session Management**
+- **Protected Routes**
 
-## Authentication
+### User Roles
 
-The app includes a complete authentication system with:
+- **Administrator**: Full system access
+- **Instructor**: Course and student management
+- **Student**: Course enrollment and materials access
 
-- Email/password signup and login
-- Google OAuth integration
-- Protected routes for authenticated users
-- Automatic redirect handling
-- Loading states and error handling
+## 📁 File Management
 
-## Code Style
+Supabase Storage is used for secure file management:
 
-The project enforces strict code quality standards:
+- **Profile Avatars**: User profile pictures
+- **Course Materials**: Educational content and resources
+- **Notice Attachments**: Document attachments for announcements
+- **Student Documents**: Academic records and certificates
+- **Instructor Documents**: Teaching materials and credentials
 
-- **TypeScript**: Strict mode enabled with no implicit any
-- **ESLint**: Airbnb configuration with TypeScript support
-- **Prettier**: Consistent code formatting
-- **Husky**: Pre-commit hooks to enforce quality
+### Storage Buckets
 
-## Testing
+- `profile-avatars` - Public access for profile pictures
+- `course-materials` - Public access for educational content
+- `notice-attachments` - Public access for announcements
+- `student-documents` - Private access for student records
+- `instructor-documents` - Private access for instructor files
 
-Tests are written using Jest and React Testing Library. Run tests with:
+## 🧪 Testing
+
+### Run Tests
 
 ```bash
-yarn test
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm test -- --coverage
+
+# Run tests in watch mode
+npm test -- --watch
 ```
 
-## CI/CD
+### Test Configuration
 
-The project includes a GitHub Actions workflow that:
+Tests use a separate Supabase test instance:
 
-1. Installs dependencies
-2. Runs ESLint (fails on warnings)
-3. Checks Prettier formatting
-4. Runs tests with coverage
-5. Builds the application
+```env
+REACT_APP_SUPABASE_TEST_URL=http://localhost:54321
+REACT_APP_SUPABASE_TEST_ANON_KEY=your_test_anon_key
+```
 
-### 📦 **Ready to Run:**
+## 🚀 Deployment
+
+### Vercel Deployment
+
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Environment Variables**: Set the following in Vercel:
+   - `REACT_APP_SUPABASE_URL`
+   - `REACT_APP_SUPABASE_ANON_KEY`
+3. **Deploy**: Push to main branch for automatic deployment
+
+### Manual Deployment
+
 ```bash
-yarn install  # Install dependencies
-yarn start    # Start development server
-yarn test     # Run tests
-yarn build    # Build for production
+# Build for production
+npm run build
+
+# Deploy to Vercel
+vercel --prod
 ```
 
-The project is now ready for development with Yarn! The Firebase configuration is already set up with your provided credentials, and all authentication features are implemented and working.
+## 🔧 Development
 
-## Contributing
+### Available Scripts
+
+```bash
+npm start          # Start development server
+npm run build      # Build for production
+npm test           # Run tests
+npm run lint       # Run ESLint
+npm run lint:fix   # Fix ESLint issues
+npm run type-check # Run TypeScript type checking
+```
+
+### Code Style
+
+- **TypeScript**: Strict mode enabled
+- **ESLint**: Airbnb configuration with TypeScript rules
+- **Prettier**: Code formatting
+- **Husky**: Pre-commit hooks
+
+### Component Guidelines
+
+- Use functional components with hooks
+- Implement proper TypeScript interfaces
+- Follow the component naming convention
+- Use Radix UI primitives for base components
+- Apply Tailwind CSS for styling
+
+## 🔒 Security
+
+- **Row Level Security (RLS)** enabled on all tables
+- **JWT Authentication** for API access
+- **CORS** properly configured
+- **Input Validation** on all forms
+- **File Type Validation** for uploads
+- **Rate Limiting** on API endpoints
+
+## 📊 Performance
+
+- **Code Splitting** with React.lazy
+- **Image Optimization** with proper sizing
+- **Bundle Analysis** with webpack-bundle-analyzer
+- **Caching** strategies for static assets
+- **Lazy Loading** for non-critical components
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
 
-## License
+### Commit Convention
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add new feature
+fix: bug fix
+docs: documentation changes
+style: formatting changes
+refactor: code refactoring
+test: adding tests
+chore: maintenance tasks
+```
+
+## 📝 License
 
 This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support and questions:
+
+- Create an issue in the repository
+- Check the documentation in `/docs/`
+- Review the Supabase documentation
+
+## 🔄 Migration from Firebase
+
+This project has been migrated from Firebase to Supabase. For migration details, see:
+
+- [Migration Plan](./docs/SUPABASE_MIGRATION_PLAN.md)
+- [Migration Complete](./docs/MIGRATION_COMPLETE.md)
+- [Backend Documentation](../edverse-backend/README.md)

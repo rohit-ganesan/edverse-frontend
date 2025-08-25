@@ -109,7 +109,7 @@ export function NoticeBoard({ className = '' }: NoticeBoardProps): JSX.Element {
       {/* Header */}
       <Flex justify="between" align="center" className="mb-4 flex-shrink-0">
         <Heading size="4" className="text-gray-900 dark:text-gray-100">
-          Notice Board
+          Announcements
         </Heading>
         <Flex align="center" gap="2">
           {notificationCount > 0 && (

@@ -78,3 +78,129 @@
 - Maintain high-level `docs/` folder with “Phase 1 Setup” guide.
 - Document environment variables (`.env.example`) and Firebase emulator usage.
 
+
+
+You are refactoring the EdVerse codebase to be monetizable and consistent.
+
+## Primary Goals
+1) Reorganize modules into tiers: /modules/core, /modules/growth, /modules/enterprise.
+2) Gate features by plan (free, starter, growth, scale, enterprise) and role (owner, admin, teacher, admissions, finance, parent, student).
+3) Implement visible locked states + Upgrade modal (do not hard-hide paid features).
+4) Introduce AccessContext with usePlan/useFeature/useCan and lazy-load non-core modules.
+5) Normalize UI vocabulary using config from /config/terms.json (do not change DB terms tenant_*).
+
+## Vocabulary Normalization
+- Load /config/terms.json and apply ui_replacements ONLY to UI strings (route titles, labels, tooltips, docs).
+- DO NOT modify DB identifiers, SQL files, Supabase policies, or code using tenant_* intentionally.
+- Standardize: Instructor → Teacher; Organization/Org → School; Notice Board → Announcements; Syllabus → Curriculum.
+- Centralize strings into i18n (en.json) where possible; replace literals with tokens.
+
+## Folder & Route Refactor
+Create:
+  /modules/core
+    students/, courses/, classes/, attendance/, results/, fees/, admins/, organization/, settings-basic/, notice-board-basic/
+  /modules/growth
+    analytics/, parents-portal/, notice-board-advanced/, join-codes/, instructors/, payments-online/
+  /modules/enterprise
+    admissions/, fee-advanced/, audit-logs/, sso-saml/, branding/, syllabus-advanced/, integrations/
+
+Rules:
+- Move existing screens into the appropriate folder. Keep imports working via path aliases (e.g., @/modules/...).
+- /modules/core is eagerly loaded. /modules/growth and /modules/enterprise are lazy-loaded behind feature flags.
+- Replace “Notice Board” basic page with /modules/core/notice-board-basic (post-only).
+- Keep “Instructors” minimal; no HR features.
+
+## Access & Feature Flags
+Create:
+  src/types/access.ts (Plan, Role, Capability)
+  src/context/AccessContext.tsx (plan, role, features[], capabilities[])
+  src/components/guards/FeatureGate.tsx
+  src/components/guards/CapabilityGate.tsx
+  src/components/upsell/UpgradeHint.tsx
+
+Hydration:
+- After auth, fetch tenant plan + tenant_features + role and provide via AccessContext.
+- Use useFeature('feature.key') and useCan('capability.key') to gate components.
+
+Route registry:
+- Create config/routes.ts with each route’s required feature/capability. Sidebar shows items user can view; locked actions render disabled with UpgradeHint.
+
+## Plans & Unlocks (implement as mapping)
+Free:
+  attendance.view, attendance.mark,
+  results.view,
+  classes.view,
+  courses.view,
+  students.view,
+  fees.view_overview, fees.structures.basic, fees.record_manual,
+  notices.view, notices.send (basic),
+  org.manage, staff.invite, settings.integrations
+Starter (adds):
+  attendance.bulk_import, results.enter, results.export,
+  classes.crud, classes.reschedule, courses.crud, courses.export,
+  students.crud, analytics.view (basic)
+Growth (adds):
+  fees.online, fees.reminders.email,
+  announcements targeting/scheduling (notices.analytics),
+  analytics.view (full), portal.parent, api.read
+Scale (adds):
+  auth.sso, audit.logs,
+  fees.reminders.smswa, fees.reconcile, api.rw
+Enterprise (adds):
+  settings.branding, admissions.*, syllabus-advanced, integrations
+
+## UI/UX Rules
+- Locked features show a disabled control with lock icon + tooltip + UpgradeHint component. On click: open upgrade modal linking to /billing.
+- Empty states for gated tabs display a rich “Upgrade to Growth/Scale” panel explaining value.
+- Keep growth/enterprise modules in codebase but gated; do not ship dead links.
+
+## Supabase (leave DB identifiers alone)
+- Do NOT rename tenant_* in code, SQL, or policies.
+- If migrations not present, create/verify:
+  tenants(plan), tenant_members(role, class_ids, student_ids), tenant_features(feature, enabled).
+- RLS: users read own tenant_members; admins (owner/admin) can manage within tenant; tenant_features readable to members, writable to admins.
+
+## Coding Tasks (step-by-step)
+1. Create /config/terms.json if missing. Use it to normalize UI labels across pages/components.
+2. Move modules into new folders; fix imports with TS path aliases.
+3. Add AccessContext and hooks; wire initial fetch after login.
+4. Insert FeatureGate/CapabilityGate/UpgradeHint in:
+   - Fees: online payments, reminders email/SMS, reconcile
+   - Announcements: advanced targeting/scheduling/analytics
+   - Analytics route: gate to Growth+
+   - Admissions: enterprise only
+5. Implement route registry and update sidebar/topnav rendering with view permissions.
+6. Add i18n en.json; replace string literals in nav/titles/buttons/tooltips.
+7. Add telemetry events: upgrade_shown, upgrade_clicked, feature_locked_viewed.
+8. Provide a simple /billing page placeholder.
+9. Add a Playwright smoke test:
+   - As Free plan teacher, Fees > “Send Reminder” shows UpgradeHint (Growth).
+   - As Growth admin, same button is enabled; SMS reminder still locked (Scale).
+10. Ensure all “Instructor” references in UI read as “Teacher”; “Organization/Org” reads as “School”.
+
+## Safeguards
+- Never alter SQL schemas inadvertently through string replacement.
+- Exclude **supabase/**, **server/**, **src/db/**, ***.sql**, ***.d.ts** from vocabulary replacements.
+- If a token matches both UI and DB, prompt for manual review.
+
+## Outputs
+- Updated folder structure and imports.
+- AccessContext + guards + upgrade UX components.
+- i18n en.json with normalized terms.
+- Route registry with gating.
+- Minimal tests.
+- Changelog note summarizing plan-gating and vocabulary normalization.
+
+Complete the refactor with small, frequent commits:
+- chore(vocab): UI Instructor→Teacher, Org→School (no DB changes)
+- feat(access): AccessContext + FeatureGate/CapabilityGate
+- refactor(modules): split into core/growth/enterprise
+- feat(upsell): UpgradeHint and /billing
+- feat(gate): fees, announcements, analytics
+- test(e2e): locked→upgrade flow
+
+Hook fetchAccess() to your Supabase session/Edge Function so you return plan + features + role in one roundtrip.
+
+For lazy-loading growth/enterprise modules, check useFeature() before importing, or use a parent route that chooses Basic vs Advanced component based on a feature flag.
+
+Keep server-side enforcement via RLS; the client is UX gating only.

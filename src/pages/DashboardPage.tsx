@@ -36,7 +36,7 @@ export function DashboardPage(): JSX.Element {
       subtitle: 'No data yet',
     },
     {
-      title: 'Total Instructors',
+      title: 'Total Teachers',
       value: '0',
       icon: GraduationCap,
       gradient: {
@@ -146,7 +146,7 @@ export function DashboardPage(): JSX.Element {
             <QuickActions />
           </div>
 
-          {/* Notice Board */}
+          {/* Announcements */}
           <div className="lg:col-span-2">
             <NoticeBoard />
           </div>

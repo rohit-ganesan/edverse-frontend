@@ -82,14 +82,14 @@ const defaultMenuItems: MenuItem[] = [
   },
   {
     id: 'notice',
-    label: 'Notice Board',
+    label: 'Announcements',
     icon: Bell,
     path: '/notice/overview',
     basePath: '/notice',
   },
   {
     id: 'instructors',
-    label: 'Instructors',
+    label: 'Teachers',
     icon: Users,
     path: '/instructors/overview',
     basePath: '/instructors',
@@ -134,7 +134,7 @@ const otherItems: MenuItem[] = [
   },
   {
     id: 'organization',
-    label: 'Organization',
+    label: 'School',
     icon: Building,
     path: '/organization/overview',
     basePath: '/organization',
