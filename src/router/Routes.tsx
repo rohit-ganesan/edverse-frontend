@@ -30,6 +30,8 @@ import { SupportPage } from 'pages/SupportPage';
 import { SettingsPage } from 'pages/SettingsPage';
 import AuthCallbackPage from 'pages/AuthCallbackPage';
 import { EmailVerificationPage } from 'pages/EmailVerificationPage';
+import { ForgotPasswordPage } from 'pages/ForgotPasswordPage';
+import { ResetPasswordPage } from 'pages/ResetPasswordPage';
 
 export function AppRoutes(): JSX.Element {
   return (
@@ -38,6 +40,8 @@ export function AppRoutes(): JSX.Element {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/auth/verify" element={<EmailVerificationPage />} />
         <Route path="/debug" element={<DebugPage />} />
