@@ -58,8 +58,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Get access context
-  const { initializeAccess } = useAccess();
+  // Get access context with error handling
+  let initializeAccess: (() => Promise<void>) | null = null;
+  try {
+    const accessContext = useAccess();
+    initializeAccess = accessContext.initializeAccess;
+  } catch (error) {
+    // If AccessContext is not available, we'll handle it gracefully
+    console.warn('AccessContext not available:', error);
+  }
 
   // Simple logging utility
   const log = useCallback((message: string, data?: any) => {
@@ -152,12 +159,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             role: profile.role,
           });
 
-          // Initialize access data after profile is loaded
-          try {
-            await initializeAccess();
-            log('Access data initialized successfully');
-          } catch (accessError) {
-            log('Failed to initialize access data', { error: accessError });
+          // Initialize access data after profile is loaded (with error handling)
+          if (initializeAccess) {
+            try {
+              await initializeAccess();
+              log('Access data initialized successfully');
+            } catch (accessError) {
+              log('Failed to initialize access data', { error: accessError });
+              // Don't throw - this is not critical for auth to work
+            }
           }
         }
       } catch (error: any) {

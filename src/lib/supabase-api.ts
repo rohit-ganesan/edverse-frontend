@@ -269,7 +269,11 @@ export const getAccessData = async (): Promise<{
 
     return response.data;
   } catch (error) {
-    console.error('Error fetching access data:', error);
+    // Don't log error for "No active session" as it's expected for unauthenticated users
+    if (error instanceof Error && error.message !== 'No active session') {
+      console.error('Error fetching access data:', error);
+    }
+
     // Return default access data on error
     return {
       plan: 'free',

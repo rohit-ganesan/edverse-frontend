@@ -1,68 +1,31 @@
-// No React import needed with new JSX transform
-import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Container, Flex, Box, Heading, Text } from '@radix-ui/themes';
-import { SignUpForm } from 'features/auth/components/SignUpForm';
-import { useAuth } from 'features/auth/AuthContext';
+import React from 'react';
+import { Box, Container, Flex, Heading, Text } from '@radix-ui/themes';
+import { SignUpForm } from '../features/auth/components/SignUpForm';
 
-export function SignUpPage(): JSX.Element {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Get the intended destination from location state, default to dashboard
-  const from = location.state?.from?.pathname || '/dashboard';
-
-  // Redirect to intended destination if already authenticated
-  useEffect(() => {
-    if (user) {
-      navigate(from, { replace: true });
-    }
-  }, [user, navigate, from]);
-
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
+export const SignUpPage: React.FC = () => {
   return (
-    <Container className="min-h-screen bg-gray-50">
+    <Container size="1" className="min-h-screen">
       <Flex
         direction="column"
         align="center"
         justify="center"
-        className="min-h-screen py-12"
-        gap="8"
+        className="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
       >
-        <Box className="text-center">
-          <Heading size="8" className="text-blue-600 mb-2">
-            EdVerse
-          </Heading>
-          <Text size="4" color="gray">
-            Start your learning journey today
-          </Text>
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-blue-900 mb-2">
-                  Development Mode
-                </h3>
-                <p className="text-xs text-blue-700">
-                  Using Supabase authentication system
-                </p>
-              </div>
-            </div>
-          )}
+        <Box className="max-w-lg w-full space-y-8">
+          <Box className="text-center">
+            <Heading size="8" className="text-gray-900 mb-2">
+              Welcome to EdVerse
+            </Heading>
+            <Text size="3" className="text-gray-600">
+              Your comprehensive learning management system
+            </Text>
+          </Box>
+
+          <SignUpForm />
         </Box>
-        <SignUpForm />
       </Flex>
     </Container>
   );
-}
+};
+
+export default SignUpPage;

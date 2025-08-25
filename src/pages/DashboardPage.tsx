@@ -147,9 +147,9 @@ export function DashboardPage(): JSX.Element {
           </div>
 
           {/* Announcements */}
-          <div className="lg:col-span-2">
+          {/* <div className="lg:col-span-2">
             <NoticeBoard />
-          </div>
+          </div> */}
         </div>
 
         {/* Migration Status */}

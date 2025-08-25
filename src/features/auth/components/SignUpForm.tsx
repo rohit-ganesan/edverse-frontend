@@ -157,14 +157,6 @@ export function SignUpForm({ onSuccess }: SignUpFormProps): JSX.Element {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Create Account
             </h2>
-            <p className="text-sm text-gray-600">
-              Using Supabase Auth
-              {process.env.NODE_ENV === 'development' && (
-                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                  DEV
-                </span>
-              )}
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

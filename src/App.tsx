@@ -36,11 +36,11 @@ function ThemedApp(): JSX.Element {
       appearance={theme || 'light'}
     >
       <ToastProvider swipeDirection="right">
-        <AccessProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <AccessProvider>
             <AppRoutes />
-          </AuthProvider>
-        </AccessProvider>
+          </AccessProvider>
+        </AuthProvider>
         <ToastViewport />
       </ToastProvider>
     </Theme>

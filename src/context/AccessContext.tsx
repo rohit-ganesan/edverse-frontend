@@ -4,10 +4,12 @@ import React, {
   useMemo,
   useState,
   useEffect,
+  useCallback,
 } from 'react';
 import type { Plan, Role, Capability } from '../types/access';
 import { getFeaturesForPlan } from '../config/planFeatures';
 import { getAccessData } from '../lib/supabase-api';
+import { useAuth } from '../features/auth/AuthContext';
 
 export type AccessState = {
   plan: Plan;
@@ -45,8 +47,19 @@ const AccessContext = createContext<
 
 export function AccessProvider({ children }: { children: React.ReactNode }) {
   const [accessState, setAccessState] = useState<AccessState>(DEFAULT_ACCESS);
+  const { user, loading: authLoading } = useAuth();
 
-  const initializeAccess = async () => {
+  const initializeAccess = useCallback(async () => {
+    // Only fetch access data if user is authenticated
+    if (!user) {
+      setAccessState((prev) => ({
+        ...prev,
+        isLoading: false,
+        isInitialized: true,
+      }));
+      return;
+    }
+
     try {
       setAccessState((prev) => ({ ...prev, isLoading: true }));
 
@@ -68,11 +81,26 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
         isInitialized: true,
       }));
     }
-  };
+  }, [user]);
 
-  const refreshAccess = async () => {
+  const refreshAccess = useCallback(async () => {
     await initializeAccess();
-  };
+  }, [initializeAccess]);
+
+  // Initialize access when user changes
+  useEffect(() => {
+    // Only initialize if user is authenticated and auth is not loading
+    if (!authLoading && user) {
+      initializeAccess();
+    } else if (!authLoading && !user) {
+      // Set initialized to true for unauthenticated users
+      setAccessState((prev) => ({
+        ...prev,
+        isLoading: false,
+        isInitialized: true,
+      }));
+    }
+  }, [initializeAccess, authLoading, user]);
 
   const contextValue = useMemo(
     () => ({
@@ -80,7 +108,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       initializeAccess,
       refreshAccess,
     }),
-    [accessState]
+    [accessState, initializeAccess, refreshAccess]
   );
 
   return (

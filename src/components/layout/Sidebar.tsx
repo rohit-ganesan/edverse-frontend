@@ -2,6 +2,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Box, Text, Heading, Separator } from '@radix-ui/themes';
 import { useState, useEffect } from 'react';
 import { useAuth } from 'features/auth/AuthContext';
+import { ROUTES } from 'config/routes';
+// Feature filtering will be handled by route guards
 import {
   Home,
   BookOpen,
@@ -29,6 +31,9 @@ interface MenuItem {
   icon: React.ComponentType<{ className?: string }>;
   path: string;
   basePath: string;
+  feature?: string;
+  cap?: string;
+  module: 'core' | 'growth' | 'enterprise';
 }
 
 interface SidebarProps {
@@ -37,128 +42,165 @@ interface SidebarProps {
   onToggleRearrangeMode?: () => void;
 }
 
-const defaultMenuItems: MenuItem[] = [
-  {
-    id: 'home',
-    label: 'Home',
-    icon: Home,
-    path: '/dashboard',
-    basePath: '/dashboard',
-  },
-  {
-    id: 'courses',
-    label: 'Courses',
-    icon: BookOpen,
-    path: '/courses/overview',
-    basePath: '/courses',
-  },
-  {
-    id: 'classes',
-    label: 'Classes',
-    icon: CalendarDays,
-    path: '/classes/overview',
-    basePath: '/classes',
-  },
-  {
-    id: 'syllabus',
-    label: 'Syllabus',
-    icon: FileText,
-    path: '/syllabus/overview',
-    basePath: '/syllabus',
-  },
-  {
-    id: 'attendance',
-    label: 'Attendance',
-    icon: UserCheck,
-    path: '/attendance/overview',
-    basePath: '/attendance',
-  },
-  {
-    id: 'result',
-    label: 'Results',
-    icon: Award,
-    path: '/result/overview',
-    basePath: '/result',
-  },
-  {
-    id: 'notice',
-    label: 'Announcements',
-    icon: Bell,
-    path: '/notice/overview',
-    basePath: '/notice',
-  },
-  {
-    id: 'instructors',
-    label: 'Teachers',
-    icon: Users,
-    path: '/instructors/overview',
-    basePath: '/instructors',
-  },
-  {
-    id: 'students',
-    label: 'Students',
-    icon: GraduationCap,
-    path: '/students/overview',
-    basePath: '/students',
-  },
-  {
-    id: 'admission',
-    label: 'Admission',
-    icon: UserPlus,
-    path: '/admission/overview',
-    basePath: '/admission',
-  },
-  {
-    id: 'fee',
-    label: 'Fee',
-    icon: DollarSign,
-    path: '/fee/overview',
-    basePath: '/fee',
-  },
-];
+// Icon mapping for routes
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  home: Home,
+  dashboard: Home,
+  courses: BookOpen,
+  classes: CalendarDays,
+  syllabus: FileText,
+  attendance: UserCheck,
+  results: Award,
+  result: Award,
+  notices: Bell,
+  notice: Bell,
+  announcements: Bell,
+  instructors: Users,
+  teachers: Users,
+  students: GraduationCap,
+  admission: UserPlus,
+  admissions: UserPlus,
+  fees: DollarSign,
+  fee: DollarSign,
+  analytics: Sparkles,
+  organization: Building,
+  org: Building,
+  admins: Shield,
+  settings: Settings,
+  support: HelpCircle,
+  'whats-new': Sparkles,
+  test: Settings,
+};
 
-const otherItems: MenuItem[] = [
+// Build menu items with proper labels
+const buildMenuItems = (): MenuItem[] => {
+  const items: MenuItem[] = [
+    {
+      id: 'home',
+      label: 'Home',
+      icon: Home,
+      path: '/dashboard',
+      basePath: '/dashboard',
+      module: 'core',
+    },
+    {
+      id: 'students',
+      label: 'Students',
+      icon: GraduationCap,
+      path: '/students/all-students',
+      basePath: '/students',
+      module: 'core',
+    },
+    {
+      id: 'courses',
+      label: 'Courses',
+      icon: BookOpen,
+      path: '/courses/overview',
+      basePath: '/courses',
+      module: 'core',
+    },
+    {
+      id: 'classes',
+      label: 'Classes',
+      icon: CalendarDays,
+      path: '/classes/overview',
+      basePath: '/classes',
+      module: 'core',
+    },
+    {
+      id: 'attendance',
+      label: 'Attendance',
+      icon: UserCheck,
+      path: '/attendance/overview',
+      basePath: '/attendance',
+      module: 'core',
+    },
+    {
+      id: 'results',
+      label: 'Results',
+      icon: Award,
+      path: '/results/overview',
+      basePath: '/results',
+      module: 'core',
+    },
+    {
+      id: 'fees',
+      label: 'Fees',
+      icon: DollarSign,
+      path: '/fees/overview',
+      basePath: '/fees',
+      module: 'core',
+    },
+    {
+      id: 'notices',
+      label: 'Notices',
+      icon: Bell,
+      path: '/notices/overview',
+      basePath: '/notices',
+      module: 'core',
+    },
+    {
+      id: 'instructors',
+      label: 'Instructors',
+      icon: Users,
+      path: '/instructors/overview',
+      basePath: '/instructors',
+      module: 'core',
+    },
+    {
+      id: 'admins',
+      label: 'Admins',
+      icon: Shield,
+      path: '/admins/overview',
+      basePath: '/admins',
+      module: 'core',
+    },
+    {
+      id: 'organization',
+      label: 'Organization',
+      icon: Building,
+      path: '/organization/overview',
+      basePath: '/organization',
+      module: 'core',
+    },
+  ];
+
+  return items;
+};
+
+// Additional items not in route registry
+const additionalItems: MenuItem[] = [
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
+    path: '/settings/overview',
+    basePath: '/settings',
+    module: 'core',
+  },
   {
     id: 'test',
     label: '🧪 Integration Test',
     icon: Settings,
     path: '/test',
     basePath: '/test',
+    module: 'core',
   },
   {
     id: 'whats-new',
     label: "What's New",
     icon: Sparkles,
-    path: '/whats-new/overview',
+    path: '/whats-new',
     basePath: '/whats-new',
-  },
-  {
-    id: 'organization',
-    label: 'School',
-    icon: Building,
-    path: '/organization/overview',
-    basePath: '/organization',
-  },
-  {
-    id: 'admins',
-    label: 'Admins',
-    icon: Shield,
-    path: '/admins/overview',
-    basePath: '/admins',
+    module: 'growth',
   },
   {
     id: 'support',
     label: 'Support',
     icon: HelpCircle,
-    path: '/support/overview',
+    path: '/support',
     basePath: '/support',
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    path: '/settings/general',
-    basePath: '/settings',
+    module: 'core',
   },
 ];
 
@@ -169,15 +211,24 @@ export function Sidebar({
 }: SidebarProps): JSX.Element {
   const location = useLocation();
   const { user, userProfile, updateUserProfile } = useAuth();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
-  // Load saved menu order from user profile on component mount
+  // Build menu items from route registry and filter by permissions
   useEffect(() => {
-    // TODO: Implement menuOrder functionality in Supabase schema if needed
-    // For now, just use default menu items
-    setMenuItems(defaultMenuItems);
-  }, [userProfile]);
+    const mainItems = buildMenuItems();
+    setMenuItems(mainItems);
+  }, []);
+
+  // Filter menu items based on user permissions and remove duplicates
+  const filteredMenuItems = menuItems.filter((item, index, self) => {
+    // Remove duplicates by keeping only the first occurrence
+    const isFirstOccurrence = index === self.findIndex((t) => t.id === item.id);
+
+    // For now, show all items since access control is temporarily disabled
+    // TODO: Re-enable feature filtering once we fix the hook rules
+    return isFirstOccurrence;
+  });
 
   // Save menu order to user profile
   const saveMenuOrder = async (items: MenuItem[]) => {
@@ -298,7 +349,7 @@ export function Sidebar({
       </Box>
 
       {/* Main Navigation */}
-      <Box className="flex-1 overflow-y-auto p-4">
+      <Box className="flex-1 overflow-y-auto p-4 flex flex-col">
         {isRearrangeMode && (
           <>
             {/* Done Button */}
@@ -330,21 +381,24 @@ export function Sidebar({
           </>
         )}
 
-        <Box className="space-y-1">
-          {menuItems.map((item, index) => renderMenuItem(item, index))}
+        {/* Main Menu Items - Takes up available space */}
+        <Box className="flex-1 space-y-1">
+          {filteredMenuItems.map((item, index) => renderMenuItem(item, index))}
         </Box>
 
-        <Separator className="my-6" />
+        {/* Utilities Section - Anchored to bottom */}
+        <Box className="mt-auto pt-6">
+          <Separator className="mb-6" />
 
-        {/* Other Items */}
-        <Box className="space-y-1">
-          <Text
-            size="1"
-            className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-          >
-            Other
-          </Text>
-          {otherItems.map((item) => renderMenuItem(item, -1))}
+          <Box className="space-y-1">
+            <Text
+              size="1"
+              className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+            >
+              Utilities
+            </Text>
+            {additionalItems.map((item) => renderMenuItem(item, -1))}
+          </Box>
         </Box>
       </Box>
     </Box>

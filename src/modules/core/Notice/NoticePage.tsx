@@ -30,7 +30,7 @@ export function NoticePage(): JSX.Element {
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'all-notices',
     validTabs: ['all-notices', 'recent', 'drafts', 'analytics'],
-    basePath: '/notice',
+    basePath: '/notices',
   });
 
   // Convert stats to ModernStatsGridColored format
