@@ -218,11 +218,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // STEP 3: Authentication functions
   const signUp = useCallback(
     async (email: string, password: string, userData: any): Promise<void> => {
-      log('Starting sign up process', { email });
+      log('Starting enhanced sign up process', { email });
 
       try {
         setLoading(true);
 
+        // First, create the auth user
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -240,9 +241,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           return;
         }
 
-        log('Sign up completed successfully');
+        // If we have a session, create the enhanced profile
+        if (data.session && data.user) {
+          log('Creating enhanced user profile');
+
+          const { data: profileData, error: profileError } =
+            await authAPI.createEnhancedUserProfile(userData);
+
+          if (profileError) {
+            log('Failed to create enhanced profile', { error: profileError });
+            // Don't throw here - the user is created, just the profile failed
+          } else {
+            log('Enhanced profile created successfully', profileData);
+          }
+        }
+
+        log('Enhanced sign up completed successfully');
       } catch (error: any) {
-        log('Sign up failed', { error: error.message });
+        log('Enhanced sign up failed', { error: error.message });
         throw error;
       } finally {
         setLoading(false);

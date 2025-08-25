@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Flex, Heading, Text } from '@radix-ui/themes';
-import { SignUpForm } from '../features/auth/components/SignUpForm';
+import { StepByStepSignUpForm } from '../features/auth/components/StepByStepSignUpForm';
 
 export const SignUpPage: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ export const SignUpPage: React.FC = () => {
         justify="center"
         className="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
       >
-        <Box className="max-w-lg w-full space-y-8">
+        <Box className="max-w-6xl w-full space-y-8">
           <Box className="text-center">
             <Heading size="8" className="text-gray-900 mb-2">
               Welcome to EdVerse
@@ -21,7 +21,7 @@ export const SignUpPage: React.FC = () => {
             </Text>
           </Box>
 
-          <SignUpForm />
+          <StepByStepSignUpForm />
         </Box>
       </Flex>
     </Container>

@@ -17,6 +17,7 @@ export const PLAN_FEATURES: Record<
     'org.manage',
     'staff.invite',
     'settings.integrations',
+    'instructors.view', // Add this for instructor routes
   ],
   starter: [
     'attendance.bulk_import',

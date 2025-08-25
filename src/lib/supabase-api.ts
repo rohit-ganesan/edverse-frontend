@@ -124,6 +124,10 @@ export const authAPI = {
     return callEdgeFunction('create-user-profile', { userData });
   },
 
+  createEnhancedUserProfile: async (userData: any) => {
+    return callEdgeFunction('create-enhanced-user-profile', { userData });
+  },
+
   updateUserProfile: async (userId: string, profileData: any) => {
     return callEdgeFunction('update-user-profile', { userId, profileData });
   },

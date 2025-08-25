@@ -1,5 +1,7 @@
 import { Lock } from 'lucide-react';
 import { usePlan } from '../../context/AccessContext';
+import { useUpgradeTelemetry } from '../../hooks/useUpgradeTelemetry';
+import { useEffect } from 'react';
 
 type Needed = 'starter' | 'growth' | 'scale' | 'enterprise';
 
@@ -7,12 +9,25 @@ export function UpgradeHint({
   neededPlan,
   message,
   ctaHref = '/billing',
+  context = 'route_guard',
 }: {
   neededPlan: Needed;
   message?: string;
   ctaHref?: string;
-}) {
+  context?: string;
+}): JSX.Element {
   const plan = usePlan();
+  const { trackUpgradeShown, trackUpgradeClicked } = useUpgradeTelemetry();
+
+  // Track when upgrade hint is shown
+  useEffect(() => {
+    trackUpgradeShown(neededPlan, context);
+  }, [neededPlan, context, trackUpgradeShown]);
+
+  const handleUpgradeClick = () => {
+    trackUpgradeClicked(plan, neededPlan, context);
+  };
+
   return (
     <div className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
       <div className="mt-0.5">
@@ -27,6 +42,7 @@ export function UpgradeHint({
         </div>
         <a
           href={ctaHref}
+          onClick={handleUpgradeClick}
           className="mt-3 inline-flex items-center rounded-lg bg-black px-3 py-2 text-sm font-medium text-white"
         >
           Upgrade to {neededPlan}

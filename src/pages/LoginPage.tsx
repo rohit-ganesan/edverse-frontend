@@ -47,7 +47,7 @@ export const LoginPage: React.FC = () => {
               Welcome to EdVerse
             </Heading>
             <Text size="3" className="text-gray-600">
-              Your comprehensive learning management system
+              Your comprehensive student management system
             </Text>
           </Box>
 

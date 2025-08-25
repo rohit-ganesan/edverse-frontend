@@ -8,6 +8,7 @@ import {
 import { RadixCard } from 'components/ui/RadixCard';
 import { QuickActions } from 'components/dashboard/QuickActions';
 import { NoticeBoard } from 'components/dashboard/NoticeBoard';
+import { AccessDebugger } from 'components/debug/AccessDebugger';
 import {
   Shield,
   Users,
@@ -138,6 +139,9 @@ export function DashboardPage(): JSX.Element {
 
         {/* Stats Grid */}
         <ModernStatsGridColored stats={mockStats} />
+
+        {/* Access Debugger */}
+        <AccessDebugger />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

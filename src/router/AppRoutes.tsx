@@ -1,25 +1,8 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate, Link } from 'react-router-dom';
-// Route registry temporarily disabled
-// import { ROUTES } from '../config/routes';
-import { useFeature, useCan, useAccess } from '../context/AccessContext';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import { Box, Text } from '@radix-ui/themes';
-
-// Import core module components
-import {
-  StudentsPage,
-  CoursesPage,
-  ClassesPage,
-  AttendancePage,
-  ResultPage,
-  NoticePage,
-  InstructorsPage,
-  FeePage,
-  AdminsPage,
-  OrganizationPage,
-  SettingsPage,
-} from '../modules/core';
+import RouteGuard from '../components/routing/RouteGuard';
 
 // Import Dashboard page
 import { DashboardPage } from '../pages/DashboardPage';
@@ -35,10 +18,6 @@ import { EmailVerificationPage } from '../pages/EmailVerificationPage';
 import { IntegrationTestPage } from '../pages/IntegrationTestPage';
 import { WhatsNewPage } from '../pages/WhatsNewPage';
 import { SupportPage } from '../pages/SupportPage';
-
-// Lazy load modules
-const GrowthModule = lazy(() => import('../modules/growth'));
-const EnterpriseModule = lazy(() => import('../modules/enterprise'));
 
 // Loading component
 function LoadingSpinner({ message }: { message: string }) {
@@ -69,70 +48,6 @@ function ProtectedRoute({ element }: { element: React.ReactNode }) {
   return <>{element}</>;
 }
 
-function GuardedRoute({
-  element,
-  feature,
-  cap,
-}: {
-  element: React.ReactNode;
-  feature?: string;
-  cap?: string;
-}) {
-  const { user, loading: authLoading } = useAuth();
-
-  // Show loading while auth is being checked
-  if (authLoading) {
-    return <LoadingSpinner message="Checking authentication..." />;
-  }
-
-  // Redirect to login if not authenticated
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // TODO: Re-enable access checks once we implement proper hook handling
-  // For now, just return the element without access checks
-  // This prevents infinite loops and hook rule violations
-  return <>{element}</>;
-}
-
-function ModuleLoader({
-  module,
-  feature,
-  cap,
-}: {
-  module: 'growth' | 'enterprise';
-  feature?: string;
-  cap?: string;
-}) {
-  const { user, loading: authLoading } = useAuth();
-
-  // Show loading while auth is being checked
-  if (authLoading) {
-    return <LoadingSpinner message="Checking authentication..." />;
-  }
-
-  // Redirect to login if not authenticated
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // TODO: Re-enable access checks once we implement proper hook handling
-  // For now, just load the module without access checks
-  // This prevents infinite loops and hook rule violations
-  const ModuleComponent = module === 'growth' ? GrowthModule : EnterpriseModule;
-
-  return (
-    <Suspense
-      fallback={<LoadingSpinner message={`Loading ${module} features...`} />}
-    >
-      <ModuleComponent />
-    </Suspense>
-  );
-}
-
-// Core module components are now imported from modules/core
-
 export default function AppRoutes() {
   return (
     <Routes>
@@ -146,113 +61,244 @@ export default function AppRoutes() {
       <Route path="/billing" element={<BillingPage />} />
 
       {/* Core module routes (eagerly loaded) */}
+      {/* Students */}
+      <Route
+        path="/students"
+        element={
+          <RouteGuard
+            moduleKey="students:core"
+            feature="students.view"
+            cap="students.view"
+          />
+        }
+      />
       <Route
         path="/students/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="students:core"
             feature="students.view"
             cap="students.view"
-            element={<StudentsPage />}
+          />
+        }
+      />
+
+      {/* Courses */}
+      <Route
+        path="/courses"
+        element={
+          <RouteGuard
+            moduleKey="courses:core"
+            feature="courses.view"
+            cap="courses.view"
           />
         }
       />
       <Route
         path="/courses/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="courses:core"
             feature="courses.view"
             cap="courses.view"
-            element={<CoursesPage />}
+          />
+        }
+      />
+
+      {/* Classes */}
+      <Route
+        path="/classes"
+        element={
+          <RouteGuard
+            moduleKey="classes:core"
+            feature="classes.view"
+            cap="classes.view"
           />
         }
       />
       <Route
         path="/classes/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="classes:core"
             feature="classes.view"
             cap="classes.view"
-            element={<ClassesPage />}
+          />
+        }
+      />
+
+      {/* Attendance */}
+      <Route
+        path="/attendance"
+        element={
+          <RouteGuard
+            moduleKey="attendance:core"
+            feature="attendance.view"
+            cap="attendance.mark"
           />
         }
       />
       <Route
         path="/attendance/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="attendance:core"
             feature="attendance.view"
-            cap="attendance.view"
-            element={<AttendancePage />}
+            cap="attendance.mark"
+          />
+        }
+      />
+
+      {/* Results */}
+      <Route
+        path="/results"
+        element={
+          <RouteGuard
+            moduleKey="results:core"
+            feature="results.view"
+            cap="results.enter"
           />
         }
       />
       <Route
         path="/results/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="results:core"
             feature="results.view"
-            cap="results.view"
-            element={<ResultPage />}
+            cap="results.enter"
+          />
+        }
+      />
+
+      {/* Notices */}
+      <Route
+        path="/notices"
+        element={
+          <RouteGuard
+            moduleKey="notices:core"
+            feature="notices.view"
+            cap="notices.send"
           />
         }
       />
       <Route
         path="/notices/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="notices:core"
             feature="notices.view"
-            cap="notices.view"
-            element={<NoticePage />}
+            cap="notices.send"
+          />
+        }
+      />
+
+      {/* Instructors */}
+      <Route
+        path="/instructors"
+        element={
+          <RouteGuard
+            moduleKey="instructors:core"
+            feature="staff.invite"
+            cap="staff.invite"
           />
         }
       />
       <Route
         path="/instructors/:tab"
         element={
-          <GuardedRoute
-            feature="instructors.view"
-            cap="instructors.view"
-            element={<InstructorsPage />}
+          <RouteGuard
+            moduleKey="instructors:core"
+            feature="staff.invite"
+            cap="staff.invite"
+          />
+        }
+      />
+
+      {/* Fees */}
+      <Route
+        path="/fees"
+        element={
+          <RouteGuard
+            moduleKey="fees:core"
+            feature="fees.view_overview"
+            cap="fees.record_manual"
           />
         }
       />
       <Route
         path="/fees/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="fees:core"
             feature="fees.view_overview"
-            cap="fees.view_overview"
-            element={<FeePage />}
+            cap="fees.record_manual"
+          />
+        }
+      />
+
+      {/* Admins */}
+      <Route
+        path="/admins"
+        element={
+          <RouteGuard
+            moduleKey="admins:core"
+            feature="staff.invite"
+            cap="staff.invite"
           />
         }
       />
       <Route
         path="/admins/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="admins:core"
             feature="staff.invite"
             cap="staff.invite"
-            element={<AdminsPage />}
+          />
+        }
+      />
+
+      {/* Organization */}
+      <Route
+        path="/organization"
+        element={
+          <RouteGuard
+            moduleKey="organization:core"
+            feature="org.manage"
+            cap="org.manage"
           />
         }
       />
       <Route
         path="/organization/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="organization:core"
             feature="org.manage"
             cap="org.manage"
-            element={<OrganizationPage />}
+          />
+        }
+      />
+
+      {/* Settings */}
+      <Route
+        path="/settings"
+        element={
+          <RouteGuard
+            moduleKey="settings:core"
+            feature="settings.integrations"
+            cap="settings.integrations"
           />
         }
       />
       <Route
         path="/settings/:tab"
         element={
-          <GuardedRoute
+          <RouteGuard
+            moduleKey="settings:core"
             feature="settings.integrations"
             cap="settings.integrations"
-            element={<SettingsPage />}
           />
         }
       />
@@ -275,50 +321,55 @@ export default function AppRoutes() {
       <Route
         path="/analytics"
         element={
-          <ModuleLoader
-            module="growth"
+          <RouteGuard
+            moduleKey="analytics:growth"
             feature="analytics.view"
             cap="analytics.view"
+            neededPlan="growth"
           />
         }
       />
       <Route
         path="/parent-portal"
         element={
-          <ModuleLoader
-            module="growth"
+          <RouteGuard
+            moduleKey="parent-portal:growth"
             feature="portal.parent"
             cap="portal.parent"
+            neededPlan="growth"
           />
         }
       />
       <Route
         path="/notices-advanced"
         element={
-          <ModuleLoader
-            module="growth"
+          <RouteGuard
+            moduleKey="notices-advanced:growth"
             feature="notices.analytics"
             cap="notices.analytics"
+            neededPlan="growth"
           />
         }
       />
       <Route
         path="/join-codes"
         element={
-          <ModuleLoader
-            module="growth"
+          <RouteGuard
+            moduleKey="join-codes:growth"
             feature="staff.invite"
             cap="staff.invite"
+            neededPlan="growth"
           />
         }
       />
       <Route
         path="/payments-online"
         element={
-          <ModuleLoader
-            module="growth"
+          <RouteGuard
+            moduleKey="payments-online:growth"
             feature="fees.online"
             cap="fees.online"
+            neededPlan="growth"
           />
         }
       />
@@ -327,66 +378,77 @@ export default function AppRoutes() {
       <Route
         path="/admissions"
         element={
-          <ModuleLoader
-            module="enterprise"
+          <RouteGuard
+            moduleKey="admissions:enterprise"
             feature="admissions.view"
             cap="admissions.view"
+            neededPlan="enterprise"
           />
         }
       />
       <Route
         path="/fees-advanced"
         element={
-          <ModuleLoader
-            module="enterprise"
+          <RouteGuard
+            moduleKey="fees-advanced:enterprise"
             feature="fees.advanced"
             cap="fees.advanced"
+            neededPlan="enterprise"
           />
         }
       />
       <Route
         path="/audit-logs"
         element={
-          <ModuleLoader
-            module="enterprise"
+          <RouteGuard
+            moduleKey="audit-logs:enterprise"
             feature="audit.logs"
             cap="audit.logs"
+            neededPlan="enterprise"
           />
         }
       />
       <Route
         path="/sso-saml"
         element={
-          <ModuleLoader module="enterprise" feature="auth.sso" cap="auth.sso" />
+          <RouteGuard
+            moduleKey="sso-saml:enterprise"
+            feature="auth.sso"
+            cap="auth.sso"
+            neededPlan="enterprise"
+          />
         }
       />
       <Route
         path="/branding"
         element={
-          <ModuleLoader
-            module="enterprise"
+          <RouteGuard
+            moduleKey="branding:enterprise"
             feature="settings.branding"
             cap="settings.branding"
+            neededPlan="enterprise"
           />
         }
       />
       <Route
         path="/syllabus-advanced"
         element={
-          <ModuleLoader
-            module="enterprise"
+          <RouteGuard
+            moduleKey="syllabus-advanced:enterprise"
             feature="syllabus.advanced"
             cap="syllabus.advanced"
+            neededPlan="enterprise"
           />
         }
       />
       <Route
         path="/integrations"
         element={
-          <ModuleLoader
-            module="enterprise"
+          <RouteGuard
+            moduleKey="integrations:enterprise"
             feature="integrations.view"
             cap="integrations.view"
+            neededPlan="enterprise"
           />
         }
       />
