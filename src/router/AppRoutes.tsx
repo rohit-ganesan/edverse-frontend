@@ -18,6 +18,7 @@ import { EmailVerificationPage } from '../pages/EmailVerificationPage';
 import { IntegrationTestPage } from '../pages/IntegrationTestPage';
 import { WhatsNewPage } from '../pages/WhatsNewPage';
 import { SupportPage } from '../pages/SupportPage';
+import { ProfilePage } from '../pages/ProfilePage';
 
 // Loading component
 function LoadingSpinner({ message }: { message: string }) {
@@ -60,18 +61,7 @@ export default function AppRoutes() {
       <Route path="/auth/verify" element={<EmailVerificationPage />} />
       <Route path="/billing" element={<BillingPage />} />
 
-      {/* Core module routes (eagerly loaded) */}
-      {/* Students */}
-      <Route
-        path="/students"
-        element={
-          <RouteGuard
-            moduleKey="students:core"
-            feature="students.view"
-            cap="students.view"
-          />
-        }
-      />
+      {/* Core module routes */}
       <Route
         path="/students/:tab"
         element={
@@ -83,17 +73,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Courses */}
-      <Route
-        path="/courses"
-        element={
-          <RouteGuard
-            moduleKey="courses:core"
-            feature="courses.view"
-            cap="courses.view"
-          />
-        }
-      />
       <Route
         path="/courses/:tab"
         element={
@@ -105,17 +84,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Classes */}
-      <Route
-        path="/classes"
-        element={
-          <RouteGuard
-            moduleKey="classes:core"
-            feature="classes.view"
-            cap="classes.view"
-          />
-        }
-      />
       <Route
         path="/classes/:tab"
         element={
@@ -127,17 +95,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Attendance */}
-      <Route
-        path="/attendance"
-        element={
-          <RouteGuard
-            moduleKey="attendance:core"
-            feature="attendance.view"
-            cap="attendance.mark"
-          />
-        }
-      />
       <Route
         path="/attendance/:tab"
         element={
@@ -149,17 +106,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Results */}
-      <Route
-        path="/results"
-        element={
-          <RouteGuard
-            moduleKey="results:core"
-            feature="results.view"
-            cap="results.enter"
-          />
-        }
-      />
       <Route
         path="/results/:tab"
         element={
@@ -171,17 +117,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Notices */}
-      <Route
-        path="/notices"
-        element={
-          <RouteGuard
-            moduleKey="notices:core"
-            feature="notices.view"
-            cap="notices.send"
-          />
-        }
-      />
       <Route
         path="/notices/:tab"
         element={
@@ -193,17 +128,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Instructors */}
-      <Route
-        path="/instructors"
-        element={
-          <RouteGuard
-            moduleKey="instructors:core"
-            feature="staff.invite"
-            cap="staff.invite"
-          />
-        }
-      />
       <Route
         path="/instructors/:tab"
         element={
@@ -215,17 +139,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Fees */}
-      <Route
-        path="/fees"
-        element={
-          <RouteGuard
-            moduleKey="fees:core"
-            feature="fees.view_overview"
-            cap="fees.record_manual"
-          />
-        }
-      />
       <Route
         path="/fees/:tab"
         element={
@@ -237,17 +150,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Admins */}
-      <Route
-        path="/admins"
-        element={
-          <RouteGuard
-            moduleKey="admins:core"
-            feature="staff.invite"
-            cap="staff.invite"
-          />
-        }
-      />
       <Route
         path="/admins/:tab"
         element={
@@ -259,17 +161,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Organization */}
-      <Route
-        path="/organization"
-        element={
-          <RouteGuard
-            moduleKey="organization:core"
-            feature="org.manage"
-            cap="org.manage"
-          />
-        }
-      />
       <Route
         path="/organization/:tab"
         element={
@@ -281,17 +172,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Settings */}
-      <Route
-        path="/settings"
-        element={
-          <RouteGuard
-            moduleKey="settings:core"
-            feature="settings.integrations"
-            cap="settings.integrations"
-          />
-        }
-      />
       <Route
         path="/settings/:tab"
         element={
@@ -304,6 +184,10 @@ export default function AppRoutes() {
       />
 
       {/* Additional utility routes */}
+      <Route
+        path="/profile"
+        element={<ProtectedRoute element={<ProfilePage />} />}
+      />
       <Route
         path="/test"
         element={<ProtectedRoute element={<IntegrationTestPage />} />}

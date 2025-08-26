@@ -1,289 +1,414 @@
-import { useState } from 'react';
-import { Box, Flex, Text, Heading, Grid } from '@radix-ui/themes';
-import { DashboardLayout } from 'components/layout/DashboardLayout';
-import { RadixCard } from 'components/ui/RadixCard';
-import { RadixButton } from 'components/ui/RadixButton';
-import { LineItem } from 'components/ui/LineItem';
-import { FormField } from 'components/ui/FormField';
-import { useAuth } from 'features/auth/AuthContext';
-import { User, MapPin, Mail, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DashboardLayout } from '../components/layout/DashboardLayout';
+import { PageHeader } from '../components/ui/PageHeader';
+import {
+  Text,
+  Heading,
+  Button,
+  Card,
+  TextField,
+  Switch,
+  Badge,
+} from '@radix-ui/themes';
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  Edit,
+  Save,
+  X,
+  Camera,
+} from 'lucide-react';
+import { useAuth } from '../features/auth/AuthContext';
+import { useAccess } from '../context/AccessContext';
+
+interface UserProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  date_of_birth?: string;
+  avatar_url?: string;
+  role: string;
+  plan: string;
+  created_at: string;
+  last_login?: string;
+}
 
 export function ProfilePage(): JSX.Element {
-  const authContext = useAuth();
+  const { user } = useAuth();
+  const { plan, role } = useAccess();
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Get user and profile safely
-  const user = authContext?.user;
-  const userProfile = authContext?.userProfile;
-  const updateUserProfile = authContext?.updateUserProfile;
-
-  // Initialize form data with safe defaults - must be called before conditional returns
+  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [formData, setFormData] = useState({
-    firstName: userProfile?.first_name || '',
-    lastName: userProfile?.last_name || '',
-    address: userProfile?.address || '',
-    role: userProfile?.role || 'Administrator',
+    first_name: '',
+    last_name: '',
+    phone: '',
+    address: '',
+    date_of_birth: '',
   });
 
-  // Defensive check for auth context - after hooks
-  if (!authContext) {
-    console.error('ProfilePage: Auth context is not available');
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      try {
+        // In a real app, you'd fetch from your API
+        // For now, we'll construct from available data
+        const userProfile: UserProfile = {
+          id: user.id,
+          first_name: user.user_metadata?.first_name || 'User',
+          last_name: user.user_metadata?.last_name || '',
+          email: user.email || '',
+          phone: user.user_metadata?.phone || '',
+          address: user.user_metadata?.address || '',
+          date_of_birth: user.user_metadata?.date_of_birth || '',
+          avatar_url: user.user_metadata?.avatar_url || '',
+          role: role || 'user',
+          plan: plan || 'free',
+          created_at: user.created_at || new Date().toISOString(),
+          last_login: user.last_sign_in_at || '',
+        };
+
+        setProfile(userProfile);
+        setFormData({
+          first_name: userProfile.first_name,
+          last_name: userProfile.last_name,
+          phone: userProfile.phone || '',
+          address: userProfile.address || '',
+          date_of_birth: userProfile.date_of_birth || '',
+        });
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user, role, plan]);
+
+  const handleSave = async () => {
+    try {
+      // In a real app, you'd update via API
+      console.log('Saving profile:', formData);
+      setIsEditing(false);
+      // You would typically update the profile state here after successful save
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        phone: profile.phone || '',
+        address: profile.address || '',
+        date_of_birth: profile.date_of_birth || '',
+      });
+    }
+    setIsEditing(false);
+  };
+
+  if (isLoading) {
     return (
       <DashboardLayout>
-        <Box className="p-6">
-          <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900 mb-2">
-              Authentication Error
-            </h1>
-            <p className="text-gray-600">
-              Unable to load authentication context. Please refresh the page.
-            </p>
-          </div>
-        </Box>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
       </DashboardLayout>
     );
   }
 
-  // Safe getters for user data
-  const getUserDisplayName = (): string => {
-    if (userProfile?.first_name && userProfile?.last_name) {
-      return `${userProfile.first_name} ${userProfile.last_name}`;
-    }
-
-    if (user?.email) {
-      return user.email.split('@')[0]; // Use email username as fallback
-    }
-
-    return 'User';
-  };
-
-  const getUserEmail = (): string => {
-    return user?.email || 'Not available';
-  };
-
-  const getUserRole = (): string => {
-    return userProfile?.role || 'Administrator';
-  };
-
-  const getUserAddress = (): string | null => {
-    return userProfile?.address || null;
-  };
-
-  const handleInputChange = (field: string, value: string): void => {
-    if (!field || typeof value !== 'string') {
-      console.warn('ProfilePage: Invalid input change parameters');
-      return;
-    }
-
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSave = async (): Promise<void> => {
-    if (!updateUserProfile) {
-      console.error('ProfilePage: updateUserProfile function is not available');
-      return;
-    }
-
-    // Validate form data
-    if (!formData.firstName?.trim() || !formData.lastName?.trim()) {
-      console.error('ProfilePage: First name and last name are required');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Transform camelCase form data to snake_case for database
-      const profileData = {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        address: formData.address,
-        role: formData.role,
-      };
-      await updateUserProfile(profileData);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancel = (): void => {
-    // Reset form data to current profile values
-    setFormData({
-      firstName: userProfile?.first_name || '',
-      lastName: userProfile?.last_name || '',
-      address: userProfile?.address || '',
-      role: userProfile?.role || 'Administrator',
-    });
-    setIsEditing(false);
-  };
-
-  const handleStartEditing = (): void => {
-    // Refresh form data when starting to edit
-    setFormData({
-      firstName: userProfile?.first_name || '',
-      lastName: userProfile?.last_name || '',
-      address: userProfile?.address || '',
-      role: userProfile?.role || 'Administrator',
-    });
-    setIsEditing(true);
-  };
-
-  // Safe form field values
-  const getFieldValue = (
-    field: keyof typeof formData,
-    profileField?: string
-  ): string => {
-    if (isEditing) {
-      return formData[field] || '';
-    }
-
-    if (profileField && userProfile) {
-      return (userProfile as any)[profileField] || '';
-    }
-
-    // Map formData field names to userProfile field names
-    const fieldMap: Record<string, string> = {
-      firstName: 'first_name',
-      lastName: 'last_name',
-      address: 'address',
-      role: 'role',
-    };
-
-    const profileFieldName = fieldMap[field] || field;
-    return (userProfile as any)?.[profileFieldName] || '';
-  };
+  if (!profile) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <Text className="text-gray-600">Profile not found</Text>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
-      <Box className="mb-6">
-        <Heading size="6" className="text-gray-900 dark:text-gray-100 mb-2">
-          Profile Settings
-        </Heading>
-        <Text size="3" className="text-gray-600 dark:text-gray-400">
-          Manage your account information and preferences
-        </Text>
-      </Box>
+      <PageHeader
+        title="Profile"
+        description="Manage your account information and preferences"
+      />
 
-      <Grid columns="2" gap="6">
-        {/* Profile Information Card */}
-        <RadixCard size="2" className="p-6">
-          <Flex justify="between" align="center" className="mb-6">
-            <Heading size="4" className="text-gray-900 dark:text-gray-100">
-              Personal Information
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile Card */}
+        <div className="lg:col-span-1">
+          <Card className="p-8">
+            <div className="text-center mb-8">
+              <div className="relative inline-block">
+                <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                  {profile.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-12 h-12 text-blue-600" />
+                  )}
+                </div>
+                {isEditing && (
+                  <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700">
+                    <Camera className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <Heading size="4" className="mb-3">
+                {profile.first_name} {profile.last_name}
+              </Heading>
+              <Text className="text-gray-600 mb-4">{profile.email}</Text>
+
+              <div className="flex justify-center gap-3 mb-6">
+                <Badge color="blue" variant="soft">
+                  {profile.role}
+                </Badge>
+                <Badge color="green" variant="soft">
+                  {profile.plan} Plan
+                </Badge>
+              </div>
+
+              <div className="text-sm text-gray-500 space-y-2">
+                <div>
+                  Member since{' '}
+                  {new Date(profile.created_at).toLocaleDateString()}
+                </div>
+                {profile.last_login && (
+                  <div>
+                    Last login{' '}
+                    {new Date(profile.last_login).toLocaleDateString()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Profile Details */}
+        <div className="lg:col-span-2">
+          <Card className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <Heading size="4">Personal Information</Heading>
+              {!isEditing ? (
+                <Button onClick={() => setIsEditing(true)} variant="outline">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button onClick={handleSave} color="blue">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </Button>
+                  <Button onClick={handleCancel} variant="outline">
+                    <X className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* First Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  First Name
+                </label>
+                {isEditing ? (
+                  <TextField.Root
+                    value={formData.first_name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, first_name: e.target.value })
+                    }
+                    placeholder="Enter first name"
+                  />
+                ) : (
+                  <div className="flex items-center p-3 bg-gray-50 rounded-md">
+                    <User className="w-4 h-4 text-gray-400 mr-3" />
+                    <Text>{profile.first_name}</Text>
+                  </div>
+                )}
+              </div>
+
+              {/* Last Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name
+                </label>
+                {isEditing ? (
+                  <TextField.Root
+                    value={formData.last_name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, last_name: e.target.value })
+                    }
+                    placeholder="Enter last name"
+                  />
+                ) : (
+                  <div className="flex items-center p-3 bg-gray-50 rounded-md">
+                    <User className="w-4 h-4 text-gray-400 mr-3" />
+                    <Text>{profile.last_name}</Text>
+                  </div>
+                )}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="flex items-center p-3 bg-gray-50 rounded-md">
+                  <Mail className="w-4 h-4 text-gray-400 mr-3" />
+                  <Text>{profile.email}</Text>
+                </div>
+                <Text className="text-xs text-gray-500 mt-1">
+                  Email cannot be changed from this page
+                </Text>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                {isEditing ? (
+                  <TextField.Root
+                    value={formData.phone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                    placeholder="Enter phone number"
+                  />
+                ) : (
+                  <div className="flex items-center p-3 bg-gray-50 rounded-md">
+                    <Phone className="w-4 h-4 text-gray-400 mr-3" />
+                    <Text>{profile.phone || 'Not provided'}</Text>
+                  </div>
+                )}
+              </div>
+
+              {/* Address */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address
+                </label>
+                {isEditing ? (
+                  <TextField.Root
+                    value={formData.address}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
+                    placeholder="Enter address"
+                  />
+                ) : (
+                  <div className="flex items-center p-3 bg-gray-50 rounded-md">
+                    <MapPin className="w-4 h-4 text-gray-400 mr-3" />
+                    <Text>{profile.address || 'Not provided'}</Text>
+                  </div>
+                )}
+              </div>
+
+              {/* Date of Birth */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Date of Birth
+                </label>
+                {isEditing ? (
+                  <TextField.Root
+                    type="date"
+                    value={formData.date_of_birth}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        date_of_birth: e.target.value,
+                      })
+                    }
+                  />
+                ) : (
+                  <div className="flex items-center p-3 bg-gray-50 rounded-md">
+                    <Calendar className="w-4 h-4 text-gray-400 mr-3" />
+                    <Text>
+                      {profile.date_of_birth
+                        ? new Date(profile.date_of_birth).toLocaleDateString()
+                        : 'Not provided'}
+                    </Text>
+                  </div>
+                )}
+              </div>
+
+              {/* Role */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Role
+                </label>
+                <div className="flex items-center p-3 bg-gray-50 rounded-md">
+                  <Shield className="w-4 h-4 text-gray-400 mr-3" />
+                  <Text className="capitalize">{profile.role}</Text>
+                </div>
+                <Text className="text-xs text-gray-500 mt-1">
+                  Role is managed by administrators
+                </Text>
+              </div>
+            </div>
+          </Card>
+
+          {/* Account Settings */}
+          <Card className="p-6 mt-6">
+            <Heading size="4" className="mb-6">
+              Account Settings
             </Heading>
-            {!isEditing && (
-              <RadixButton variant="outline" onClick={handleStartEditing}>
-                Edit Profile
-              </RadixButton>
-            )}
-          </Flex>
 
-          <Flex direction="column" gap="4">
-            {/* Profile Avatar */}
-            <Flex
-              align="center"
-              gap="4"
-              className="mb-6 pb-4 border-b border-gray-100 dark:border-gray-700"
-            >
-              <Box className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <User className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              </Box>
-              <Box>
-                <Text
-                  size="4"
-                  weight="medium"
-                  className="text-gray-900 dark:text-gray-100 block mb-1"
-                >
-                  {getUserDisplayName()}
-                </Text>
-                <Text
-                  size="2"
-                  className="text-gray-600 dark:text-gray-400 block"
-                >
-                  {getUserRole()}
-                </Text>
-              </Box>
-            </Flex>
+            <div className="space-y-6">
+              <div className="flex items-start justify-between py-2">
+                <div className="flex-1 mr-8">
+                  <Text className="font-medium mb-2">Email Notifications</Text>
+                  <Text className="text-sm text-gray-600">
+                    Receive email updates about your account
+                  </Text>
+                </div>
+                <Switch defaultChecked />
+              </div>
 
-            {/* Form Fields */}
-            <Flex direction="column" gap="5">
-              <Grid columns="2" gap="4">
-                <FormField
-                  label="First Name"
-                  value={getFieldValue('firstName', 'firstName')}
-                  placeholder="Enter first name"
-                  isEditing={isEditing}
-                  onChange={(value) => handleInputChange('firstName', value)}
-                />
+              <div className="flex items-start justify-between py-2">
+                <div className="flex-1 mr-8">
+                  <Text className="font-medium mb-2">
+                    Two-Factor Authentication
+                  </Text>
+                  <Text className="text-sm text-gray-600">
+                    Add an extra layer of security to your account
+                  </Text>
+                </div>
+                <Switch />
+              </div>
 
-                <FormField
-                  label="Last Name"
-                  value={getFieldValue('lastName', 'lastName')}
-                  placeholder="Enter last name"
-                  isEditing={isEditing}
-                  onChange={(value) => handleInputChange('lastName', value)}
-                />
-              </Grid>
-
-              <FormField
-                label="Address"
-                value={getFieldValue('address', 'address')}
-                placeholder="Enter your address"
-                isEditing={isEditing}
-                onChange={(value) => handleInputChange('address', value)}
-              />
-
-              <FormField label="Role" value={getUserRole()} isEditing={false} />
-            </Flex>
-
-            {isEditing && (
-              <Flex gap="3" className="mt-4">
-                <RadixButton onClick={handleSave} loading={loading}>
-                  Save Changes
-                </RadixButton>
-                <RadixButton variant="outline" onClick={handleCancel}>
-                  Cancel
-                </RadixButton>
-              </Flex>
-            )}
-          </Flex>
-        </RadixCard>
-
-        {/* Account Information Card */}
-        <RadixCard size="2" className="p-6">
-          <Heading size="4" className="text-gray-900 dark:text-gray-100 mb-6">
-            Account Information
-          </Heading>
-
-          <Flex direction="column" gap="4">
-            <LineItem
-              icon={Mail}
-              label="Email Address"
-              value={getUserEmail()}
-              variant="bordered"
-            />
-
-            <LineItem
-              icon={Shield}
-              label="Account Type"
-              value={getUserRole()}
-              variant="bordered"
-            />
-
-            {getUserAddress() && (
-              <LineItem
-                icon={MapPin}
-                label="Location"
-                value={getUserAddress() || ''}
-                variant="bordered"
-              />
-            )}
-          </Flex>
-        </RadixCard>
-      </Grid>
+              <div className="flex items-start justify-between py-2">
+                <div className="flex-1 mr-8">
+                  <Text className="font-medium mb-2">Dark Mode</Text>
+                  <Text className="text-sm text-gray-600">
+                    Switch between light and dark themes
+                  </Text>
+                </div>
+                <Switch />
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

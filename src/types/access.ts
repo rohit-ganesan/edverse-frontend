@@ -34,6 +34,13 @@ export const ROLE_CAPS: Record<Role, Capability[]> = {
     'classes.take_attendance',
     'results.enter',
     'notices.send',
+    'students.view',
+    'courses.view',
+    'attendance.view',
+    'attendance.mark',
+    'results.view',
+    'fees.view_overview',
+    'notices.view',
   ],
   admissions: ['admissions.view', 'admissions.stages', 'admissions.templates'],
   finance: [
