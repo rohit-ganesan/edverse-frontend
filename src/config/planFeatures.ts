@@ -3,12 +3,12 @@ export const PLAN_FEATURES: Record<
   string[]
 > = {
   free: [
+    'students.view',
+    'courses.view',
+    'classes.view',
     'attendance.view',
     'attendance.mark',
     'results.view',
-    'classes.view',
-    'courses.view',
-    'students.view',
     'fees.view_overview',
     'fees.structures.basic',
     'fees.record_manual',
@@ -17,7 +17,6 @@ export const PLAN_FEATURES: Record<
     'org.manage',
     'staff.invite',
     'settings.integrations',
-    'instructors.view', // Add this for instructor routes
   ],
   starter: [
     'attendance.bulk_import',
@@ -28,7 +27,7 @@ export const PLAN_FEATURES: Record<
     'courses.crud',
     'courses.export',
     'students.crud',
-    'analytics.view',
+    'analytics.basic',
   ],
   growth: [
     'fees.online',
@@ -41,13 +40,14 @@ export const PLAN_FEATURES: Record<
   scale: [
     'auth.sso',
     'audit.logs',
+    'fees.reconcile', // Canonical advanced fees feature
     'fees.reminders.smswa',
-    'fees.reconcile',
     'api.rw',
   ],
   enterprise: [
     'settings.branding',
     'admissions.view',
+    'syllabus-advanced',
     'admissions.stages',
     'admissions.templates',
   ],
@@ -92,3 +92,28 @@ export function getMinPlanForFeature(
   }
   return null;
 }
+
+/**
+ * Check if a feature is available in a plan (including inherited features)
+ */
+export function isFeatureAvailableInPlan(
+  feature: string,
+  plan: keyof typeof PLAN_FEATURES
+): boolean {
+  const planFeatures = getFeaturesForPlan(plan);
+  return planFeatures.includes(feature);
+}
+
+/**
+ * Get features that are add-ons (not included in any plan)
+ * These must be purchased separately
+ */
+export const ADDON_ONLY_FEATURES = [
+  'analytics.advanced', // More advanced than basic analytics
+  'fees.reminders.smswa', // SMS/WhatsApp reminders
+  'auth.sso', // SSO integration
+  'audit.logs', // Audit logging
+  'settings.branding', // Custom branding
+  'admissions.view', // Admissions management
+  'syllabus-advanced', // Advanced curriculum
+];

@@ -72,18 +72,30 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
 
       const accessData = await getAccessData();
 
+      // plan-first fallback: ensure features never come back empty
+      const planFallback = getFeaturesForPlan(accessData.plan as Plan);
+      const features = Array.from(
+        new Set([...(accessData.features ?? []), ...planFallback])
+      );
+      const caps = (
+        accessData.capabilities?.length ? accessData.capabilities : []
+      ) as Capability[];
+
       setAccessState({
         plan: accessData.plan as Plan,
         role: accessData.role as Role,
-        features: accessData.features,
-        capabilities: accessData.capabilities as Capability[],
+        features,
+        capabilities: caps,
         isLoading: false,
         isInitialized: true,
       });
     } catch (error) {
       console.error('Failed to initialize access:', error);
+      // Fallback to plan-based features on error
+      const fallbackFeatures = getFeaturesForPlan('free');
       setAccessState((prev) => ({
         ...prev,
+        features: fallbackFeatures,
         isLoading: false,
         isInitialized: true,
       }));

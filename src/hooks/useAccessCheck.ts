@@ -1,50 +1,135 @@
 import { useMemo } from 'react';
-import { usePlan, useFeature, useCan } from '../context/AccessContext';
+import { useAccess, useFeature, useCan } from '../context/AccessContext';
+import {
+  PLAN_RANKS,
+  ADDON_FEATURES,
+  type Plan,
+  type AccessCheckResult,
+} from '../types/access';
 
-export type AccessCheckInput = {
-  feature?: string; // e.g., 'fees.online'
-  cap?: string; // e.g., 'fees.online'
-  neededPlan?: 'starter' | 'growth' | 'scale' | 'enterprise'; // for better messaging
-};
+interface AccessCheckOptions {
+  feature?: string;
+  cap?: string;
+  neededPlan?: Plan;
+}
 
-export type AccessCheck = {
-  allowed: boolean;
-  reason: null | {
-    missingFeature?: string;
-    missingCapability?: string;
-    neededPlan?: AccessCheckInput['neededPlan'];
-    currentPlan: string;
-  };
-};
-
+/**
+ * Enhanced access check hook that enforces neededPlan and provides detailed reasons
+ * for access denials. This is the primary hook for gating routes and actions.
+ */
 export function useAccessCheck({
   feature,
   cap,
   neededPlan,
-}: AccessCheckInput): AccessCheck {
-  const plan = usePlan();
-  // Hooks must be called unconditionally - always call them
-  const hasFeature = useFeature(feature || '');
-  const hasCap = useCan((cap as any) || '');
+}: AccessCheckOptions): AccessCheckResult {
+  const { plan, features, capabilities } = useAccess();
 
   return useMemo(() => {
-    // Check if the feature/cap is actually required
-    const featureRequired = !!feature;
-    const capRequired = !!cap;
+    // If no requirements specified, allow access
+    if (!feature && !cap && !neededPlan) {
+      return { allowed: true };
+    }
 
-    // Only allow if both required features/caps are available
-    const featureAllowed = !featureRequired || hasFeature;
-    const capAllowed = !capRequired || hasCap;
+    // 1. Plan-first enforcement (highest priority)
+    if (neededPlan) {
+      const currentRank = PLAN_RANKS[plan];
+      const neededRank = PLAN_RANKS[neededPlan];
 
-    if (featureAllowed && capAllowed) return { allowed: true, reason: null };
-    return {
-      allowed: false,
-      reason: {
-        missingFeature: featureRequired && !hasFeature ? feature : undefined,
-        missingCapability: capRequired && !hasCap ? cap : undefined,
-        neededPlan,
-        currentPlan: plan,
-      },
-    };
-  }, [hasFeature, hasCap, feature, cap, neededPlan, plan]);
+      if (currentRank < neededRank) {
+        return {
+          allowed: false,
+          reason: {
+            neededPlan,
+            missingFeature: feature,
+            currentPlan: plan,
+            plan: neededPlan,
+          },
+        };
+      }
+    }
+
+    // 2. Feature check (if required)
+    if (feature) {
+      const hasFeature = features.includes(feature);
+      if (!hasFeature) {
+        return {
+          allowed: false,
+          reason: {
+            missingFeature: feature,
+            currentPlan: plan,
+            plan: neededPlan,
+          },
+        };
+      }
+    }
+
+    // 3. Capability check (if required)
+    if (cap) {
+      const hasCapability =
+        capabilities.includes('*') || capabilities.includes(cap);
+      if (!hasCapability) {
+        return {
+          allowed: false,
+          reason: {
+            missingCapability: cap,
+            currentPlan: plan,
+            plan: neededPlan,
+          },
+        };
+      }
+    }
+
+    // All checks passed
+    return { allowed: true };
+  }, [feature, cap, neededPlan, plan, features, capabilities]);
+}
+
+/**
+ * Hook to check if a feature is an add-on (paid feature)
+ */
+export function useIsAddonFeature(feature: string): boolean {
+  return feature in ADDON_FEATURES;
+}
+
+/**
+ * Hook to get add-on information for a feature
+ */
+export function useAddonInfo(feature: string) {
+  return ADDON_FEATURES[feature] || null;
+}
+
+/**
+ * Hook to check if access is blocked by plan (not feature/capability)
+ */
+export function useIsPlanBlocked(neededPlan?: Plan): boolean {
+  const { plan } = useAccess();
+
+  if (!neededPlan) return false;
+
+  const currentRank = PLAN_RANKS[plan];
+  const neededRank = PLAN_RANKS[neededPlan];
+
+  return currentRank < neededRank;
+}
+
+/**
+ * Hook to check if access is blocked by missing feature
+ */
+export function useIsFeatureBlocked(feature?: string): boolean {
+  const { features } = useAccess();
+
+  if (!feature) return false;
+
+  return !features.includes(feature);
+}
+
+/**
+ * Hook to check if access is blocked by missing capability
+ */
+export function useIsCapabilityBlocked(cap?: string): boolean {
+  const { capabilities } = useAccess();
+
+  if (!cap) return false;
+
+  return !capabilities.includes('*') && !capabilities.includes(cap);
 }

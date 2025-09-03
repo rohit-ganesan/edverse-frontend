@@ -319,8 +319,8 @@ export default function AppRoutes() {
         element={
           <RouteGuard
             moduleKey="syllabus-advanced:enterprise"
-            feature="syllabus.advanced"
-            cap="syllabus.advanced"
+            feature="syllabus-advanced"
+            cap="syllabus-advanced"
             neededPlan="enterprise"
           />
         }
@@ -330,8 +330,8 @@ export default function AppRoutes() {
         element={
           <RouteGuard
             moduleKey="integrations:enterprise"
-            feature="integrations.view"
-            cap="integrations.view"
+            feature="settings.integrations"
+            cap="settings.integrations"
             neededPlan="enterprise"
           />
         }

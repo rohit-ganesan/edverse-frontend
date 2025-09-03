@@ -57,7 +57,9 @@ export const MODULES = {
   'integrations:enterprise': IntegrationsPage,
 } as const;
 
+export type ModuleKey = keyof typeof MODULES;
+
 /** Gets a component directly from the registry. */
-export function getComponent(key: keyof typeof MODULES) {
+export function getComponent(key: ModuleKey) {
   return MODULES[key];
 }
