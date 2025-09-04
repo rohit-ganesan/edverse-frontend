@@ -2,7 +2,8 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import { Box, Text } from '@radix-ui/themes';
-import RouteGuard from '../components/routing/RouteGuard';
+import { RouteGuard } from '../components/routing/RouteGuard';
+import { ProfileCreationLoader } from '../components/ProfileCreationLoader';
 
 // Import Dashboard page
 import { DashboardPage } from '../pages/DashboardPage';
@@ -34,11 +35,16 @@ function LoadingSpinner({ message }: { message: string }) {
 
 // Simple route protection that only checks authentication
 function ProtectedRoute({ element }: { element: React.ReactNode }) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, creatingProfile } = useAuth();
 
   // Show loading while auth is being checked
   if (authLoading) {
     return <LoadingSpinner message="Checking authentication..." />;
+  }
+
+  // Show profile creation loader while profile is being created
+  if (creatingProfile) {
+    return <ProfileCreationLoader message="Setting up your profile..." />;
   }
 
   // Redirect to login if not authenticated

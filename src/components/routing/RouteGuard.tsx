@@ -1,11 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAccessCheck } from '../../hooks/useAccessCheck';
 import { UpgradeHint } from '../upsell/UpgradeHint';
 import { useAccessTelemetry } from '../../hooks/useAccessTelemetry';
+import { getComponent, type ModuleKey } from '../../modules/registry';
+import { useAuth } from '../../features/auth/AuthContext';
+import { useAccess } from '../../context/AccessContext';
 import type { Plan } from '../../types/access';
 
 interface RouteGuardProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  /** Legacy: key inside MODULES registry */
+  moduleKey?: ModuleKey;
   /** Feature required to access this route */
   feature?: string;
   /** Capability required to access this route */
@@ -18,59 +24,144 @@ interface RouteGuardProps {
   showUpgradeHint?: boolean;
   /** Fallback content when access is denied */
   fallback?: React.ReactNode;
+  /** Legacy: optional locked UI */
+  locked?: React.ReactNode;
 }
 
 /**
  * Comprehensive route guard that enforces neededPlan, features, and capabilities
  * Provides detailed telemetry and upgrade hints for locked routes
+ * Maintains backward compatibility with the old moduleKey system
  */
 export function RouteGuard({
   children,
+  moduleKey,
   feature,
   cap,
   neededPlan,
   routePath = 'unknown',
   showUpgradeHint = true,
   fallback = null,
+  locked,
 }: RouteGuardProps): JSX.Element {
-  const accessCheck = useAccessCheck({ feature, cap, neededPlan });
+  const { user, loading: authLoading } = useAuth();
+  const { allowed, reason } = useAccessCheck({ feature, cap, neededPlan });
+  const { isInitialized: accessInitialized } = useAccess();
   const { trackRouteLocked } = useAccessTelemetry();
+  const location = useLocation();
+
+  // Get the component from the registry if moduleKey is provided (legacy mode)
+  const Component = useMemo(() => {
+    if (moduleKey) {
+      return getComponent(moduleKey);
+    }
+    return null;
+  }, [moduleKey]);
 
   // Track route locks for telemetry
   useEffect(() => {
-    if (!accessCheck.allowed) {
-      let reason: 'plan' | 'feature' | 'capability' = 'feature';
+    if (!allowed && !authLoading && accessInitialized) {
+      let reasonType: 'plan' | 'feature' | 'capability' = 'feature';
 
-      if (accessCheck.reason?.neededPlan) {
-        reason = 'plan';
-      } else if (accessCheck.reason?.missingCapability) {
-        reason = 'capability';
+      if (reason?.neededPlan) {
+        reasonType = 'plan';
+      } else if (reason?.missingCapability) {
+        reasonType = 'capability';
       }
 
       trackRouteLocked({
         feature,
         cap,
-        plan: accessCheck.reason?.currentPlan || 'free',
-        neededPlan: accessCheck.reason?.neededPlan,
-        reason,
+        plan: reason?.currentPlan || 'free',
+        neededPlan: reason?.neededPlan,
+        reason: reasonType,
       });
     }
-  }, [accessCheck, feature, cap, neededPlan, trackRouteLocked]);
+  }, [
+    allowed,
+    authLoading,
+    accessInitialized,
+    feature,
+    cap,
+    neededPlan,
+    reason,
+    trackRouteLocked,
+  ]);
 
-  // Access allowed
-  if (accessCheck.allowed) {
+  // Show loading while auth is being checked
+  if (authLoading) {
+    return (
+      <div className="p-4 text-sm text-neutral-500">
+        Checking authentication...
+      </div>
+    );
+  }
+
+  // Show loading while access context is being initialized
+  if (!accessInitialized) {
+    return (
+      <div className="p-4 text-sm text-neutral-500">Loading permissions...</div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  // If using legacy moduleKey system, render the component directly
+  if (moduleKey && Component) {
+    // Even for legacy routes, we must check access control
+    if (!allowed) {
+      // Show upgrade hint if enabled
+      if (showUpgradeHint) {
+        // Prefer a rich locked panel if provided (legacy compatibility)
+        if (locked) {
+          return locked as JSX.Element;
+        }
+
+        return (
+          <UpgradeHint
+            neededPlan={reason?.neededPlan}
+            feature={reason?.missingFeature}
+            message={
+              reason?.missingCapability
+                ? `You don't have permission to access this page. Required capability: ${reason.missingCapability}`
+                : undefined
+            }
+            context={`route_guard:${routePath}`}
+          />
+        );
+      }
+
+      // Show fallback or nothing
+      return <>{fallback}</>;
+    }
+
+    // Access is allowed, render the component
+    return <Component />;
+  }
+
+  // Access allowed for new system
+  if (allowed) {
     return <>{children}</>;
   }
 
   // Show upgrade hint if enabled
   if (showUpgradeHint) {
+    // Prefer a rich locked panel if provided (legacy compatibility)
+    if (locked) {
+      return locked as JSX.Element;
+    }
+
+    // Return the modal-like UpgradeHint that takes full viewport
     return (
       <UpgradeHint
-        neededPlan={accessCheck.reason?.neededPlan}
-        feature={accessCheck.reason?.missingFeature}
+        neededPlan={reason?.neededPlan}
+        feature={reason?.missingFeature}
         message={
-          accessCheck.reason?.missingCapability
-            ? `You don't have permission to access this page. Required capability: ${accessCheck.reason.missingCapability}`
+          reason?.missingCapability
+            ? `You don't have permission to access this page. Required capability: ${reason.missingCapability}`
             : undefined
         }
         context={`route_guard:${routePath}`}

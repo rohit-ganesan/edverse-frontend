@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  useAccess,
-  usePlan,
-  useRole,
-  useFeatures,
-  useCapabilities,
-} from '../../context/AccessContext';
-import { Box, Text, Card, Badge } from '@radix-ui/themes';
+import { useAccess } from '../../context/AccessContext';
+import { Text, Card, Badge } from '@radix-ui/themes';
 
 export function AccessDebugger() {
   const { plan, role, features, capabilities, isLoading, isInitialized } =

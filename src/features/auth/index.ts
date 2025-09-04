@@ -1,7 +1,7 @@
 // Auth exports - Supabase-based authentication system
 export { AuthProvider, useAuth } from './AuthContext';
 export { LoginForm } from './components/LoginForm';
-export { SignUpForm } from './components/SignUpForm';
+export { StepByStepSignUpForm } from './components/StepByStepSignUpForm';
 export { ForgotPasswordForm } from './components/ForgotPasswordForm';
 export { ResetPasswordForm } from './components/ResetPasswordForm';
 

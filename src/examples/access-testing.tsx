@@ -1,9 +1,8 @@
 import React from 'react';
-import { RouteGuard } from '../components/routing/RouteGuard';
+import { RouteGuard, useRouteAccess } from '../components/routing/RouteGuard';
 import { FeatureGate } from '../components/guards/FeatureGate';
 import { CapabilityGate } from '../components/guards/CapabilityGate';
 import { useAccessCheck } from '../hooks/useAccessCheck';
-import { useRouteAccess } from '../components/routing/RouteGuard';
 import {
   Card,
   Flex,

@@ -22,7 +22,7 @@ export type AccessState = {
 
 const DEFAULT_ACCESS: AccessState = {
   plan: 'free',
-  role: 'teacher',
+  role: 'student', // Default to student instead of teacher
   features: getFeaturesForPlan('free'),
   capabilities: [
     'classes.view',
@@ -72,11 +72,8 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
 
       const accessData = await getAccessData();
 
-      // plan-first fallback: ensure features never come back empty
-      const planFallback = getFeaturesForPlan(accessData.plan as Plan);
-      const features = Array.from(
-        new Set([...(accessData.features ?? []), ...planFallback])
-      );
+      // Respect the server's feature decisions - no client-side fallback
+      const features = accessData.features ?? [];
       const caps = (
         accessData.capabilities?.length ? accessData.capabilities : []
       ) as Capability[];

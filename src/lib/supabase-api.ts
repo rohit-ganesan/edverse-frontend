@@ -281,7 +281,7 @@ export const getAccessData = async (): Promise<{
     // Return default access data on error
     return {
       plan: 'free',
-      role: 'teacher',
+      role: 'student', // Default to student instead of teacher
       features: [
         'attendance.view',
         'attendance.mark',

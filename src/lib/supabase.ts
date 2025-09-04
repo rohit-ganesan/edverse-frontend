@@ -51,7 +51,7 @@ export type Database = {
           first_name: string;
           last_name: string;
           address: string;
-          role: 'Administrator' | 'Instructor' | 'Student' | 'Parent';
+          role: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
           created_at: string;
           updated_at: string;
         };
@@ -61,7 +61,7 @@ export type Database = {
           first_name: string;
           last_name: string;
           address?: string;
-          role?: 'Administrator' | 'Instructor' | 'Student' | 'Parent';
+          role?: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
           created_at?: string;
           updated_at?: string;
         };
@@ -71,7 +71,7 @@ export type Database = {
           first_name?: string;
           last_name?: string;
           address?: string;
-          role?: 'Administrator' | 'Instructor' | 'Student' | 'Parent';
+          role?: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
           created_at?: string;
           updated_at?: string;
         };
@@ -413,7 +413,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      user_role: 'Administrator' | 'Instructor' | 'Student' | 'Parent';
+      user_role: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
       attendance_status: 'present' | 'absent' | 'late' | 'excused';
       notification_type: 'info' | 'success' | 'warning' | 'error';
     };

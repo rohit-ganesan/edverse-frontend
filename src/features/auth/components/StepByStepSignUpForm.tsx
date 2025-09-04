@@ -208,6 +208,10 @@ export const StepByStepSignUpForm: React.FC = () => {
   };
 
   const handleInputChange = (field: keyof FormData, value: any) => {
+    // Debug: Log role changes
+    if (field === 'role') {
+      console.log('StepByStepSignUpForm: Role changed to:', value);
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -284,6 +288,9 @@ export const StepByStepSignUpForm: React.FC = () => {
 
     setLoading(true);
     setFormErrors({});
+
+    // Debug: Log what we're sending
+    console.log('StepByStepSignUpForm: Sending formData:', formData);
 
     try {
       await signUp(formData.email, formData.password, formData);
