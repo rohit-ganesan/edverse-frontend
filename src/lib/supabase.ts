@@ -52,6 +52,8 @@ export type Database = {
           last_name: string;
           address: string;
           role: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
+          tenant_id: string | null;
+          onboarding_status: 'pending' | 'complete';
           created_at: string;
           updated_at: string;
         };
@@ -62,6 +64,8 @@ export type Database = {
           last_name: string;
           address?: string;
           role?: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
+          tenant_id?: string | null;
+          onboarding_status?: 'pending' | 'complete';
           created_at?: string;
           updated_at?: string;
         };
@@ -72,6 +76,8 @@ export type Database = {
           last_name?: string;
           address?: string;
           role?: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
+          tenant_id?: string | null;
+          onboarding_status?: 'pending' | 'complete';
           created_at?: string;
           updated_at?: string;
         };

@@ -26,16 +26,15 @@ const DEFAULT_ACCESS: AccessState = {
   features: getFeaturesForPlan('free'),
   capabilities: [
     'classes.view',
-    'classes.take_attendance',
+    'attendance.view',
+    'attendance.record',
+    'results.view',
     'results.enter',
+    'notices.view',
     'notices.send',
     'students.view',
     'courses.view',
-    'attendance.view',
-    'attendance.mark',
-    'results.view',
-    'fees.view_overview',
-    'notices.view',
+    'fees.view',
   ],
   isLoading: false,
   isInitialized: false,
@@ -54,48 +53,61 @@ const AccessContext = createContext<
 
 export function AccessProvider({ children }: { children: React.ReactNode }) {
   const [accessState, setAccessState] = useState<AccessState>(DEFAULT_ACCESS);
-  const { user, loading: authLoading } = useAuth();
+  const { user, ready } = useAuth();
 
   const initializeAccess = useCallback(async () => {
-    // Only fetch access data if user is authenticated
+    console.log('🟢 AccessContext: Initializing...', { hasUser: !!user });
+
     if (!user) {
-      setAccessState((prev) => ({
-        ...prev,
+      // No user - set default state and mark as initialized
+      setAccessState({
+        plan: 'free',
+        role: 'student',
+        features: getFeaturesForPlan('free'),
+        capabilities: [],
         isLoading: false,
         isInitialized: true,
-      }));
+      });
       return;
     }
 
     try {
       setAccessState((prev) => ({ ...prev, isLoading: true }));
 
-      const accessData = await getAccessData();
+      // Add timeout to getAccessData call
+      const accessPromise = getAccessData();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Access data timeout')), 5000)
+      );
 
-      // Respect the server's feature decisions - no client-side fallback
-      const features = accessData.features ?? [];
-      const caps = (
-        accessData.capabilities?.length ? accessData.capabilities : []
-      ) as Capability[];
+      const accessData = (await Promise.race([
+        accessPromise,
+        timeoutPromise,
+      ])) as any;
+      console.log('🟢 AccessContext: Got access data', accessData);
 
       setAccessState({
         plan: accessData.plan as Plan,
         role: accessData.role as Role,
-        features,
-        capabilities: caps,
+        features: accessData.features ?? [],
+        capabilities: accessData.capabilities ?? [],
         isLoading: false,
         isInitialized: true,
       });
     } catch (error) {
-      console.error('Failed to initialize access:', error);
-      // Fallback to plan-based features on error
-      const fallbackFeatures = getFeaturesForPlan('free');
-      setAccessState((prev) => ({
-        ...prev,
-        features: fallbackFeatures,
+      console.error(
+        '🟢 AccessContext: Error',
+        error instanceof Error ? error.message : String(error)
+      );
+      // Fallback to free plan
+      setAccessState({
+        plan: 'free',
+        role: 'student',
+        features: getFeaturesForPlan('free'),
+        capabilities: [],
         isLoading: false,
         isInitialized: true,
-      }));
+      });
     }
   }, [user]);
 
@@ -104,19 +116,27 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
   }, [initializeAccess]);
 
   // Initialize access when user changes
+  // useEffect(() => {
+  //   // Only initialize if user is authenticated and auth is not loading
+  //   if (ready && user) {
+  //     initializeAccess();
+  //   } else if (ready && !user) {
+  //     // Set initialized to true for unauthenticated users
+  //     setAccessState((prev) => ({
+  //       ...prev,
+  //       isLoading: false,
+  //       isInitialized: true,
+  //     }));
+  //   }
+  // }, [initializeAccess, ready, user]);
+
   useEffect(() => {
-    // Only initialize if user is authenticated and auth is not loading
-    if (!authLoading && user) {
-      initializeAccess();
-    } else if (!authLoading && !user) {
-      // Set initialized to true for unauthenticated users
-      setAccessState((prev) => ({
-        ...prev,
-        isLoading: false,
-        isInitialized: true,
-      }));
-    }
-  }, [initializeAccess, authLoading, user]);
+    if (!ready) return;
+    if (user?.id) initializeAccess();
+    else
+      setAccessState((p) => ({ ...p, isLoading: false, isInitialized: true }));
+    // only re-run when user id changes or ready flips
+  }, [ready, user?.id, initializeAccess]);
 
   const contextValue = useMemo(
     () => ({

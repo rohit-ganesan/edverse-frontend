@@ -11,6 +11,7 @@ import { AccessDebugger } from 'components/debug/AccessDebugger';
 import { AccessDebuggerDetailed } from 'components/debug/AccessDebuggerDetailed';
 import { Users, GraduationCap, Building, CheckCircle } from 'lucide-react';
 import { useAuth } from 'features/auth/AuthContext';
+import { UserStatusCard } from 'components/dashboard/UserStatusCard';
 
 export function DashboardPage(): JSX.Element {
   const { user, userProfile } = useAuth();
@@ -75,7 +76,7 @@ export function DashboardPage(): JSX.Element {
           title="Dashboard"
           description="Welcome to your EdVerse learning management system"
         />
-
+        {/* <UserStatusCard /> */}
         {/* User Info */}
         {user && (
           <RadixCard className="p-4">

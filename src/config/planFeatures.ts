@@ -7,9 +7,9 @@ export const PLAN_FEATURES: Record<
     'courses.view',
     'classes.view',
     'attendance.view',
-    'attendance.mark',
+    'attendance.record',
     'results.view',
-    'fees.view_overview',
+    'fees.view',
     'fees.structures.basic',
     'fees.record_manual',
     'notices.view',
@@ -19,15 +19,21 @@ export const PLAN_FEATURES: Record<
     'settings.integrations',
   ],
   starter: [
-    'attendance.bulk_import',
+    'attendance.import',
     'results.enter',
     'results.export',
-    'classes.crud',
+    'classes.create',
+    'classes.update',
+    'classes.delete',
     'classes.reschedule',
-    'courses.crud',
+    'courses.create',
+    'courses.update',
+    'courses.delete',
     'courses.export',
-    'students.crud',
-    'analytics.basic',
+    'students.create',
+    'students.update',
+    'students.delete',
+    'analytics.view',
   ],
   growth: [
     'fees.online',
@@ -40,16 +46,17 @@ export const PLAN_FEATURES: Record<
   scale: [
     'auth.sso',
     'audit.logs',
-    'fees.reconcile', // Canonical advanced fees feature
+    'fees.reconcile',
     'fees.reminders.smswa',
     'api.rw',
   ],
   enterprise: [
     'settings.branding',
     'admissions.view',
-    'syllabus-advanced',
-    'admissions.stages',
-    'admissions.templates',
+    'admissions.create',
+    'admissions.update',
+    'admissions.delete',
+    'syllabus.advanced',
   ],
 };
 
@@ -115,5 +122,5 @@ export const ADDON_ONLY_FEATURES = [
   'audit.logs', // Audit logging
   'settings.branding', // Custom branding
   'admissions.view', // Admissions management
-  'syllabus-advanced', // Advanced curriculum
+  'syllabus.advanced', // Advanced curriculum
 ];

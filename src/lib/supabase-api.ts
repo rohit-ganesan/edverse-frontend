@@ -284,12 +284,12 @@ export const getAccessData = async (): Promise<{
       role: 'student', // Default to student instead of teacher
       features: [
         'attendance.view',
-        'attendance.mark',
+        'attendance.record',
         'results.view',
         'classes.view',
         'courses.view',
         'students.view',
-        'fees.view_overview',
+        'fees.view',
         'fees.structures.basic',
         'fees.record_manual',
         'notices.view',
@@ -300,7 +300,7 @@ export const getAccessData = async (): Promise<{
       ],
       capabilities: [
         'classes.view',
-        'classes.take_attendance',
+        'attendance.record',
         'results.enter',
         'notices.send',
       ],

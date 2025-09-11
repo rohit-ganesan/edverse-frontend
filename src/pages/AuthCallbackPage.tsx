@@ -14,6 +14,11 @@ export default function AuthCallbackPage(): JSX.Element {
         console.log('🔄 Processing auth callback...');
         console.log('Current URL:', window.location.href);
 
+        // Get the next parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const nextPath = urlParams.get('next') || '/dashboard';
+        console.log('Next path:', nextPath);
+
         // Parse the URL hash for auth tokens (email verification, password reset, etc.)
         const hashParams = new URLSearchParams(
           window.location.hash.substring(1)
@@ -23,35 +28,38 @@ export default function AuthCallbackPage(): JSX.Element {
         const type = hashParams.get('type');
         const tokenHash = hashParams.get('token_hash');
 
+        const errorDescription = hashParams.get('error_description');
+
         console.log('🔍 Auth callback details:', {
           type,
           hasAccessToken: !!accessToken,
           hasRefreshToken: !!refreshToken,
           hasTokenHash: !!tokenHash,
+          hasErrorDescription: !!errorDescription,
         });
 
         // Function to show success and notify other tabs
-        const showSuccessAndNotify = (userEmail: string) => {
-          console.log(
-            '✅ Email verification successful, showing success message'
-          );
-
-          // Notify other tabs about verification completion
-          try {
-            localStorage.setItem(
-              'auth_verification_complete',
-              Date.now().toString()
-            );
-          } catch (e) {
-            console.log('📱 Cross-tab communication failed');
-          }
-
-          // Show success message
-          setSuccess(
-            `Email verified successfully for ${userEmail}! You can now close this tab.`
-          );
+        // Early branch for error handling
+        if (errorDescription) {
+          console.log('❌ Auth callback error:', errorDescription);
+          setError(`Authentication failed: ${errorDescription}`);
           setLoading(false);
-        };
+          return;
+        }
+
+        // Early branch for empty hash (common email confirmation case)
+        if (!accessToken && !refreshToken && !tokenHash) {
+          console.log(
+            '✅ Email verification completed (empty hash), redirecting to login'
+          );
+          setSuccess(
+            'Email verified successfully! Please sign in to continue.'
+          );
+          setTimeout(() => {
+            navigate('/login?verified=1', { replace: true });
+          }, 2000);
+          return;
+        }
 
         if (accessToken && refreshToken) {
           console.log('✅ Found auth tokens, setting session...');
@@ -80,14 +88,21 @@ export default function AuthCallbackPage(): JSX.Element {
 
             // Check if this is email verification
             if (type === 'signup' || type === 'email_confirmation') {
-              showSuccessAndNotify(data.session.user.email || 'your email');
+              console.log(
+                '✅ Email verification successful, redirecting to onboarding'
+              );
+              // Auto-redirect to onboarding for new signups
+              setTimeout(() => {
+                console.log('🚀 Redirecting to onboarding');
+                navigate('/onboarding', { replace: true });
+              }, 1000);
               return;
             }
 
-            // For other auth types, redirect normally
+            // For other auth types, redirect to next path
             setTimeout(() => {
-              console.log('🚀 Redirecting to dashboard...');
-              navigate('/dashboard', { replace: true });
+              console.log('🚀 Redirecting to:', nextPath);
+              navigate(nextPath, { replace: true });
             }, 1000);
           } else {
             console.log('❌ No session created, redirecting to login');
@@ -118,7 +133,14 @@ export default function AuthCallbackPage(): JSX.Element {
               data.session.user.email_confirmed_at ? 'Yes' : 'No'
             );
 
-            showSuccessAndNotify(data.session.user.email || 'your email');
+            console.log(
+              '✅ Token verification successful, redirecting to onboarding'
+            );
+            // Auto-redirect to onboarding for new signups
+            setTimeout(() => {
+              console.log('🚀 Redirecting to onboarding');
+              navigate('/onboarding', { replace: true });
+            }, 1000);
             return;
           } else {
             console.log('❌ No session from token verification');
@@ -141,7 +163,7 @@ export default function AuthCallbackPage(): JSX.Element {
 
           if (data.session) {
             console.log('✅ Existing session found:', data.session.user.email);
-            navigate('/dashboard', { replace: true });
+            navigate(nextPath, { replace: true });
           } else {
             console.log('❌ No session found, redirecting to login');
             navigate('/login', { replace: true });
@@ -199,10 +221,10 @@ export default function AuthCallbackPage(): JSX.Element {
           <p className="text-gray-600 mb-6">{success}</p>
           <div className="space-y-3">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/onboarding')}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              Go to Dashboard
+              Continue Setup
             </button>
             <button
               onClick={() => window.close()}

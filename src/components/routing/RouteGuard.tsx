@@ -44,7 +44,7 @@ export function RouteGuard({
   fallback = null,
   locked,
 }: RouteGuardProps): JSX.Element {
-  const { user, loading: authLoading } = useAuth();
+  const { user, ready } = useAuth();
   const { allowed, reason } = useAccessCheck({ feature, cap, neededPlan });
   const { isInitialized: accessInitialized } = useAccess();
   const { trackRouteLocked } = useAccessTelemetry();
@@ -60,7 +60,7 @@ export function RouteGuard({
 
   // Track route locks for telemetry
   useEffect(() => {
-    if (!allowed && !authLoading && accessInitialized) {
+    if (!allowed && accessInitialized) {
       let reasonType: 'plan' | 'feature' | 'capability' = 'feature';
 
       if (reason?.neededPlan) {
@@ -79,7 +79,6 @@ export function RouteGuard({
     }
   }, [
     allowed,
-    authLoading,
     accessInitialized,
     feature,
     cap,
@@ -88,20 +87,14 @@ export function RouteGuard({
     trackRouteLocked,
   ]);
 
-  // Show loading while auth is being checked
-  if (authLoading) {
-    return (
-      <div className="p-4 text-sm text-neutral-500">
-        Checking authentication...
-      </div>
-    );
-  }
-
-  // Show loading while access context is being initialized
-  if (!accessInitialized) {
-    return (
-      <div className="p-4 text-sm text-neutral-500">Loading permissions...</div>
-    );
+  // Show loading while auth or access is being initialized
+  if (!ready || !accessInitialized) {
+    console.log('🟡 RouteGuard: Loading', {
+      ready,
+      accessInitialized,
+      hasUser: !!user,
+    });
+    return <div className="p-4 text-sm text-neutral-500">Loading...</div>;
   }
 
   // Redirect to login if not authenticated

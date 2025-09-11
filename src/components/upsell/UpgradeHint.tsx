@@ -228,7 +228,7 @@ function getMinPlanForAddon(feature: string): Plan {
     'audit.logs': 'scale',
     'settings.branding': 'enterprise',
     'admissions.view': 'enterprise',
-    'syllabus-advanced': 'enterprise',
+    'syllabus.advanced': 'enterprise',
   };
 
   return (planFeatures as Record<string, Plan>)[feature] || 'growth';

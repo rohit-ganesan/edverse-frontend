@@ -101,7 +101,7 @@ export const ADDON_CONFIGS: Record<string, AddonConfig> = {
 
   // Advanced syllabus add-on
   price_syllabus_advanced: {
-    feature: 'syllabus-advanced',
+    feature: 'syllabus.advanced',
     label: 'Advanced Curriculum',
     price: '$49/mo',
     description:

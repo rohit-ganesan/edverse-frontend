@@ -95,7 +95,7 @@ export function useIsAddonFeature(feature: string): boolean {
  * Hook to get add-on information for a feature
  */
 export function useAddonInfo(feature: string) {
-  return ADDON_FEATURES[feature] || null;
+  return (ADDON_FEATURES as Record<string, any>)[feature] || null;
 }
 
 /**

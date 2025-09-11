@@ -1,11 +1,13 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Box, Container, Flex, Heading, Text } from '@radix-ui/themes';
 import { useAuth } from '../features/auth/AuthContext';
 import { LoginForm } from '../features/auth/components/LoginForm';
 
 export const LoginPage: React.FC = () => {
   const { user, loading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const isVerified = searchParams.get('verified') === '1';
 
   // Show loading state while checking authentication
   if (loading) {
@@ -49,6 +51,13 @@ export const LoginPage: React.FC = () => {
             <Text size="3" className="text-gray-600">
               Your comprehensive student management system
             </Text>
+            {isVerified && (
+              <Box className="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                <Text size="2" className="font-medium">
+                  ✅ Email verified successfully! Please sign in to continue.
+                </Text>
+              </Box>
+            )}
           </Box>
 
           <LoginForm />

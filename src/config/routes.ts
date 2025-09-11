@@ -58,8 +58,8 @@ export const ROUTES: RouteItem[] = [
   {
     path: '/fees',
     labelKey: 'nav.fees',
-    feature: 'fees.view_overview',
-    cap: 'fees.view_overview',
+    feature: 'fees.view',
+    cap: 'fees.view',
     neededPlan: 'free',
     module: 'core',
   },
