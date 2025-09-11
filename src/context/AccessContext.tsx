@@ -1,3 +1,4 @@
+// src/context/AccessContext.tsx
 import React, {
   createContext,
   useContext,
@@ -8,8 +9,9 @@ import React, {
 } from 'react';
 import type { Plan, Role, Capability } from '../types/access';
 import { getFeaturesForPlan } from '../config/planFeatures';
-import { getAccessData } from '../lib/supabase-api';
 import { useAuth } from '../features/auth/AuthContext';
+import { getAccessData } from '../lib/supabase-api';
+import { ROLE_CAPS } from '../types/access';
 
 export type AccessState = {
   plan: Plan;
@@ -22,20 +24,9 @@ export type AccessState = {
 
 const DEFAULT_ACCESS: AccessState = {
   plan: 'free',
-  role: 'student', // Default to student instead of teacher
+  role: 'student',
   features: getFeaturesForPlan('free'),
-  capabilities: [
-    'classes.view',
-    'attendance.view',
-    'attendance.record',
-    'results.view',
-    'results.enter',
-    'notices.view',
-    'notices.send',
-    'students.view',
-    'courses.view',
-    'fees.view',
-  ],
+  capabilities: ROLE_CAPS.student,
   isLoading: false,
   isInitialized: false,
 };
@@ -52,19 +43,17 @@ const AccessContext = createContext<
 });
 
 export function AccessProvider({ children }: { children: React.ReactNode }) {
-  const [accessState, setAccessState] = useState<AccessState>(DEFAULT_ACCESS);
-  const { user, ready } = useAuth();
+  const [state, setState] = useState<AccessState>(DEFAULT_ACCESS);
+  const { user, userProfile, ready } = useAuth();
 
   const initializeAccess = useCallback(async () => {
-    console.log('🟢 AccessContext: Initializing...', { hasUser: !!user });
-
+    // Unauthed: default free/student view
     if (!user) {
-      // No user - set default state and mark as initialized
-      setAccessState({
+      setState({
         plan: 'free',
         role: 'student',
         features: getFeaturesForPlan('free'),
-        capabilities: [],
+        capabilities: ROLE_CAPS.student,
         isLoading: false,
         isInitialized: true,
       });
@@ -72,85 +61,72 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      setAccessState((prev) => ({ ...prev, isLoading: true }));
+      setState((prev) => ({ ...prev, isLoading: true }));
 
-      // Add timeout to getAccessData call
+      // Try server; timeout fast
       const accessPromise = getAccessData();
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Access data timeout')), 5000)
+      const timeout = new Promise<never>((_, rej) =>
+        setTimeout(() => rej(new Error('access-timeout')), 4000)
+      );
+      const remote = await Promise.race([accessPromise, timeout]).catch(
+        () => null as any
       );
 
-      const accessData = (await Promise.race([
-        accessPromise,
-        timeoutPromise,
-      ])) as any;
-      console.log('🟢 AccessContext: Got access data', accessData);
+      // Decide plan and role
+      const plan: Plan =
+        remote?.plan === 'starter' || remote?.plan === 'growth'
+          ? remote.plan
+          : 'free';
+      const role: Role =
+        (userProfile?.role as Role) || (remote?.role as Role) || 'student';
 
-      setAccessState({
-        plan: accessData.plan as Plan,
-        role: accessData.role as Role,
-        features: accessData.features ?? [],
-        capabilities: accessData.capabilities ?? [],
+      // Merge features: prefer remote if present, otherwise local
+      const features =
+        Array.isArray(remote?.features) && remote.features.length
+          ? remote.features
+          : getFeaturesForPlan(plan);
+
+      // Capabilities always from local ROLE_CAPS to keep client consistent
+      const caps = ROLE_CAPS[role] || ROLE_CAPS.student;
+
+      setState({
+        plan,
+        role,
+        features,
+        capabilities: caps,
         isLoading: false,
         isInitialized: true,
       });
-    } catch (error) {
-      console.error(
-        '🟢 AccessContext: Error',
-        error instanceof Error ? error.message : String(error)
-      );
-      // Fallback to free plan
-      setAccessState({
+    } catch {
+      // Fallback – still usable
+      const role: Role = (userProfile?.role as Role) || 'student';
+      setState({
         plan: 'free',
-        role: 'student',
+        role,
         features: getFeaturesForPlan('free'),
-        capabilities: [],
+        capabilities: ROLE_CAPS[role] || ROLE_CAPS.student,
         isLoading: false,
         isInitialized: true,
       });
     }
-  }, [user]);
+  }, [user, userProfile?.role]);
 
   const refreshAccess = useCallback(async () => {
     await initializeAccess();
   }, [initializeAccess]);
 
-  // Initialize access when user changes
-  // useEffect(() => {
-  //   // Only initialize if user is authenticated and auth is not loading
-  //   if (ready && user) {
-  //     initializeAccess();
-  //   } else if (ready && !user) {
-  //     // Set initialized to true for unauthenticated users
-  //     setAccessState((prev) => ({
-  //       ...prev,
-  //       isLoading: false,
-  //       isInitialized: true,
-  //     }));
-  //   }
-  // }, [initializeAccess, ready, user]);
-
   useEffect(() => {
     if (!ready) return;
     if (user?.id) initializeAccess();
-    else
-      setAccessState((p) => ({ ...p, isLoading: false, isInitialized: true }));
-    // only re-run when user id changes or ready flips
+    else setState((s) => ({ ...s, isLoading: false, isInitialized: true }));
   }, [ready, user?.id, initializeAccess]);
 
-  const contextValue = useMemo(
-    () => ({
-      ...accessState,
-      initializeAccess,
-      refreshAccess,
-    }),
-    [accessState, initializeAccess, refreshAccess]
+  const value = useMemo(
+    () => ({ ...state, initializeAccess, refreshAccess }),
+    [state, initializeAccess, refreshAccess]
   );
-
   return (
-    <AccessContext.Provider value={contextValue}>
-      {children}
-    </AccessContext.Provider>
+    <AccessContext.Provider value={value}>{children}</AccessContext.Provider>
   );
 }
 
@@ -159,13 +135,8 @@ export const usePlan = () => useAccess().plan;
 export const useRole = () => useAccess().role;
 export const useFeatures = () => useAccess().features;
 export const useCapabilities = () => useAccess().capabilities;
-
-export const useFeature = (feature: string) => {
-  const features = useFeatures();
-  return features.includes(feature);
-};
-
+export const useFeature = (feature: string) => useFeatures().includes(feature);
 export const useCan = (cap: Capability) => {
-  const capabilities = useCapabilities();
-  return capabilities.includes('*') || capabilities.includes(cap);
+  const caps = useCapabilities();
+  return caps.includes('*') || caps.includes(cap);
 };

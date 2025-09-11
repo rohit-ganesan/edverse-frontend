@@ -64,15 +64,7 @@ export const ROUTES: RouteItem[] = [
     module: 'core',
   },
 
-  // Growth
-  {
-    path: '/announcements',
-    labelKey: 'nav.announcements',
-    feature: 'notices.view',
-    cap: 'notices.view',
-    neededPlan: 'free',
-    module: 'growth',
-  },
+  // Growth - MVP: Only Analytics
   {
     path: '/analytics',
     labelKey: 'nav.analytics',
@@ -81,58 +73,26 @@ export const ROUTES: RouteItem[] = [
     neededPlan: 'growth',
     module: 'growth',
   },
-  {
-    path: '/parents',
-    labelKey: 'portal.parents',
-    feature: 'portal.parent',
-    cap: 'portal.parent',
-    neededPlan: 'growth',
-    module: 'growth',
-  },
-  {
-    path: '/payments-online',
-    labelKey: 'nav.online_payments',
-    feature: 'fees.online',
-    cap: 'fees.online',
-    neededPlan: 'growth',
-    module: 'growth',
-  },
 
-  // Scale
-  {
-    path: '/fees-advanced',
-    labelKey: 'nav.advanced_fees',
-    feature: 'fees.reconcile',
-    cap: 'fees.reconcile',
-    neededPlan: 'scale',
-    module: 'enterprise',
-  },
-  {
-    path: '/settings/sso',
-    labelKey: 'labels.sso',
-    feature: 'auth.sso',
-    cap: 'auth.sso',
-    neededPlan: 'scale',
-    module: 'enterprise',
-  },
+  // TODO: Post-MVP Growth features
+  // {
+  //   path: '/parent-portal',
+  //   labelKey: 'nav.parent_portal',
+  //   feature: 'portal.parent',
+  //   cap: 'portal.parent',
+  //   neededPlan: 'starter',
+  //   module: 'growth',
+  // },
 
-  // Enterprise
-  {
-    path: '/admissions',
-    labelKey: 'labels.admissions',
-    feature: 'admissions.view',
-    cap: 'admissions.view',
-    neededPlan: 'enterprise',
-    module: 'enterprise',
-  },
-  {
-    path: '/settings/branding',
-    labelKey: 'nav.branding',
-    feature: 'settings.branding',
-    cap: 'settings.branding',
-    neededPlan: 'enterprise',
-    module: 'enterprise',
-  },
+  // TODO: Post-MVP Enterprise features
+  // {
+  //   path: '/admissions',
+  //   labelKey: 'labels.admissions',
+  //   feature: 'admissions.view',
+  //   cap: 'admissions.view',
+  //   neededPlan: 'enterprise',
+  //   module: 'enterprise',
+  // },
 
   // Basic settings
   {

@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 import { usePlan } from '../../context/AccessContext';
 import { useUpgradeTelemetry } from '../../hooks/useUpgradeTelemetry';
-import { useIsAddonFeature } from '../../hooks/useAccessCheck';
-import { getAddonByFeature } from '../../config/addons';
+// MVP: Simplified imports - add-ons disabled
+// import { useIsAddonFeature } from '../../hooks/useAccessCheck';
+// import { getAddonByFeature } from '../../config/addons';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Plan } from '../../types/access';
@@ -41,8 +42,7 @@ export function UpgradeHint({
   const plan = usePlan();
   const navigate = useNavigate();
   const { trackUpgradeShown, trackUpgradeClicked } = useUpgradeTelemetry();
-  const isAddonFeature = useIsAddonFeature(feature || '');
-  const addonInfo = feature ? getAddonByFeature(feature) : null;
+  // MVP: No add-ons - simplified 3-tier structure only
 
   useEffect(() => {
     if (neededPlan) {
@@ -77,25 +77,14 @@ export function UpgradeHint({
   let displayMessage = message;
   let primaryCtaText = 'Upgrade';
   let secondaryCtaText = '';
-  let showAddonOption = false;
-  let showPlanUpgrade = false;
+  // MVP: Only plan upgrades, no add-ons
 
-  if (isAddonFeature && addonInfo) {
-    displayMessage = addonInfo.description;
-    primaryCtaText = `Enable ${addonInfo.label}`;
-    secondaryCtaText = `Upgrade to ${getMinPlanForAddon(feature || '')} for full access`;
-    showAddonOption = true;
-    showPlanUpgrade = true;
-  } else if (neededPlan) {
+  if (neededPlan) {
     displayMessage = message ?? `This feature requires the ${neededPlan} plan.`;
     primaryCtaText = `Upgrade to ${neededPlan}`;
-    secondaryCtaText = `Get access to advanced features and capabilities`;
-    showPlanUpgrade = true;
   } else {
     displayMessage = message ?? 'This feature requires an upgrade.';
     primaryCtaText = 'Upgrade';
-    secondaryCtaText = 'Unlock premium features and capabilities';
-    showPlanUpgrade = true;
   }
 
   return (
@@ -109,9 +98,7 @@ export function UpgradeHint({
             </Box>
 
             <Heading size="6" className="mb-2">
-              {isAddonFeature
-                ? 'Feature Available as Add-on'
-                : 'Feature Locked'}
+              Feature Locked
             </Heading>
 
             <Flex gap="2" align="center" className="mb-3">
@@ -132,63 +119,18 @@ export function UpgradeHint({
 
           <Separator className="my-6" />
 
-          {/* Feature Details */}
-          {isAddonFeature && addonInfo && (
-            <Box className="mb-6">
-              <Flex direction="column" gap="3">
-                <Flex justify="between" align="center">
-                  <Text size="4" weight="bold">
-                    {addonInfo.label}
-                  </Text>
-                  <Text size="5" weight="bold" color="blue">
-                    {addonInfo.price}
-                  </Text>
-                </Flex>
-                <Text size="2" color="gray">
-                  {addonInfo.description}
-                </Text>
-                <Badge color="blue" variant="soft" className="capitalize w-fit">
-                  {addonInfo.category}
-                </Badge>
-              </Flex>
-            </Box>
-          )}
+          {/* MVP: No add-on details - simplified 3-tier structure */}
 
-          {/* Action Buttons */}
+          {/* Action Buttons - MVP: Only plan upgrades */}
           <Flex direction="column" gap="3" className="mb-6">
-            {showAddonOption ? (
-              <>
-                <Button
-                  size="4"
-                  onClick={handleAddonClick}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                >
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  {primaryCtaText}
-                </Button>
-
-                {showPlanUpgrade && (
-                  <Button
-                    size="3"
-                    variant="outline"
-                    onClick={handleBillingClick}
-                    className="w-full"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    {secondaryCtaText}
-                  </Button>
-                )}
-              </>
-            ) : (
-              <Button
-                size="4"
-                onClick={handleBillingClick}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-              >
-                <Sparkles className="h-5 w-5 mr-2" />
-                {primaryCtaText}
-              </Button>
-            )}
+            <Button
+              size="4"
+              onClick={handleBillingClick}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              <Sparkles className="h-5 w-5 mr-2" />
+              {primaryCtaText}
+            </Button>
           </Flex>
 
           {/* Navigation */}

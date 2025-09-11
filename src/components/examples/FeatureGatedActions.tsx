@@ -36,7 +36,7 @@ export function FeatureGatedActions() {
         feature="fees.reminders.smswa"
         fallback={
           <UpgradeHint
-            neededPlan="scale"
+            neededPlan="growth"
             message="SMS reminders are part of Scale plan."
             context="action_button"
           />
@@ -72,7 +72,7 @@ export function FeatureGatedActions() {
         feature="admissions.view"
         fallback={
           <UpgradeHint
-            neededPlan="enterprise"
+            neededPlan="growth"
             message="Admissions management is part of Enterprise plan."
             context="action_button"
           />

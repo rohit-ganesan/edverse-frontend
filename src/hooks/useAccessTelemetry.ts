@@ -30,67 +30,62 @@ export function useAccessTelemetry() {
   );
 
   /**
-   * Track when a feature grant is added
+   * Track when a feature is unlocked (MVP: plan upgrades only)
    */
-  const trackGrantAdded = useCallback(
+  const trackFeatureUnlocked = useCallback(
     (data: {
       feature: string;
-      reason: 'paid_addon' | 'trial' | 'promo' | 'contract' | 'support';
+      reason: 'plan_upgrade' | 'trial' | 'promo' | 'support';
       plan: Plan;
       metadata?: Record<string, any>;
     }) => {
-      console.log('Feature grant added:', {
-        event: 'addon_enabled',
+      console.log('Feature unlocked:', {
+        event: 'feature_unlocked',
         timestamp: new Date().toISOString(),
         ...data,
       });
 
       // Example: Send to analytics service
-      // analytics.track('addon_enabled', data);
+      // analytics.track('feature_unlocked', data);
     },
     []
   );
 
   /**
-   * Track when a feature grant is removed
+   * Track when a feature is locked (MVP: plan downgrade)
    */
-  const trackGrantRemoved = useCallback(
+  const trackFeatureLocked = useCallback(
     (data: {
       feature: string;
-      reason: 'paid_addon' | 'trial' | 'promo' | 'contract' | 'support';
+      reason: 'plan_downgrade' | 'trial_expired' | 'support';
       plan: Plan;
       metadata?: Record<string, any>;
     }) => {
-      console.log('Feature grant removed:', {
-        event: 'addon_disabled',
+      console.log('Feature locked:', {
+        event: 'feature_locked',
         timestamp: new Date().toISOString(),
         ...data,
       });
 
       // Example: Send to analytics service
-      // analytics.track('addon_disabled', data);
+      // analytics.track('feature_locked', data);
     },
     []
   );
 
   /**
-   * Track when a feature grant expires
+   * Track when a trial expires (MVP: plan-based trials)
    */
-  const trackGrantExpired = useCallback(
-    (data: {
-      feature: string;
-      reason: 'paid_addon' | 'trial' | 'promo' | 'contract' | 'support';
-      plan: Plan;
-      metadata?: Record<string, any>;
-    }) => {
-      console.log('Feature grant expired:', {
-        event: 'addon_expired',
+  const trackTrialExpired = useCallback(
+    (data: { feature: string; plan: Plan; metadata?: Record<string, any> }) => {
+      console.log('Trial expired:', {
+        event: 'trial_expired',
         timestamp: new Date().toISOString(),
         ...data,
       });
 
       // Example: Send to analytics service
-      // analytics.track('addon_expired', data);
+      // analytics.track('trial_expired', data);
     },
     []
   );
@@ -136,9 +131,9 @@ export function useAccessTelemetry() {
 
   return {
     trackRouteLocked,
-    trackGrantAdded,
-    trackGrantRemoved,
-    trackGrantExpired,
+    trackFeatureUnlocked,
+    trackFeatureLocked,
+    trackTrialExpired,
     trackFeatureLockedViewed,
     trackActionLocked,
   };

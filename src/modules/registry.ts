@@ -17,14 +17,15 @@ import NoticeBoardAdvancedPage from './growth/NoticeBoardAdvancedPage';
 import JoinCodesPage from './growth/JoinCodesPage';
 import PaymentsOnlinePage from './growth/PaymentsOnlinePage';
 
-// Enterprise modules
-import AdmissionsPage from './enterprise/Admission/AdmissionsPage';
-import FeeAdvancedPage from './enterprise/FeeAdvancedPage';
-import AuditLogsPage from './enterprise/AuditLogsPage';
-import SSOSAMLPage from './enterprise/SSOSAMLPage';
-import BrandingPage from './enterprise/BrandingPage';
-import SyllabusAdvancedPage from './enterprise/Syllabus/SyllabusAdvancedPage';
-import IntegrationsPage from './enterprise/IntegrationsPage';
+// MVP: Enterprise modules disabled for simplified 3-tier structure
+// TODO: Re-enable post-MVP
+// import AdmissionsPage from './enterprise/Admission/AdmissionsPage';
+// import FeeAdvancedPage from './enterprise/FeeAdvancedPage';
+// import AuditLogsPage from './enterprise/AuditLogsPage';
+// import SSOSAMLPage from './enterprise/SSOSAMLPage';
+// import BrandingPage from './enterprise/BrandingPage';
+// import SyllabusAdvancedPage from './enterprise/Syllabus/SyllabusAdvancedPage';
+// import IntegrationsPage from './enterprise/IntegrationsPage';
 
 export const MODULES = {
   // Core modules (eagerly loaded)
@@ -47,14 +48,15 @@ export const MODULES = {
   'join-codes:growth': JoinCodesPage,
   'payments-online:growth': PaymentsOnlinePage,
 
-  // Enterprise modules
-  'admissions:enterprise': AdmissionsPage,
-  'fees-advanced:enterprise': FeeAdvancedPage,
-  'audit-logs:enterprise': AuditLogsPage,
-  'sso-saml:enterprise': SSOSAMLPage,
-  'branding:enterprise': BrandingPage,
-  'syllabus-advanced:enterprise': SyllabusAdvancedPage,
-  'integrations:enterprise': IntegrationsPage,
+  // MVP: Enterprise modules disabled for simplified 3-tier structure
+  // TODO: Re-enable post-MVP
+  // 'admissions:enterprise': AdmissionsPage,
+  // 'fees-advanced:enterprise': FeeAdvancedPage,
+  // 'audit-logs:enterprise': AuditLogsPage,
+  // 'sso-saml:enterprise': SSOSAMLPage,
+  // 'branding:enterprise': BrandingPage,
+  // 'syllabus-advanced:enterprise': SyllabusAdvancedPage,
+  // 'integrations:enterprise': IntegrationsPage,
 } as const;
 
 export type ModuleKey = keyof typeof MODULES;

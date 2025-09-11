@@ -58,17 +58,13 @@
   },
   "locks": {
     "growth_needed": "Available on Growth plan",
-    "scale_needed": "Available on Scale plan",
-    "enterprise_needed": "Available on Enterprise plan",
     "upgrade_required": "Upgrade required",
     "feature_locked": "Feature locked"
   },
   "plans": {
     "free": "Free",
     "starter": "Starter",
-    "growth": "Growth",
-    "scale": "Scale",
-    "enterprise": "Enterprise"
+    "growth": "Growth"
   },
   "features": {
     "attendance": {

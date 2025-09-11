@@ -33,7 +33,7 @@ interface MenuItem {
   basePath: string;
   feature?: string;
   cap?: string;
-  module: 'core' | 'growth' | 'enterprise';
+  module: 'core' | 'growth';
 }
 
 interface SidebarProps {

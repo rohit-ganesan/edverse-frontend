@@ -159,10 +159,6 @@ export function UserStatusCard() {
 
   const getPlanColor = (plan: string) => {
     switch (plan) {
-      case 'enterprise':
-        return 'red';
-      case 'scale':
-        return 'orange';
       case 'growth':
         return 'blue';
       case 'starter':

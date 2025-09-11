@@ -63,7 +63,7 @@ export function AccessTestingExamples(): JSX.Element {
             Admissions Route
           </Heading>
           <RouteGuard
-            neededPlan="enterprise"
+            neededPlan="growth"
             feature="admissions.view"
             routePath="/admissions"
           >
@@ -84,7 +84,7 @@ export function AccessTestingExamples(): JSX.Element {
           <Heading size="4" className="mb-2">
             Advanced Fees Feature
           </Heading>
-          <FeatureGate feature="fees.reconcile" neededPlan="scale">
+          <FeatureGate feature="fees.reconcile" neededPlan="growth">
             <Box className="bg-green-100 p-4 rounded">
               ✅ Advanced fees reconciliation is available
             </Box>
@@ -152,7 +152,7 @@ function AccessCheckExample(): JSX.Element {
   const accessCheck = useAccessCheck({
     feature: 'fees.reconcile',
     cap: 'fees.reconcile',
-    neededPlan: 'scale',
+    neededPlan: 'growth',
   });
 
   return (

@@ -183,7 +183,7 @@ function ProtectedRoutes() {
           }
         />
 
-        {/* Growth module routes (lazy loaded) */}
+        {/* Growth module routes (lazy loaded) - MVP: Only Analytics */}
         <Route
           path="/analytics"
           element={
@@ -195,129 +195,24 @@ function ProtectedRoutes() {
             />
           }
         />
-        <Route
-          path="/parent-portal"
-          element={
-            <RouteGuard
-              moduleKey="parent-portal:growth"
-              feature="portal.parent"
-              cap="portal.parent"
-              neededPlan="growth"
-            />
-          }
-        />
-        <Route
-          path="/notices-advanced"
-          element={
-            <RouteGuard
-              moduleKey="notices-advanced:growth"
-              feature="notices.analytics"
-              cap="notices.analytics"
-              neededPlan="growth"
-            />
-          }
-        />
-        <Route
-          path="/join-codes"
-          element={
-            <RouteGuard
-              moduleKey="join-codes:growth"
-              feature="staff.invite"
-              cap="staff.invite"
-              neededPlan="growth"
-            />
-          }
-        />
-        <Route
-          path="/payments-online"
-          element={
-            <RouteGuard
-              moduleKey="payments-online:growth"
-              feature="fees.online"
-              cap="fees.online"
-              neededPlan="growth"
-            />
-          }
-        />
 
-        {/* Enterprise module routes (lazy loaded) */}
-        <Route
-          path="/admissions"
-          element={
-            <RouteGuard
-              moduleKey="admissions:enterprise"
-              feature="admissions.view"
-              cap="admissions.view"
-              neededPlan="enterprise"
-            />
-          }
-        />
-        <Route
-          path="/fees-advanced"
-          element={
-            <RouteGuard
-              moduleKey="fees-advanced:enterprise"
-              feature="fees.advanced"
-              cap="fees.advanced"
-              neededPlan="enterprise"
-            />
-          }
-        />
-        <Route
-          path="/audit-logs"
-          element={
-            <RouteGuard
-              moduleKey="audit-logs:enterprise"
-              feature="audit.logs"
-              cap="audit.logs"
-              neededPlan="enterprise"
-            />
-          }
-        />
-        <Route
-          path="/sso-saml"
-          element={
-            <RouteGuard
-              moduleKey="sso-saml:enterprise"
-              feature="auth.sso"
-              cap="auth.sso"
-              neededPlan="enterprise"
-            />
-          }
-        />
-        <Route
-          path="/branding"
-          element={
-            <RouteGuard
-              moduleKey="branding:enterprise"
-              feature="settings.branding"
-              cap="settings.branding"
-              neededPlan="enterprise"
-            />
-          }
-        />
-        <Route
-          path="/syllabus-advanced"
-          element={
-            <RouteGuard
-              moduleKey="syllabus-advanced:enterprise"
-              feature="syllabus.advanced"
-              cap="syllabus.advanced"
-              neededPlan="enterprise"
-            />
-          }
-        />
-        <Route
-          path="/integrations"
-          element={
-            <RouteGuard
-              moduleKey="integrations:enterprise"
-              feature="settings.integrations"
-              cap="settings.integrations"
-              neededPlan="enterprise"
-            />
-          }
-        />
+        {/* TODO: Post-MVP - Add parent portal, advanced notices, etc. */}
+        {/* 
+      <Route path="/parent-portal" ... />
+      <Route path="/notices-advanced" ... />
+      <Route path="/payments-online" ... />
+      */}
+
+        {/* TODO: Post-MVP - Enterprise features */}
+        {/*
+      <Route path="/admissions" ... />
+      <Route path="/fees-advanced" ... />
+      <Route path="/audit-logs" ... />
+      <Route path="/sso-saml" ... />
+      <Route path="/branding" ... />
+      <Route path="/syllabus-advanced" ... />
+      <Route path="/integrations" ... />
+      */}
 
         {/* Dashboard as default */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
