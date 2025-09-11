@@ -1,6 +1,7 @@
 // src/hooks/useAccessCheck.ts
 import { useMemo } from 'react';
 import { useAccess } from '../context/AccessContext';
+import { getMinPlanForFeature } from '../config/planFeatures';
 import type { Plan } from '../types/access';
 
 const PLAN_RANKS: Record<Plan, number> = { free: 0, starter: 1, growth: 2 };
@@ -19,8 +20,15 @@ export function useAccessCheck(opts: {
     if (!isInitialized) {
       return { allowed: false, reason: { currentPlan: plan } };
     }
-    if (!meetsPlan(plan, neededPlan)) {
-      return { allowed: false, reason: { neededPlan, currentPlan: plan } };
+    // Auto-compute neededPlan from feature if not provided (reduces human error)
+    const effectiveNeededPlan =
+      neededPlan || (feature ? getMinPlanForFeature(feature) : undefined);
+
+    if (!meetsPlan(plan, effectiveNeededPlan)) {
+      return {
+        allowed: false,
+        reason: { neededPlan: effectiveNeededPlan, currentPlan: plan },
+      };
     }
     if (feature && !features.includes(feature)) {
       return {

@@ -1,5 +1,7 @@
 import React from 'react';
 import { supabase } from './supabase';
+import { ROLE_CAPS } from '../types/access';
+import { getFeaturesForPlan } from '../config/planFeatures';
 
 // Base URL for Supabase Edge Functions
 const getEdgeFunctionUrl = (functionName: string) => {
@@ -282,28 +284,8 @@ export const getAccessData = async (): Promise<{
     return {
       plan: 'free',
       role: 'student', // Default to student instead of teacher
-      features: [
-        'attendance.view',
-        'attendance.record',
-        'results.view',
-        'classes.view',
-        'courses.view',
-        'students.view',
-        'fees.view',
-        'fees.structures.basic',
-        'fees.record_manual',
-        'notices.view',
-        'notices.send',
-        'org.manage',
-        'staff.invite',
-        'settings.integrations',
-      ],
-      capabilities: [
-        'classes.view',
-        'attendance.record',
-        'results.enter',
-        'notices.send',
-      ],
+      features: getFeaturesForPlan('free'), // Use features for Free plan
+      capabilities: ROLE_CAPS.student, // Use proper student capabilities from ROLE_CAPS
     };
   }
 };

@@ -26,7 +26,7 @@ const DEFAULT_ACCESS: AccessState = {
   plan: 'free',
   role: 'student',
   features: getFeaturesForPlan('free'),
-  capabilities: ROLE_CAPS.student,
+  capabilities: [], // <— was ROLE_CAPS.student; make empty for guests/unauthenticated
   isLoading: false,
   isInitialized: false,
 };
@@ -53,7 +53,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
         plan: 'free',
         role: 'student',
         features: getFeaturesForPlan('free'),
-        capabilities: ROLE_CAPS.student,
+        capabilities: [], // <— was ROLE_CAPS.student
         isLoading: false,
         isInitialized: true,
       });
@@ -136,6 +136,7 @@ export const useRole = () => useAccess().role;
 export const useFeatures = () => useAccess().features;
 export const useCapabilities = () => useAccess().capabilities;
 export const useFeature = (feature: string) => useFeatures().includes(feature);
+// NOTE: useCan only checks role caps. For plan gating, also verify a matching feature (or wrap with useAccessCheck/RouteGuard).
 export const useCan = (cap: Capability) => {
   const caps = useCapabilities();
   return caps.includes('*') || caps.includes(cap);

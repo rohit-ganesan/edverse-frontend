@@ -5,7 +5,6 @@ export type Role =
   | 'owner'
   | 'admin'
   | 'teacher'
-  | 'admissions'
   | 'finance'
   | 'parent'
   | 'student';
@@ -24,9 +23,51 @@ export interface AccessCheckResult {
 
 // Uniform CRUD verbs: view | create | update | delete | manage | export | publish | reconcile | import | invite | brand
 
+// IMPORTANT: ROLE_CAPS is plan-agnostic. Plan gating MUST be enforced via features/neededPlan.
+// Do NOT put analytics.view (or other plan-gated features) here. Use features per plan.
 /** Role → capabilities (RBAC). Keep synced with RLS/Edge. */
 export const ROLE_CAPS: Record<Role, Capability[]> = {
-  owner: ['*'],
+  owner: [
+    // All Admin capabilities plus billing rights (explicit list ensures plan-gating still works)
+    // Students
+    'students.view',
+    'students.create',
+    'students.update',
+    'students.delete',
+    // Courses
+    'courses.view',
+    'courses.create',
+    'courses.update',
+    'courses.delete',
+    // Classes
+    'classes.view',
+    'classes.create',
+    'classes.update',
+    'classes.delete',
+    'classes.reschedule',
+    // Attendance
+    'attendance.view',
+    'attendance.record',
+    'attendance.import',
+    // Results
+    'results.view',
+    'results.enter',
+    'results.publish',
+    'results.export',
+    // Notices
+    'notices.view',
+    'notices.send',
+    // Fees
+    'fees.view',
+    'fees.record_manual',
+    'fees.export',
+    // Admin ops
+    'staff.invite',
+    'org.manage',
+    'settings.integrations',
+    // Owner-only
+    'billing.manage',
+  ],
 
   admin: [
     // READ
@@ -58,8 +99,6 @@ export const ROLE_CAPS: Record<Role, Capability[]> = {
     'staff.invite',
     'org.manage',
     'settings.integrations',
-    // Growth (plan gated)
-    'analytics.view',
   ],
 
   teacher: [
@@ -75,22 +114,7 @@ export const ROLE_CAPS: Record<Role, Capability[]> = {
     'fees.view',
   ],
 
-  admissions: [
-    'admissions.view',
-    'admissions.create',
-    'admissions.update',
-    'admissions.delete',
-    'students.view',
-    'students.create',
-    'students.update',
-  ],
-
-  finance: [
-    'fees.view',
-    'fees.structures.basic',
-    'fees.record_manual',
-    'fees.export',
-  ],
+  finance: ['fees.view', 'fees.record_manual', 'fees.export'],
 
   parent: [
     'portal.parent',

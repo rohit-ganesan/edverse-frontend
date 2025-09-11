@@ -190,7 +190,6 @@ function ProtectedRoutes() {
             <RouteGuard
               moduleKey="analytics:growth"
               feature="analytics.view"
-              cap="analytics.view"
               neededPlan="growth"
             />
           }
