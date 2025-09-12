@@ -4,6 +4,8 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
+  useMemo,
 } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
@@ -61,9 +63,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [ready, setReady] = useState<boolean>(false);
 
-  // Logging helper
+  // Cache refs to skip duplicate profile fetches
+  const lastUserIdRef = useRef<string | null>(null);
+  const lastProfileUpdatedAtRef = useRef<string | null>(null);
+
+  // Logging helper - silenced in production
   const log = useCallback((message: string, data?: any) => {
+    if (process.env.NODE_ENV === 'production') return;
     const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+    // eslint-disable-next-line no-console
     console.log(`🔵 [${timestamp}] AuthContext: ${message}`, data || '');
   }, []);
 
@@ -96,11 +104,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (!mounted) return;
 
-      // Update auth state immediately
-      setSession(session ?? null);
-      setUser(session?.user ?? null);
+      // Update auth state immediately with shallow comparison
+      setSession((prev) =>
+        prev !== (session ?? null) ? (session ?? null) : prev
+      );
+      setUser((prev) =>
+        prev !== (session?.user ?? null) ? (session?.user ?? null) : prev
+      );
 
       if (session?.user?.id) {
+        lastUserIdRef.current = session.user.id;
+
         // User is signed in - fetch profile
         log('Starting profile fetch process...');
         // STEP 1: Try ensure_profile with timeout
@@ -143,17 +157,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
           if (profileError) {
             log('STEP 2: Profile fetch error', profileError);
-            setUserProfile(null);
+            setUserProfile((prev) => (prev !== null ? null : prev));
           } else if (profile) {
             log('STEP 2: Profile found', {
               id: profile.id,
               email: profile.email,
               role: profile.role,
             });
-            setUserProfile(profile);
+
+            // Only set when updated_at changed (or first time)
+            const nextUpdated = profile.updated_at ?? null;
+            const prevUpdated = lastProfileUpdatedAtRef.current;
+            if (prevUpdated !== nextUpdated) {
+              lastProfileUpdatedAtRef.current = nextUpdated;
+              setUserProfile((prev) =>
+                prev?.id === profile?.id &&
+                prev?.role === profile?.role &&
+                prev?.first_name === profile?.first_name &&
+                prev?.last_name === profile?.last_name &&
+                prev?.updated_at === profile?.updated_at
+                  ? prev
+                  : profile
+              );
+            } else {
+              log('Profile unchanged (updated_at), skipping setUserProfile');
+            }
           } else {
             log('STEP 2: No profile found in database');
-            setUserProfile(null);
+            setUserProfile((prev) => (prev !== null ? null : prev));
           }
         } catch (fetchError) {
           log(
@@ -162,19 +193,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               ? fetchError.message
               : String(fetchError)
           );
-          setUserProfile(null);
+          setUserProfile((prev) => (prev !== null ? null : prev));
         }
       } else {
         // User is signed out
         log('No user ID, clearing profile');
-        setUserProfile(null);
+        lastUserIdRef.current = null;
+        lastProfileUpdatedAtRef.current = null;
+        setUserProfile((prev) => (prev !== null ? null : prev));
       }
 
       // STEP 3: Always complete the auth flow
       log('STEP 3: Completing auth flow...');
       log('STEP 3: Setting loading=false, ready=true');
-      setLoading(false);
-      setReady(true);
+      setLoading((prev) => (prev !== false ? false : prev));
+      setReady((prev) => (prev !== true ? true : prev));
       log('STEP 3: Auth flow completed successfully');
     });
 
@@ -182,7 +215,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [log]);
 
   // STEP 2: Authentication functions
   const signUp = useCallback(
@@ -255,9 +288,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     log('Starting sign out process');
 
     try {
-      setUserProfile(null);
-      setSession(null);
-      setLoading(false);
+      setUserProfile((prev) => (prev !== null ? null : prev));
+      setSession((prev) => (prev !== null ? null : prev));
+      setLoading((prev) => (prev !== false ? false : prev));
 
       // Let Supabase handle its own cleanup
       const { error } = await supabase.auth.signOut();
@@ -270,9 +303,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       log('Sign out error (local state cleared)', { error: error.message });
-      setUserProfile(null);
-      setSession(null);
-      setLoading(false);
+      setUserProfile((prev) => (prev !== null ? null : prev));
+      setSession((prev) => (prev !== null ? null : prev));
+      setLoading((prev) => (prev !== false ? false : prev));
     }
   }, [log]);
 
@@ -297,17 +330,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [user, log]
   );
 
-  const value: AuthContextType = {
-    user,
-    session,
-    userProfile,
-    loading,
-    ready,
-    signUp,
-    signIn,
-    signOut,
-    updateUserProfile,
-  };
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      session,
+      userProfile,
+      loading,
+      ready,
+      signUp,
+      signIn,
+      signOut,
+      updateUserProfile,
+    }),
+    [
+      user,
+      session,
+      userProfile,
+      loading,
+      ready,
+      signUp,
+      signIn,
+      signOut,
+      updateUserProfile,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

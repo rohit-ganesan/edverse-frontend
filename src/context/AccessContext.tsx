@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from 'react';
 import type { Plan, Role, Capability } from '../types/access';
 import { getFeaturesForPlan } from '../config/planFeatures';
@@ -42,74 +43,131 @@ const AccessContext = createContext<
   refreshAccess: async () => {},
 });
 
+const shallowEqual = (a: any, b: any) => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const ak = Object.keys(a);
+  const bk = Object.keys(b);
+  if (ak.length !== bk.length) return false;
+  for (const k of ak) {
+    if (a[k] !== b[k]) return false;
+  }
+  return true;
+};
+
+// Shallow array equality (order-sensitive)
+const arraysEqual = (a: any[] = [], b: any[] = []) => {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+};
+
+// Return prevArr if same elements, else nextArr
+const stableArray = (prevArr: string[] = [], nextArr: string[] = []) =>
+  arraysEqual(prevArr, nextArr) ? prevArr : nextArr;
+
 export function AccessProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AccessState>(DEFAULT_ACCESS);
   const { user, userProfile, ready } = useAuth();
 
+  // Call token to cancel stale async returns
+  const callTokenRef = useRef(0);
+
+  // Derive a stable role string to avoid re-runs when role value is same but re-wrapped
+  const effectiveRole = userProfile?.role ?? undefined;
+
   const initializeAccess = useCallback(async () => {
-    // Unauthed: default free/student view
+    const myToken = ++callTokenRef.current;
+
+    // Guests: fast path
     if (!user) {
-      setState({
+      const next: AccessState = {
         plan: 'free',
         role: 'student',
         features: getFeaturesForPlan('free'),
-        capabilities: [], // <— was ROLE_CAPS.student
+        capabilities: [],
         isLoading: false,
         isInitialized: true,
-      });
+      };
+      setState((prev) => (shallowEqual(prev, next) ? prev : next));
       return;
     }
 
+    // Avoid no-op render when already loading
+    setState((prev) => (prev.isLoading ? prev : { ...prev, isLoading: true }));
+
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    const timeoutMs = 4000;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(
+        () => reject(new Error('access-timeout')),
+        timeoutMs
+      );
+    });
+
     try {
-      setState((prev) => ({ ...prev, isLoading: true }));
+      const remote = await Promise.race([
+        getAccessData(),
+        timeoutPromise,
+      ]).catch(() => null as any);
 
-      // Try server; timeout fast
-      const accessPromise = getAccessData();
-      const timeout = new Promise<never>((_, rej) =>
-        setTimeout(() => rej(new Error('access-timeout')), 4000)
-      );
-      const remote = await Promise.race([accessPromise, timeout]).catch(
-        () => null as any
-      );
+      // Cancel if a newer call started
+      if (callTokenRef.current !== myToken) return;
 
-      // Decide plan and role
       const plan: Plan =
         remote?.plan === 'starter' || remote?.plan === 'growth'
           ? remote.plan
           : 'free';
-      const role: Role =
-        (userProfile?.role as Role) || (remote?.role as Role) || 'student';
 
-      // Merge features: prefer remote if present, otherwise local
-      const features =
+      const role: Role =
+        (effectiveRole as Role) || (remote?.role as Role) || 'student';
+
+      const rawFeatures =
         Array.isArray(remote?.features) && remote.features.length
           ? remote.features
           : getFeaturesForPlan(plan);
 
-      // Capabilities always from local ROLE_CAPS to keep client consistent
-      const caps = ROLE_CAPS[role] || ROLE_CAPS.student;
+      // Optional: ensure deterministic order
+      const normalizedFeatures = [...rawFeatures].sort();
 
-      setState({
-        plan,
-        role,
-        features,
-        capabilities: caps,
-        isLoading: false,
-        isInitialized: true,
+      const capabilities = ROLE_CAPS[role] || ROLE_CAPS.student;
+
+      setState((prev) => {
+        const next: AccessState = {
+          plan,
+          role,
+          features: stableArray(prev.features, normalizedFeatures),
+          capabilities: stableArray(prev.capabilities, capabilities),
+          isLoading: false,
+          isInitialized: true,
+        };
+        return shallowEqual(prev, next) ? prev : next;
       });
     } catch {
-      // Fallback – still usable
-      const role: Role = (userProfile?.role as Role) || 'student';
-      setState({
-        plan: 'free',
-        role,
-        features: getFeaturesForPlan('free'),
-        capabilities: ROLE_CAPS[role] || ROLE_CAPS.student,
-        isLoading: false,
-        isInitialized: true,
+      if (callTokenRef.current !== myToken) return;
+
+      const role: Role = (effectiveRole as Role) || 'student';
+
+      setState((prev) => {
+        const fallbackFeatures = getFeaturesForPlan('free');
+        const next: AccessState = {
+          plan: 'free',
+          role,
+          features: stableArray(prev.features, fallbackFeatures),
+          capabilities: stableArray(
+            prev.capabilities,
+            ROLE_CAPS[role] || ROLE_CAPS.student
+          ),
+          isLoading: false,
+          isInitialized: true,
+        };
+        return shallowEqual(prev, next) ? prev : next;
       });
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
     }
-  }, [user, userProfile?.role]);
+  }, [user, effectiveRole]);
 
   const refreshAccess = useCallback(async () => {
     await initializeAccess();
@@ -117,8 +175,15 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    if (user?.id) initializeAccess();
-    else setState((s) => ({ ...s, isLoading: false, isInitialized: true }));
+    if (user?.id) {
+      initializeAccess();
+    } else {
+      setState((s) =>
+        s.isInitialized && !s.isLoading
+          ? s
+          : { ...s, isLoading: false, isInitialized: true }
+      );
+    }
   }, [ready, user?.id, initializeAccess]);
 
   const value = useMemo(
@@ -139,5 +204,5 @@ export const useFeature = (feature: string) => useFeatures().includes(feature);
 // NOTE: useCan only checks role caps. For plan gating, also verify a matching feature (or wrap with useAccessCheck/RouteGuard).
 export const useCan = (cap: Capability) => {
   const caps = useCapabilities();
-  return caps.includes('*') || caps.includes(cap);
+  return caps.includes(cap);
 };
