@@ -1,55 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Flex, Text, Button } from '@radix-ui/themes';
-import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAccess } from '../context/AccessContext';
 import { useNavigate } from 'react-router-dom';
+import {
+  fetchPricing,
+  formatPrice,
+  formatPeriod,
+  getUpgradeButtonText,
+  isCurrentPlan,
+  type PricingPlan,
+} from '../lib/pricing';
 
 export const BillingPage: React.FC = () => {
   const { plan } = useAccess();
   const navigate = useNavigate();
+  const [plans, setPlans] = useState<PricingPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const plans = [
-    {
-      name: 'Free',
-      price: 0,
-      period: 'per month',
-      features: [
-        'View students, courses, and classes',
-        'View attendance and results',
-        'View notices and fees',
-        'Basic dashboard',
-      ],
-      current: plan === 'free',
-    },
-    {
-      name: 'Starter',
-      price: 29,
-      period: 'per month',
-      features: [
-        'Everything in Free',
-        'Record attendance',
-        'Enter results and grades',
-        'Send notices to students',
-        'Invite staff members',
-        'Basic integrations',
-        'Parent & student portals',
-      ],
-      current: plan === 'starter',
-    },
-    {
-      name: 'Growth',
-      price: 99,
-      period: 'per month',
-      features: [
-        'Everything in Starter',
-        'Advanced analytics dashboard',
-        'Detailed reporting',
-        'Performance insights',
-        'Data export capabilities',
-      ],
-      current: plan === 'growth',
-    },
-  ];
+  // Fetch pricing from backend
+  useEffect(() => {
+    const loadPricing = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const pricingData = await fetchPricing({
+          currency: 'USD',
+          period: 'month',
+        });
+
+        setPlans(pricingData.plans);
+      } catch (err) {
+        console.error('Failed to load pricing:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load pricing');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPricing();
+  }, []);
 
   return (
     <Box className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -79,69 +71,112 @@ export const BillingPage: React.FC = () => {
           </Text>
         </Box>
 
-        <Flex gap="6" wrap="wrap" justify="center">
-          {plans.map((planItem) => (
-            <Box
-              key={planItem.name}
-              className={`
-                bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-80
-                ${planItem.current ? 'ring-2 ring-blue-500' : ''}
-              `}
-            >
-              <Box className="text-center mb-6">
-                <Flex align="center" justify="center" gap="2" className="mb-2">
-                  <Text
-                    size="5"
-                    weight="bold"
-                    className="text-gray-900 dark:text-gray-100"
-                  >
-                    {planItem.name}
-                  </Text>
-                  {planItem.current && (
-                    <CheckCircle className="w-5 h-5 text-blue-500" />
-                  )}
-                </Flex>
-                <Flex align="baseline" justify="center" gap="1">
-                  <Text
-                    size="6"
-                    weight="bold"
-                    className="text-blue-600 dark:text-blue-400"
-                  >
-                    ${planItem.price}
-                  </Text>
-                  <Text size="3" className="text-gray-500 dark:text-gray-400">
-                    {planItem.period}
-                  </Text>
-                </Flex>
-              </Box>
+        {/* Loading State */}
+        {loading && (
+          <Box className="text-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <Text size="3" className="text-gray-600 dark:text-gray-400">
+              Loading pricing information...
+            </Text>
+          </Box>
+        )}
 
-              <Box className="space-y-3 mb-6">
-                {planItem.features.map((feature, index) => (
-                  <Flex key={index} align="center" gap="2">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    <Text size="2" className="text-gray-700 dark:text-gray-300">
-                      {feature}
+        {/* Error State */}
+        {error && (
+          <Box className="text-center py-12">
+            <Text size="4" className="text-red-600 dark:text-red-400 mb-4">
+              Failed to load pricing
+            </Text>
+            <Text size="3" className="text-gray-600 dark:text-gray-400 mb-4">
+              {error}
+            </Text>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Try Again
+            </Button>
+          </Box>
+        )}
+
+        {/* Plans Grid */}
+        {!loading && !error && (
+          <Flex gap="6" wrap="wrap" justify="center">
+            {plans.map((planItem) => (
+              <Box
+                key={planItem.plan_key}
+                className={`
+                bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-80
+                ${isCurrentPlan(planItem.plan_key, plan) ? 'ring-2 ring-blue-500' : ''}
+              `}
+              >
+                <Box className="text-center mb-6">
+                  <Flex
+                    align="center"
+                    justify="center"
+                    gap="2"
+                    className="mb-2"
+                  >
+                    <Text
+                      size="5"
+                      weight="bold"
+                      className="text-gray-900 dark:text-gray-100"
+                    >
+                      {planItem.plan_name}
+                    </Text>
+                    {isCurrentPlan(planItem.plan_key, plan) && (
+                      <CheckCircle className="w-5 h-5 text-blue-500" />
+                    )}
+                  </Flex>
+                  <Flex align="baseline" justify="center" gap="1">
+                    <Text
+                      size="6"
+                      weight="bold"
+                      className="text-blue-600 dark:text-blue-400"
+                    >
+                      {formatPrice(planItem.amount_cents, planItem.currency)}
+                    </Text>
+                    <Text size="3" className="text-gray-500 dark:text-gray-400">
+                      {formatPeriod(planItem.period, planItem.trial_days)}
                     </Text>
                   </Flex>
-                ))}
-              </Box>
+                </Box>
 
-              <Box className="text-center">
-                {planItem.current ? (
-                  <Box className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-2">
-                    <Text size="2" className="text-gray-600 dark:text-gray-400">
-                      Current Plan
-                    </Text>
-                  </Box>
-                ) : (
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                    {plan === 'free' ? 'Upgrade' : 'Contact Sales'}
-                  </button>
-                )}
+                <Box className="space-y-3 mb-6">
+                  {planItem.features.map((feature, index) => (
+                    <Flex key={index} align="center" gap="2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      <Text
+                        size="2"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
+                        {feature}
+                      </Text>
+                    </Flex>
+                  ))}
+                </Box>
+
+                <Box className="text-center">
+                  {isCurrentPlan(planItem.plan_key, plan) ? (
+                    <Box className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-2">
+                      <Text
+                        size="2"
+                        className="text-gray-600 dark:text-gray-400"
+                      >
+                        Current Plan
+                      </Text>
+                    </Box>
+                  ) : (
+                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                      {getUpgradeButtonText(
+                        planItem,
+                        plan,
+                        isCurrentPlan(planItem.plan_key, plan)
+                      )}
+                    </button>
+                  )}
+                </Box>
               </Box>
-            </Box>
-          ))}
-        </Flex>
+            ))}
+          </Flex>
+        )}
 
         <Box className="text-center mt-12">
           <Text size="3" className="text-gray-600 dark:text-gray-400">
