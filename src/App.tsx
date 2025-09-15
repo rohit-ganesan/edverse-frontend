@@ -1,13 +1,26 @@
-// No React import needed with new JSX transform
+import React from 'react';
 import { Theme } from '@radix-ui/themes';
 import { AuthProvider } from 'features/auth/AuthContext';
 import { AccessProvider } from 'context/AccessContext';
 import { ThemeProvider, useTheme } from 'contexts/ThemeContext';
 import { AppRoutes } from 'router/Routes';
 import { ToastProvider, ToastViewport } from 'components/ui/Toast';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 function ThemedApp(): JSX.Element {
   const themeContext = useTheme();
+  const queryClient = React.useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: true,
+          },
+        },
+      }),
+    []
+  );
 
   // Defensive check for theme context
   if (!themeContext) {
@@ -36,12 +49,14 @@ function ThemedApp(): JSX.Element {
       appearance={theme || 'light'}
     >
       <ToastProvider swipeDirection="right">
-        <AuthProvider>
-          <AccessProvider>
-            <AppRoutes />
-          </AccessProvider>
-        </AuthProvider>
-        <ToastViewport />
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <AccessProvider>
+              <AppRoutes />
+            </AccessProvider>
+          </AuthProvider>
+          <ToastViewport />
+        </QueryClientProvider>
       </ToastProvider>
     </Theme>
   );

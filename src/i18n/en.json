@@ -54,7 +54,15 @@
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "back": "Back"
+    "back": "Back",
+    "export_report": "Export Report",
+    "add_department": "Add Department",
+    "save_changes": "Save Changes",
+    "manage_locations": "Manage Locations",
+    "generate_report": "Generate Report",
+    "import_data": "Import Data",
+    "export_notices": "Export Notices",
+    "create_notice": "Create Notice"
   },
   "locks": {
     "growth_needed": "Available on Growth plan",
@@ -160,5 +168,33 @@
     "not_found": "Page not found",
     "unauthorized": "You are not authorized to access this feature",
     "upgrade_prompt": "Upgrade your plan to access this feature"
+  },
+  "tabs": {
+    "departments": "Departments",
+    "reports": "Reports",
+    "recent": "Recent",
+    "drafts": "Drafts",
+    "overview": "Overview",
+    "analytics": "Analytics"
+  },
+  "pages": {
+    "instructors": {
+      "description": "Manage teachers, departments, and performance"
+    },
+    "organization": {
+      "description": "Manage your school's structure, departments, and organizational settings",
+      "institution_info": "Institution Information",
+      "institution_info_sub": "Basic details about your educational institution",
+      "quick_actions": "Quick Actions",
+      "quick_actions_sub": "Common organizational management tasks",
+      "campus_locations": "Campus Locations",
+      "locations_sub": "Manage campus buildings, rooms, and facilities",
+      "school_settings": "School Settings",
+      "settings_sub": "Configure institutional preferences and system settings"
+    },
+    "announcements": {
+      "description": "Manage announcements, notifications, and important updates",
+      "all_notices": "All Notices"
+    }
   }
 }

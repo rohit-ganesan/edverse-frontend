@@ -47,16 +47,12 @@ export function UpgradeHint({
   useEffect(() => {
     if (neededPlan) {
       trackUpgradeShown(neededPlan, context);
-    } else if (feature) {
-      trackUpgradeShown('addon', context);
     }
-  }, [neededPlan, feature, context, trackUpgradeShown]);
+  }, [neededPlan, context, trackUpgradeShown]);
 
   const handleUpgradeClick = () => {
     if (neededPlan) {
       trackUpgradeClicked(plan, neededPlan, context);
-    } else if (feature) {
-      trackUpgradeClicked(plan, 'addon', context);
     }
   };
 
@@ -69,10 +65,7 @@ export function UpgradeHint({
     navigate('/billing');
   };
 
-  const handleAddonClick = () => {
-    handleUpgradeClick();
-    navigate(`/billing?addon=${feature}`);
-  };
+  // Add-ons disabled in MVP tiers
 
   let displayMessage = message;
   let primaryCtaText = 'Upgrade';
@@ -161,17 +154,4 @@ export function UpgradeHint({
   );
 }
 
-function getMinPlanForAddon(feature: string): Plan {
-  const planFeatures = {
-    'fees.online': 'growth',
-    'fees.reminders.smswa': 'scale',
-    'analytics.advanced': 'growth',
-    'auth.sso': 'scale',
-    'audit.logs': 'scale',
-    'settings.branding': 'enterprise',
-    'admissions.view': 'enterprise',
-    'syllabus.advanced': 'enterprise',
-  };
-
-  return (planFeatures as Record<string, Plan>)[feature] || 'growth';
-}
+// No add-on minimum plan mapping in MVP

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAccessCheck } from '../../hooks/useAccessCheck';
 import { UpgradeHint } from '../upsell/UpgradeHint';
 import type { Plan } from '../../types/access';
+import { usePlan } from '../../context/AccessContext';
+import { useAccessTelemetry } from '../../hooks/useAccessTelemetry';
 
 type Props = {
   feature: string;
@@ -21,6 +23,25 @@ export function FeatureGate({
   showUpgradeHint = true,
 }: Props) {
   const accessCheck = useAccessCheck({ feature, neededPlan });
+  const plan = usePlan();
+  const { trackFeatureLockedViewed } = useAccessTelemetry();
+
+  useEffect(() => {
+    if (!accessCheck.allowed) {
+      trackFeatureLockedViewed({
+        feature,
+        plan,
+        neededPlan: accessCheck.reason?.neededPlan,
+        context: 'feature_gate',
+      });
+    }
+  }, [
+    accessCheck.allowed,
+    accessCheck.reason?.neededPlan,
+    feature,
+    plan,
+    trackFeatureLockedViewed,
+  ]);
 
   if (accessCheck.allowed) {
     return <>{children}</>;

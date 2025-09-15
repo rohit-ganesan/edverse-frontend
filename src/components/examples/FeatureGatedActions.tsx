@@ -31,13 +31,13 @@ export function FeatureGatedActions() {
         </CapabilityGate>
       </FeatureGate>
 
-      {/* SMS reminders require Scale plan */}
+      {/* SMS reminders not part of MVP tiers */}
       <FeatureGate
         feature="fees.reminders.smswa"
         fallback={
           <UpgradeHint
             neededPlan="growth"
-            message="SMS reminders are part of Scale plan."
+            message="SMS reminders are not available in MVP."
             context="action_button"
           />
         }
@@ -67,13 +67,13 @@ export function FeatureGatedActions() {
         </CapabilityGate>
       </FeatureGate>
 
-      {/* Enterprise-only features */}
+      {/* Enterprise-only features not part of MVP */}
       <FeatureGate
         feature="admissions.view"
         fallback={
           <UpgradeHint
             neededPlan="growth"
-            message="Admissions management is part of Enterprise plan."
+            message="Admissions management is not available in MVP tiers."
             context="action_button"
           />
         }

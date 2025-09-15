@@ -3,6 +3,9 @@ import { Box, Text, Heading, Separator } from '@radix-ui/themes';
 import { useState, useEffect } from 'react';
 import { useAuth } from 'features/auth/AuthContext';
 import { ROUTES } from 'config/routes';
+import { useAccess } from 'context/AccessContext';
+import { PLAN_RANKS } from 'types/access';
+import en from 'i18n/en.json';
 // Feature filtering will be handled by route guards
 import {
   Home,
@@ -10,14 +13,12 @@ import {
   Bell,
   Users,
   GraduationCap,
-  UserPlus,
   DollarSign,
   Sparkles,
   Building,
   Shield,
   HelpCircle,
   Settings,
-  FileText,
   CalendarDays,
   UserCheck,
   Award,
@@ -42,42 +43,14 @@ interface SidebarProps {
   onToggleRearrangeMode?: () => void;
 }
 
-// Icon mapping for routes
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  home: Home,
-  dashboard: Home,
-  courses: BookOpen,
-  classes: CalendarDays,
-  syllabus: FileText,
-  attendance: UserCheck,
-  results: Award,
-  result: Award,
-  notices: Bell,
-  notice: Bell,
-  announcements: Bell,
-  instructors: Users,
-  teachers: Users,
-  students: GraduationCap,
-  admission: UserPlus,
-  admissions: UserPlus,
-  fees: DollarSign,
-  fee: DollarSign,
-  analytics: Sparkles,
-  organization: Building,
-  org: Building,
-  admins: Shield,
-  settings: Settings,
-  support: HelpCircle,
-  'whats-new': Sparkles,
-  test: Settings,
-};
+// Icon mapping removed (unused)
 
-// Build menu items with proper labels
+// Build menu items with proper labels (i18n)
 const buildMenuItems = (): MenuItem[] => {
   const items: MenuItem[] = [
     {
       id: 'home',
-      label: 'Home',
+      label: en.nav.dashboard,
       icon: Home,
       path: '/dashboard',
       basePath: '/dashboard',
@@ -85,7 +58,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'students',
-      label: 'Students',
+      label: en.nav.students,
       icon: GraduationCap,
       path: '/students/all-students',
       basePath: '/students',
@@ -93,7 +66,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'courses',
-      label: 'Courses',
+      label: en.nav.courses,
       icon: BookOpen,
       path: '/courses/overview',
       basePath: '/courses',
@@ -101,7 +74,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'classes',
-      label: 'Classes',
+      label: en.nav.classes,
       icon: CalendarDays,
       path: '/classes/overview',
       basePath: '/classes',
@@ -109,7 +82,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'attendance',
-      label: 'Attendance',
+      label: en.labels.attendance,
       icon: UserCheck,
       path: '/attendance/overview',
       basePath: '/attendance',
@@ -117,7 +90,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'results',
-      label: 'Results',
+      label: en.labels.results,
       icon: Award,
       path: '/results/overview',
       basePath: '/results',
@@ -125,7 +98,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'fees',
-      label: 'Fees',
+      label: en.nav.fees,
       icon: DollarSign,
       path: '/fees/overview',
       basePath: '/fees',
@@ -133,7 +106,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'notices',
-      label: 'Notices',
+      label: en.nav.announcements,
       icon: Bell,
       path: '/notices/overview',
       basePath: '/notices',
@@ -141,7 +114,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'instructors',
-      label: 'Instructors',
+      label: en.nav.instructors,
       icon: Users,
       path: '/instructors/overview',
       basePath: '/instructors',
@@ -157,7 +130,7 @@ const buildMenuItems = (): MenuItem[] => {
     },
     {
       id: 'organization',
-      label: 'Organization',
+      label: en.nav.organization,
       icon: Building,
       path: '/organization/overview',
       basePath: '/organization',
@@ -172,7 +145,7 @@ const buildMenuItems = (): MenuItem[] => {
 const additionalItems: MenuItem[] = [
   {
     id: 'settings',
-    label: 'Settings',
+    label: en.nav.settings,
     icon: Settings,
     path: '/settings/overview',
     basePath: '/settings',
@@ -188,7 +161,7 @@ const additionalItems: MenuItem[] = [
   },
   {
     id: 'whats-new',
-    label: "What's New",
+    label: en.nav.whats_new,
     icon: Sparkles,
     path: '/whats-new',
     basePath: '/whats-new',
@@ -196,7 +169,7 @@ const additionalItems: MenuItem[] = [
   },
   {
     id: 'support',
-    label: 'Support',
+    label: en.nav.support,
     icon: HelpCircle,
     path: '/support',
     basePath: '/support',
@@ -210,7 +183,8 @@ export function Sidebar({
   onToggleRearrangeMode,
 }: SidebarProps): JSX.Element {
   const location = useLocation();
-  const { user, userProfile, updateUserProfile } = useAuth();
+  const { user, updateUserProfile } = useAuth();
+  const { plan, features, capabilities } = useAccess();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
@@ -220,14 +194,22 @@ export function Sidebar({
     setMenuItems(mainItems);
   }, []);
 
-  // Filter menu items based on user permissions and remove duplicates
+  // Filter menu items: hide if user lacks role capability entirely
   const filteredMenuItems = menuItems.filter((item, index, self) => {
-    // Remove duplicates by keeping only the first occurrence
     const isFirstOccurrence = index === self.findIndex((t) => t.id === item.id);
+    if (!isFirstOccurrence) return false;
 
-    // For now, show all items since access control is temporarily disabled
-    // TODO: Re-enable feature filtering once we fix the hook rules
-    return isFirstOccurrence;
+    // Map basePath to a route config when available
+    const route = ROUTES.find((r) => item.basePath.startsWith(r.path));
+    if (!route) return true; // keep items not in registry
+
+    if (
+      route.cap &&
+      !(capabilities.includes('*') || capabilities.includes(route.cap))
+    ) {
+      return false;
+    }
+    return true;
   });
 
   // Save menu order to user profile
@@ -294,6 +276,15 @@ export function Sidebar({
     const active = isActive(item.basePath);
     const isDragging = draggedItem === item.id;
 
+    // Locked if plan/feature gating blocks visibility (role capability is granted but plan/feature missing)
+    const route = ROUTES.find((r) => item.basePath.startsWith(r.path));
+    const locked = route
+      ? (route.neededPlan &&
+          PLAN_RANKS[plan] <
+            PLAN_RANKS[route.neededPlan as keyof typeof PLAN_RANKS]) ||
+        (route.feature ? !features.includes(route.feature) : false)
+      : false;
+
     const handleClick = (e: React.MouseEvent) => {
       if (isRearrangeMode) {
         e.preventDefault();
@@ -326,6 +317,7 @@ export function Sidebar({
           <Text size="2" className="flex-1">
             {item.label}
           </Text>
+          {locked && <span className="ml-2 text-gray-400">🔒</span>}
         </Link>
       </Box>
     );

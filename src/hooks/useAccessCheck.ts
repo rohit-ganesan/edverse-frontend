@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import { useAccess } from '../context/AccessContext';
 import { getMinPlanForFeature } from '../config/planFeatures';
 import type { Plan } from '../types/access';
+import { PLAN_RANKS } from '../types/access';
 
-const PLAN_RANKS: Record<Plan, number> = { free: 0, starter: 1, growth: 2 };
 const meetsPlan = (current: Plan, needed?: Plan) =>
   !needed || PLAN_RANKS[current] >= PLAN_RANKS[needed];
 

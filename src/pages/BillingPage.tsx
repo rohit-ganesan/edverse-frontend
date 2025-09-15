@@ -11,13 +11,17 @@ import {
   isCurrentPlan,
   type PricingPlan,
 } from '../lib/pricing';
+import { startSubscription } from '../lib/pricing';
+import { useAuth } from '../features/auth/AuthContext';
 
 export const BillingPage: React.FC = () => {
-  const { plan } = useAccess();
+  const { plan, refreshAccess } = useAccess();
+  const { userProfile } = useAuth();
   const navigate = useNavigate();
   const [plans, setPlans] = useState<PricingPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subscribingPlan, setSubscribingPlan] = useState<string | null>(null);
 
   // Fetch pricing from backend
   useEffect(() => {
@@ -164,12 +168,42 @@ export const BillingPage: React.FC = () => {
                       </Text>
                     </Box>
                   ) : (
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                      {getUpgradeButtonText(
-                        planItem,
-                        plan,
-                        isCurrentPlan(planItem.plan_key, plan)
-                      )}
+                    <button
+                      className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors ${subscribingPlan === planItem.plan_key ? 'opacity-70 cursor-wait' : ''}`}
+                      disabled={!!subscribingPlan}
+                      onClick={async () => {
+                        try {
+                          setSubscribingPlan(planItem.plan_key);
+                          setError(null);
+                          // Require tenant_id from profile
+                          const tenantId = userProfile?.tenant_id;
+                          if (!tenantId) {
+                            throw new Error('No tenant selected');
+                          }
+                          await startSubscription({
+                            tenant_id: tenantId,
+                            plan_key: planItem.plan_key,
+                            currency: planItem.currency,
+                            period: planItem.period,
+                          });
+                          await refreshAccess();
+                          navigate(-1);
+                        } catch (e: any) {
+                          setError(
+                            e?.message || 'Failed to start subscription'
+                          );
+                        } finally {
+                          setSubscribingPlan(null);
+                        }
+                      }}
+                    >
+                      {subscribingPlan === planItem.plan_key
+                        ? 'Processing…'
+                        : getUpgradeButtonText(
+                            planItem,
+                            plan,
+                            isCurrentPlan(planItem.plan_key, plan)
+                          )}
                     </button>
                   )}
                 </Box>

@@ -67,7 +67,7 @@ function ProtectedRoutes() {
             <RouteGuard
               moduleKey="attendance:core"
               feature="attendance.view"
-              cap="attendance.record"
+              cap="attendance.view"
             />
           }
         />
@@ -78,7 +78,7 @@ function ProtectedRoutes() {
             <RouteGuard
               moduleKey="results:core"
               feature="results.view"
-              cap="results.enter"
+              cap="results.view"
             />
           }
         />

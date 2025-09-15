@@ -1,5 +1,6 @@
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
+import en from 'i18n/en.json';
 import {
   ModernStatsGridColored,
   ColoredStatItem,
@@ -88,17 +89,17 @@ export function NoticePage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Announcements"
-        description="Manage announcements, notifications, and important updates"
+        title={en.nav.announcements}
+        description={en.pages.announcements.description}
         actions={[
           {
-            label: 'Export Notices',
+            label: en.cta.export_notices,
             icon: Download,
             variant: 'outline',
             onClick: handleExportNotices,
           },
           {
-            label: 'Create Notice',
+            label: en.cta.create_notice,
             icon: Plus,
             isPrimary: true,
             onClick: handleCreateNotice,
@@ -122,22 +123,22 @@ export function NoticePage(): JSX.Element {
         tabs={[
           {
             value: 'all-notices',
-            label: 'All Notices',
+            label: en.pages.announcements.all_notices,
             content: <AllNotices isLoading={isLoading} />,
           },
           {
             value: 'recent',
-            label: 'Recent',
+            label: en.tabs.recent,
             content: <Recent isLoading={isLoading} />,
           },
           {
             value: 'drafts',
-            label: 'Drafts',
+            label: en.tabs.drafts,
             content: <Drafts isLoading={isLoading} />,
           },
           {
             value: 'analytics',
-            label: 'Analytics',
+            label: en.tabs.analytics,
             content: <Analytics isLoading={isLoading} />,
           },
         ]}

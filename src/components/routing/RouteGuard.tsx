@@ -47,7 +47,7 @@ export function RouteGuard({
   const { user, ready } = useAuth();
   const { allowed, reason } = useAccessCheck({ feature, cap, neededPlan });
   const { isInitialized: accessInitialized } = useAccess();
-  const { trackRouteLocked } = useAccessTelemetry();
+  const { trackRouteLocked, trackFeatureLockedViewed } = useAccessTelemetry();
   const location = useLocation();
 
   // Get the component from the registry if moduleKey is provided (legacy mode)
@@ -76,6 +76,16 @@ export function RouteGuard({
         neededPlan: reason?.neededPlan,
         reason: reasonType,
       });
+
+      // Also track feature locked viewed for plan/feature restrictions
+      if (feature) {
+        trackFeatureLockedViewed({
+          feature,
+          plan: (reason?.currentPlan as any) || 'free',
+          neededPlan: reason?.neededPlan,
+          context: `route_guard:${routePath}`,
+        });
+      }
     }
   }, [
     allowed,
@@ -85,6 +95,8 @@ export function RouteGuard({
     neededPlan,
     reason,
     trackRouteLocked,
+    trackFeatureLockedViewed,
+    routePath,
   ]);
 
   // Show loading while auth or access is being initialized

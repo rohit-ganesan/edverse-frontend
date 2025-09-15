@@ -1,5 +1,6 @@
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
+import en from 'i18n/en.json';
 import {
   ModernStatsGridColored,
   ColoredStatItem,
@@ -34,7 +35,7 @@ export function InstructorsPage(): JSX.Element {
   // Convert stats to ModernStatsGridColored format
   const coloredStats: ColoredStatItem[] = [
     {
-      title: 'Total Instructors',
+      title: en.labels.instructors,
       value: stats.totalInstructors.toString(),
       icon: Users,
       gradient: {
@@ -50,7 +51,7 @@ export function InstructorsPage(): JSX.Element {
       },
     },
     {
-      title: 'Active Instructors',
+      title: `${en.labels.instructors} (Active)`,
       value: stats.activeInstructors.toString(),
       icon: Users,
       gradient: {
@@ -90,22 +91,22 @@ export function InstructorsPage(): JSX.Element {
   const tabItems = [
     {
       value: 'all-instructors',
-      label: 'All Instructors',
+      label: `All ${en.labels.instructors}`,
       content: <AllInstructors isLoading={isLoading} />,
     },
     {
       value: 'departments',
-      label: 'Departments',
+      label: en.tabs.departments,
       content: <Departments isLoading={isLoading} />,
     },
     {
       value: 'analytics',
-      label: 'Analytics',
+      label: en.tabs.analytics,
       content: <Analytics isLoading={isLoading} />,
     },
     {
       value: 'reports',
-      label: 'Reports',
+      label: en.tabs.reports,
       content: <Reports isLoading={isLoading} />,
     },
   ];
@@ -113,8 +114,8 @@ export function InstructorsPage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="Instructors"
-        description="Manage faculty members, departments, and performance"
+        title={en.nav.instructors}
+        description={en.pages.instructors.description}
         actions={headerActions}
       />
 

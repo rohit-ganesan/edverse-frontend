@@ -11,6 +11,7 @@ import {
 } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { PageHeader } from 'components/ui/PageHeader';
+import en from 'i18n/en.json';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
 import { TabContainer } from 'components/ui/TabContainer';
@@ -304,10 +305,10 @@ export function OrganizationPage(): JSX.Element {
               <Flex justify="between" align="center">
                 <Box>
                   <Heading size="4" className="text-gray-900 mb-1">
-                    Institution Information
+                    {en.pages.organization.institution_info}
                   </Heading>
                   <Text size="2" className="text-gray-600">
-                    Basic details about your educational institution
+                    {en.pages.organization.institution_info_sub}
                   </Text>
                 </Box>
                 <RadixButton
@@ -426,10 +427,10 @@ export function OrganizationPage(): JSX.Element {
           <RadixCard className="p-0 shadow-xl border-0 bg-white overflow-hidden">
             <Box className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
               <Heading size="4" className="text-gray-900 mb-1">
-                Quick Actions
+                {en.pages.organization.quick_actions}
               </Heading>
               <Text size="2" className="text-gray-600">
-                Common organizational management tasks
+                {en.pages.organization.quick_actions_sub}
               </Text>
             </Box>
 
@@ -441,7 +442,7 @@ export function OrganizationPage(): JSX.Element {
                   className="h-20 flex-col gap-2"
                 >
                   <Plus className="w-6 h-6" />
-                  <Text size="2">Add Department</Text>
+                  <Text size="2">{en.cta.add_department}</Text>
                 </RadixButton>
                 <RadixButton
                   variant="outline"
@@ -449,7 +450,7 @@ export function OrganizationPage(): JSX.Element {
                   className="h-20 flex-col gap-2"
                 >
                   <MapPin className="w-6 h-6" />
-                  <Text size="2">Manage Locations</Text>
+                  <Text size="2">{en.cta.manage_locations}</Text>
                 </RadixButton>
                 <RadixButton
                   variant="outline"
@@ -457,7 +458,7 @@ export function OrganizationPage(): JSX.Element {
                   className="h-20 flex-col gap-2"
                 >
                   <FileText className="w-6 h-6" />
-                  <Text size="2">Generate Report</Text>
+                  <Text size="2">{en.cta.generate_report}</Text>
                 </RadixButton>
                 <RadixButton
                   variant="outline"
@@ -465,7 +466,7 @@ export function OrganizationPage(): JSX.Element {
                   className="h-20 flex-col gap-2"
                 >
                   <Upload className="w-6 h-6" />
-                  <Text size="2">Import Data</Text>
+                  <Text size="2">{en.cta.import_data}</Text>
                 </RadixButton>
               </Grid>
             </Box>
@@ -582,10 +583,10 @@ export function OrganizationPage(): JSX.Element {
               <Flex justify="between" align="center">
                 <Box>
                   <Heading size="4" className="text-gray-900 mb-1">
-                    Campus Locations
+                    {en.pages.organization.campus_locations}
                   </Heading>
                   <Text size="2" className="text-gray-600">
-                    Manage campus buildings, rooms, and facilities
+                    {en.pages.organization.locations_sub}
                   </Text>
                 </Box>
                 <Badge color="orange" variant="soft" size="2">
@@ -687,10 +688,10 @@ export function OrganizationPage(): JSX.Element {
               <Flex justify="between" align="center">
                 <Box>
                   <Heading size="4" className="text-gray-900 mb-1">
-                    School Settings
+                    {en.pages.organization.school_settings}
                   </Heading>
                   <Text size="2" className="text-gray-600">
-                    Configure institutional preferences and system settings
+                    {en.pages.organization.settings_sub}
                   </Text>
                 </Box>
                 <RadixButton
@@ -699,7 +700,7 @@ export function OrganizationPage(): JSX.Element {
                   className="bg-white/70 hover:bg-white"
                 >
                   <Save className="w-4 h-4 mr-1" />
-                  Save Changes
+                  {en.cta.save_changes}
                 </RadixButton>
               </Flex>
             </Box>
@@ -841,8 +842,8 @@ export function OrganizationPage(): JSX.Element {
   return (
     <DashboardLayout>
       <PageHeader
-        title="School"
-        description="Manage your school's structure, departments, and organizational settings"
+        title={en.labels.school}
+        description={en.pages.organization.description}
         actions={[
           {
             label: 'Export Report',

@@ -13,6 +13,8 @@ import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
 import { FeatureGate } from '../../../../components/guards/FeatureGate';
 import { UpgradeHint } from '../../../../components/upsell/UpgradeHint';
+import { InlineUpgradeHint } from '../../../../components/upsell/InlineUpgradeHint';
+import { CapabilityGate } from '../../../../components/guards/CapabilityGate';
 import {
   Search,
   Download,
@@ -161,22 +163,34 @@ export function Payments({
                 Export
               </RadixButton>
               <FeatureGate
-                feature="fees.online"
+                feature="fees.record_manual"
                 fallback={
-                  <UpgradeHint
-                    neededPlan="growth"
-                    message="Online payment processing requires the Growth plan."
+                  <InlineUpgradeHint
+                    neededPlan="starter"
+                    message="Manual fee recording requires the Starter plan."
+                    context="fees.record_manual"
                   />
                 }
               >
-                <RadixButton
-                  variant="solid"
-                  size="2"
-                  className="bg-green-600 hover:bg-green-700"
+                <CapabilityGate
+                  cap="fees.record_manual"
+                  fallback={
+                    <InlineUpgradeHint
+                      neededPlan="starter"
+                      message="Manual fee recording requires the Starter plan."
+                      context="fees.record_manual"
+                    />
+                  }
                 >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Record Payment
-                </RadixButton>
+                  <RadixButton
+                    variant="solid"
+                    size="2"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Record Payment
+                  </RadixButton>
+                </CapabilityGate>
               </FeatureGate>
             </Flex>
           </Flex>
@@ -498,22 +512,34 @@ export function Payments({
                 </RadixButton>
               ) : (
                 <FeatureGate
-                  feature="fees.online"
+                  feature="fees.record_manual"
                   fallback={
-                    <UpgradeHint
-                      neededPlan="growth"
-                      message="Online payment processing requires the Growth plan."
+                    <InlineUpgradeHint
+                      neededPlan="starter"
+                      message="Manual fee recording requires the Starter plan."
+                      context="fees.record_manual"
                     />
                   }
                 >
-                  <RadixButton
-                    variant="solid"
-                    size="3"
-                    className="bg-green-600 hover:bg-green-700"
+                  <CapabilityGate
+                    cap="fees.record_manual"
+                    fallback={
+                      <InlineUpgradeHint
+                        neededPlan="starter"
+                        message="Manual fee recording requires the Starter plan."
+                        context="fees.record_manual"
+                      />
+                    }
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Record Payment
-                  </RadixButton>
+                    <RadixButton
+                      variant="solid"
+                      size="3"
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Record Payment
+                    </RadixButton>
+                  </CapabilityGate>
                 </FeatureGate>
               )}
             </Box>
