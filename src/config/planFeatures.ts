@@ -15,6 +15,10 @@ export const FEATURES_BY_PLAN: Record<Plan, string[]> = {
     'results.view',
     'notices.view',
     'fees.view',
+    // allow admin screens visibility for owners/admins even on Free
+    'staff.invite',
+    'org.manage',
+    'settings.integrations',
   ],
 
   starter: [
