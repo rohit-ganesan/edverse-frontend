@@ -9,6 +9,7 @@ import { Building, Users, BookOpen, Eye } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import type { Department } from '../types';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import { Plan } from 'types/access';
 
 export function Departments({
   isLoading = false,
@@ -224,8 +225,14 @@ export function Departments({
               label: 'Add Department',
               icon: <Building className="w-4 h-4 mr-1" />,
               onClick: handleAddDepartment,
+              gate: { cap: 'staff.invite', neededPlan: 'starter' as any },
             },
           ]}
+          advancedFilterGate={{
+            cap: 'staff.update',
+            neededPlan: 'starter' as Plan,
+          }}
+          exportGate={{ cap: 'staff.update', neededPlan: 'starter' as Plan }}
           onSort={handleSort}
           getRowKey={(department, index) => department.id.toString()}
           error={error}

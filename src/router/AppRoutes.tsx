@@ -67,8 +67,8 @@ function ProtectedRoutes() {
           element={<Navigate to="/students/overview" replace />}
         />
         <Route
-          path="/instructors"
-          element={<Navigate to="/instructors/overview" replace />}
+          path="/teachers"
+          element={<Navigate to="/teachers/overview" replace />}
         />
 
         {/* Students standalone pages */}
@@ -245,7 +245,7 @@ function ProtectedRoutes() {
         />
 
         <Route
-          path="/instructors/:tab"
+          path="/teachers/:tab"
           element={
             <RouteGuard
               moduleKey="instructors:core"
@@ -257,50 +257,50 @@ function ProtectedRoutes() {
 
         {/* Instructors standalone pages */}
         <Route
-          path="/instructors/view-instructor"
+          path="/teachers/view-teacher"
           element={
             <RouteGuard
               feature="staff.invite"
               cap="staff.invite"
-              routePath="/instructors/view-instructor"
+              routePath="/teachers/view-teacher"
             >
               <ViewInstructorPage />
             </RouteGuard>
           }
         />
         <Route
-          path="/instructors/add-instructor"
+          path="/teachers/add-teacher"
           element={
             <RouteGuard
               feature="staff.invite"
               cap="staff.invite"
               neededPlan="starter"
-              routePath="/instructors/add-instructor"
+              routePath="/teachers/add-teacher"
             >
               <AddInstructorPage />
             </RouteGuard>
           }
         />
         <Route
-          path="/instructors/edit-instructor"
+          path="/teachers/edit-teacher"
           element={
             <RouteGuard
               feature="staff.invite"
               cap="staff.invite"
               neededPlan="starter"
-              routePath="/instructors/edit-instructor"
+              routePath="/teachers/edit-teacher"
             >
               <EditInstructorPage />
             </RouteGuard>
           }
         />
         <Route
-          path="/instructors/:id/performance"
+          path="/teachers/:id/performance"
           element={
             <RouteGuard
               feature="analytics.view"
               neededPlan="growth"
-              routePath="/instructors/:id/performance"
+              routePath="/teachers/:id/performance"
             >
               <InstructorPerformancePage />
             </RouteGuard>

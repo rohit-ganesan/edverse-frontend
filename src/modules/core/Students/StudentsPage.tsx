@@ -18,14 +18,22 @@ import { Analytics } from './tabs/Analytics';
 import { Reports } from './tabs/Reports';
 import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import { FeatureGate } from 'components/guards/FeatureGate';
+import { useAccess } from 'context/AccessContext';
 
 export function StudentsPage(): JSX.Element {
   const { stats, isLoading } = useStudentData();
+  const { features } = useAccess();
+  const hasAnalytics = features.includes('analytics.view');
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'all-students',
-    validTabs: ['all-students', 'analytics', 'reports'],
+    validTabs: [
+      'all-students',
+      ...(hasAnalytics ? ['analytics'] : []),
+      'reports',
+    ],
     basePath: '/students',
   });
 
@@ -109,7 +117,9 @@ export function StudentsPage(): JSX.Element {
     {
       value: 'analytics',
       label: 'Analytics',
-      content: <Analytics isLoading={isLoading} />,
+      content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
+      disabled: !hasAnalytics,
+      tooltip: 'Requires GROWTH plan',
     },
     {
       value: 'reports',
@@ -126,15 +136,21 @@ export function StudentsPage(): JSX.Element {
         actions={headerActions}
       />
 
-      {isLoading ? (
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          {[...Array(4)].map((_, i) => (
-            <SkeletonCard key={i} height="120px" />
-          ))}
-        </div>
-      ) : (
-        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
-      )}
+      <FeatureGate
+        feature="analytics.view"
+        neededPlan="growth"
+        showUpgradeHint={false}
+      >
+        {isLoading ? (
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <SkeletonCard key={i} height="120px" />
+            ))}
+          </div>
+        ) : (
+          <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+        )}
+      </FeatureGate>
 
       <TabContainer
         tabs={tabItems}

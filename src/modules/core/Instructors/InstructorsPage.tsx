@@ -6,6 +6,7 @@ import {
   ColoredStatItem,
 } from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
+import { FeatureGate } from 'components/guards/FeatureGate';
 import { Users, Calendar, Award, ArrowUpRight } from 'lucide-react';
 import { useInstructorData } from './hooks/useInstructorData';
 import { AllInstructors } from './tabs/AllInstructors';
@@ -14,15 +15,23 @@ import { Analytics } from './tabs/Analytics';
 import { Reports } from './tabs/Reports';
 import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import { useAccess } from 'context/AccessContext';
 
 export function InstructorsPage(): JSX.Element {
   const { stats, isLoading } = useInstructorData();
+  const { features } = useAccess();
+  const hasAnalytics = features.includes('analytics.view');
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
-    defaultTab: 'all-instructors',
-    validTabs: ['all-instructors', 'departments', 'analytics', 'reports'],
-    basePath: '/instructors',
+    defaultTab: 'all-teachers',
+    validTabs: [
+      'all-teachers',
+      'departments',
+      ...(hasAnalytics ? ['analytics'] : []),
+      'reports',
+    ],
+    basePath: '/teachers',
   });
 
   const headerActions: Array<{
@@ -90,7 +99,7 @@ export function InstructorsPage(): JSX.Element {
 
   const tabItems = [
     {
-      value: 'all-instructors',
+      value: 'all-teachers',
       label: `All ${en.labels.instructors}`,
       content: <AllInstructors isLoading={isLoading} />,
     },
@@ -102,7 +111,13 @@ export function InstructorsPage(): JSX.Element {
     {
       value: 'analytics',
       label: en.tabs.analytics,
-      content: <Analytics isLoading={isLoading} />,
+      content: hasAnalytics ? <Analytics isLoading={isLoading} /> : <div />,
+      disabled: !hasAnalytics,
+      tooltip: (
+        <div className="flex items-center gap-2">
+          <span className="text-amber-300">Requires GROWTH plan</span>
+        </div>
+      ),
     },
     {
       value: 'reports',
@@ -119,15 +134,21 @@ export function InstructorsPage(): JSX.Element {
         actions={headerActions}
       />
 
-      {isLoading ? (
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          {[...Array(4)].map((_, i) => (
-            <SkeletonCard key={i} height="120px" />
-          ))}
-        </div>
-      ) : (
-        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
-      )}
+      <FeatureGate
+        feature="analytics.view"
+        neededPlan="growth"
+        showUpgradeHint={false}
+      >
+        {isLoading ? (
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <SkeletonCard key={i} height="120px" />
+            ))}
+          </div>
+        ) : (
+          <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+        )}
+      </FeatureGate>
 
       <TabContainer
         tabs={tabItems}

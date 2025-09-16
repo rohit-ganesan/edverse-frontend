@@ -210,7 +210,7 @@ export function AllClasses({
   const actions: DataTableAction<ClassSection>[] = [
     {
       icon: <Eye className="w-4 h-4" />,
-      label: 'View Students',
+      label: 'View',
       onClick: handleViewStudents,
     },
     {
@@ -286,6 +286,11 @@ export function AllClasses({
               gate: { cap: 'classes.create', neededPlan: 'starter' as Plan },
             },
           ]}
+          advancedFilterGate={{
+            cap: 'classes.update',
+            neededPlan: 'starter' as Plan,
+          }}
+          exportGate={{ cap: 'classes.update', neededPlan: 'starter' as Plan }}
           onSort={handleSort}
           getRowKey={(classSection, index) => classSection.id.toString()}
           emptyStateIcon={<GraduationCap className="w-12 h-12" />}

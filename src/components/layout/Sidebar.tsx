@@ -116,8 +116,8 @@ const buildMenuItems = (): MenuItem[] => {
       id: 'instructors',
       label: en.nav.instructors,
       icon: Users,
-      path: '/instructors/overview',
-      basePath: '/instructors',
+      path: '/teachers/overview',
+      basePath: '/teachers',
       module: 'core',
     },
     {

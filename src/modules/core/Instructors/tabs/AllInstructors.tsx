@@ -10,6 +10,7 @@ import { useInstructorData } from '../hooks/useInstructorData';
 import { useInstructorManagement } from '../hooks/useInstructorManagement';
 import type { Instructor } from '../types';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import { Plan } from 'types/access';
 
 export function AllInstructors({
   isLoading = false,
@@ -214,7 +215,7 @@ export function AllInstructors({
           data={instructors}
           columns={columns}
           actions={actions}
-          title="Instructor Records"
+          title="Teacher Records"
           icon={<Users className="w-5 h-5 text-purple-600" />}
           searchPlaceholder="Search by name, ID, email, or subjects..."
           searchFields={['name', 'employeeId', 'email', 'subjects']}
@@ -243,11 +244,17 @@ export function AllInstructors({
           ]}
           headerActions={[
             {
-              label: 'Add Instructor',
+              label: 'Add Teacher',
               icon: <User className="w-4 h-4 mr-1" />,
               onClick: handleAddInstructor,
+              gate: { cap: 'staff.invite', neededPlan: 'starter' as any },
             },
           ]}
+          advancedFilterGate={{
+            cap: 'staff.update',
+            neededPlan: 'starter' as Plan,
+          }}
+          exportGate={{ cap: 'staff.update', neededPlan: 'starter' as Plan }}
           onSort={handleSort}
           onFilter={handleFilter}
           getRowKey={(instructor, index) => instructor.id.toString()}

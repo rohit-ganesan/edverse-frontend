@@ -22,13 +22,13 @@ export function useInstructorManagement() {
       employeeId: instructor.employeeId,
     };
 
-    navigate('/instructors/view-instructor', {
+    navigate('/teachers/view-teacher', {
       state: { instructorData },
     });
   };
 
   const handleAddInstructor = () => {
-    navigate('/instructors/add-instructor');
+    navigate('/teachers/add-teacher');
   };
 
   // Export functionality

@@ -89,6 +89,12 @@ export interface DataTableProps<T> {
     neededPlan?: Plan;
     tooltip?: string;
   };
+  sortGate?: {
+    cap?: string;
+    feature?: string;
+    neededPlan?: Plan;
+    tooltip?: string;
+  };
 
   // Customization
   emptyStateIcon?: ReactNode;
@@ -121,6 +127,7 @@ export function DataTable<T>({
   headerActions = [],
   advancedFilterGate,
   exportGate,
+  sortGate,
   emptyStateIcon,
   emptyStateTitle = 'No records found',
   emptyStateSubtitle = 'Try adjusting your search terms or add a new record',
@@ -541,20 +548,64 @@ export function DataTable<T>({
             ))}
 
             {/* Sort Options */}
-            {sortOptions.length > 0 && (
-              <Box className="min-w-[150px]">
-                <Select.Root value={sortBy} onValueChange={setSortBy} size="2">
-                  <Select.Trigger className="w-full" />
-                  <Select.Content>
-                    {sortOptions.map((option) => (
-                      <Select.Item key={option.value} value={option.value}>
-                        {option.label}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Root>
-              </Box>
-            )}
+            {sortOptions.length > 0 &&
+              (sortGate ? (
+                <CapabilityGate
+                  cap={sortGate.cap || 'students.update'}
+                  feature={sortGate.feature}
+                  neededPlan={sortGate.neededPlan}
+                  showUpgradeHint={false}
+                  context="datatable:sort"
+                  fallback={
+                    <SoftTooltip
+                      content={getRequiredPlanText({
+                        neededPlan: sortGate.neededPlan as any,
+                        feature: sortGate.feature,
+                      })}
+                    >
+                      <div className="min-w-[150px] opacity-60 cursor-not-allowed">
+                        <Select.Root value={sortBy} size="2" disabled>
+                          <Select.Trigger className="w-full" />
+                        </Select.Root>
+                      </div>
+                    </SoftTooltip>
+                  }
+                >
+                  <Box className="min-w-[150px]">
+                    <Select.Root
+                      value={sortBy}
+                      onValueChange={setSortBy}
+                      size="2"
+                    >
+                      <Select.Trigger className="w-full" />
+                      <Select.Content>
+                        {sortOptions.map((option) => (
+                          <Select.Item key={option.value} value={option.value}>
+                            {option.label}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                  </Box>
+                </CapabilityGate>
+              ) : (
+                <Box className="min-w-[150px]">
+                  <Select.Root
+                    value={sortBy}
+                    onValueChange={setSortBy}
+                    size="2"
+                  >
+                    <Select.Trigger className="w-full" />
+                    <Select.Content>
+                      {sortOptions.map((option) => (
+                        <Select.Item key={option.value} value={option.value}>
+                          {option.label}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
+                </Box>
+              ))}
           </Flex>
         </Box>
 

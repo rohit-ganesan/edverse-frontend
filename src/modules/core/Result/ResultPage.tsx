@@ -14,15 +14,24 @@ import { Analytics } from './tabs/Analytics';
 import { PublishResults } from './tabs/PublishResults';
 import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import { FeatureGate } from 'components/guards/FeatureGate';
+import { useAccess } from 'context/AccessContext';
 
 export function ResultPage(): JSX.Element {
   const { analytics, isLoading } = useResultData();
   const { exportResults } = useResultManagement();
+  const { features } = useAccess();
+  const hasAnalytics = features.includes('analytics.view');
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'overview',
-    validTabs: ['overview', 'student-results', 'analytics', 'publish-results'],
+    validTabs: [
+      'overview',
+      'student-results',
+      ...(hasAnalytics ? ['analytics'] : []),
+      'publish-results',
+    ],
     basePath: '/result',
   });
 
@@ -102,15 +111,21 @@ export function ResultPage(): JSX.Element {
       />
 
       {/* Stats Skeleton */}
-      {isLoading ? (
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          {[...Array(4)].map((_, i) => (
-            <SkeletonCard key={i} height="120px" />
-          ))}
-        </div>
-      ) : (
-        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
-      )}
+      <FeatureGate
+        feature="analytics.view"
+        neededPlan="growth"
+        showUpgradeHint={false}
+      >
+        {isLoading ? (
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <SkeletonCard key={i} height="120px" />
+            ))}
+          </div>
+        ) : (
+          <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+        )}
+      </FeatureGate>
 
       <TabContainer
         activeTab={activeTab}
@@ -129,7 +144,9 @@ export function ResultPage(): JSX.Element {
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics isLoading={isLoading} />,
+            content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
+            disabled: !hasAnalytics,
+            tooltip: 'Requires GROWTH plan',
           },
           {
             value: 'publish-results',

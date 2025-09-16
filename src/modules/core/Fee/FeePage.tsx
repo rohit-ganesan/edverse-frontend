@@ -26,9 +26,13 @@ import { Settings } from './tabs/Settings';
 import { useFeeData } from './hooks/useFeeData';
 import { useTabRouting } from '../../../lib/useTabRouting';
 import { SkeletonCard } from '../../../components/ui/Skeleton';
+import { FeatureGate } from '../../../components/guards/FeatureGate';
+import { useAccess } from '../../../context/AccessContext';
 
 export function FeePage(): JSX.Element {
   const { stats, isLoading } = useFeeData();
+  const { features } = useAccess();
+  const hasAnalytics = features.includes('analytics.view');
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -38,7 +42,7 @@ export function FeePage(): JSX.Element {
       'payments',
       'fee-structures',
       'reports',
-      'analytics',
+      ...(hasAnalytics ? ['analytics'] : []),
       'settings',
     ],
     basePath: '/fee',
@@ -147,15 +151,21 @@ export function FeePage(): JSX.Element {
         ]}
       />
 
-      {isLoading ? (
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          {[...Array(4)].map((_, i) => (
-            <SkeletonCard key={i} height="120px" />
-          ))}
-        </div>
-      ) : (
-        <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
-      )}
+      <FeatureGate
+        feature="analytics.view"
+        neededPlan="growth"
+        showUpgradeHint={false}
+      >
+        {isLoading ? (
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <SkeletonCard key={i} height="120px" />
+            ))}
+          </div>
+        ) : (
+          <ModernStatsGridColored stats={coloredStats} columns="4" gap="6" />
+        )}
+      </FeatureGate>
 
       <TabContainer
         activeTab={activeTab}
@@ -184,7 +194,9 @@ export function FeePage(): JSX.Element {
           {
             value: 'analytics',
             label: 'Analytics',
-            content: <Analytics isLoading={isLoading} />,
+            content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
+            disabled: !hasAnalytics,
+            tooltip: 'Requires GROWTH plan',
           },
           {
             value: 'settings',

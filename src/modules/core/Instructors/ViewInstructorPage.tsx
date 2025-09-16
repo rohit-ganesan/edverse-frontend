@@ -64,7 +64,7 @@ export function ViewInstructorPage(): JSX.Element {
           setError(
             'No instructor data found. Please select an instructor from the list.'
           );
-          navigate('/instructors/overview');
+          navigate('/teachers/overview');
           return;
         }
 
@@ -98,7 +98,7 @@ export function ViewInstructorPage(): JSX.Element {
 
   const handleEdit = () => {
     if (instructor) {
-      navigate('/instructors/edit-instructor', {
+      navigate('/teachers/edit-teacher', {
         state: { instructorData: instructor },
       });
     }
@@ -113,7 +113,7 @@ export function ViewInstructorPage(): JSX.Element {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      navigate('/instructors/overview');
+      navigate('/teachers/overview');
     } catch (error) {
       console.error('Error deleting instructor:', error);
       setError('Failed to delete instructor. Please try again.');
@@ -155,7 +155,7 @@ export function ViewInstructorPage(): JSX.Element {
             </Text>
             <RadixButton
               variant="soft"
-              onClick={() => navigate('/instructors/overview')}
+              onClick={() => navigate('/teachers/overview')}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Instructors
@@ -174,7 +174,7 @@ export function ViewInstructorPage(): JSX.Element {
           <Flex align="center" gap="3">
             <RadixButton
               variant="ghost"
-              onClick={() => navigate('/instructors/overview')}
+              onClick={() => navigate('/teachers/overview')}
               className="p-2"
             >
               <ArrowLeft className="w-4 h-4" />
