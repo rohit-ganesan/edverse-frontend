@@ -7,6 +7,7 @@ import {
   Heading,
   AlertDialog,
   Button,
+  Tooltip,
 } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
@@ -14,7 +15,18 @@ import { RadixButton } from 'components/ui/RadixButton';
 import { FormField } from 'components/ui/FormField';
 import { StatusBadge } from 'components/ui/StatusBadge';
 import { PersonAvatar } from 'components/ui/PersonAvatar';
-import { ArrowLeft, Edit, Trash2, Mail, Phone, BookOpen } from 'lucide-react';
+import {
+  ArrowLeft,
+  Edit,
+  Trash2,
+  Mail,
+  Phone,
+  BookOpen,
+  Lock,
+} from 'lucide-react';
+import { CapabilityGate } from 'components/guards/CapabilityGate';
+import type { Plan } from 'types/access';
+import { getMinPlanForFeature } from 'config/planFeatures';
 
 interface InstructorData {
   id: string;
@@ -52,7 +64,7 @@ export function ViewInstructorPage(): JSX.Element {
           setError(
             'No instructor data found. Please select an instructor from the list.'
           );
-          navigate('/instructors');
+          navigate('/instructors/overview');
           return;
         }
 
@@ -101,7 +113,7 @@ export function ViewInstructorPage(): JSX.Element {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      navigate('/instructors');
+      navigate('/instructors/overview');
     } catch (error) {
       console.error('Error deleting instructor:', error);
       setError('Failed to delete instructor. Please try again.');
@@ -143,7 +155,7 @@ export function ViewInstructorPage(): JSX.Element {
             </Text>
             <RadixButton
               variant="soft"
-              onClick={() => navigate('/instructors')}
+              onClick={() => navigate('/instructors/overview')}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Instructors
@@ -162,7 +174,7 @@ export function ViewInstructorPage(): JSX.Element {
           <Flex align="center" gap="3">
             <RadixButton
               variant="ghost"
-              onClick={() => navigate('/instructors')}
+              onClick={() => navigate('/instructors/overview')}
               className="p-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -178,46 +190,135 @@ export function ViewInstructorPage(): JSX.Element {
           </Flex>
 
           <Flex gap="2">
-            <RadixButton variant="outline" onClick={handleEdit}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </RadixButton>
+            {(() => {
+              const getRequiredPlanText = (opts?: {
+                neededPlan?: string;
+                feature?: string;
+              }) => {
+                const plan = (
+                  opts?.neededPlan ||
+                  getMinPlanForFeature(opts?.feature || '') ||
+                  'starter'
+                ).toUpperCase();
+                return (
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-3 h-3 text-amber-500" />
+                    <span className="text-amber-300">Requires {plan} plan</span>
+                  </div>
+                );
+              };
 
-            <AlertDialog.Root>
-              <AlertDialog.Trigger>
-                <RadixButton variant="outline" color="red">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </RadixButton>
-              </AlertDialog.Trigger>
-              <AlertDialog.Content style={{ maxWidth: 450 }}>
-                <AlertDialog.Title>Delete Instructor</AlertDialog.Title>
-                <AlertDialog.Description size="2">
-                  Are you sure you want to delete{' '}
-                  <strong>{instructor?.name}</strong>? This action cannot be
-                  undone and will permanently remove all instructor data
-                  including course assignments and teaching history.
-                </AlertDialog.Description>
+              const SoftTooltip = ({
+                content,
+                children,
+              }: {
+                content: React.ReactNode;
+                children: React.ReactNode;
+              }) => (
+                <Tooltip content={content}>
+                  <div className="[&_[data-radix-tooltip-content]]:bg-gray-900/85">
+                    {children}
+                  </div>
+                </Tooltip>
+              );
 
-                <Flex gap="3" mt="4" justify="end">
-                  <AlertDialog.Cancel>
-                    <Button variant="soft" color="gray">
-                      Cancel
-                    </Button>
-                  </AlertDialog.Cancel>
-                  <AlertDialog.Action>
-                    <Button
-                      variant="solid"
-                      color="red"
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                    >
-                      {isDeleting ? 'Deleting...' : 'Delete Instructor'}
-                    </Button>
-                  </AlertDialog.Action>
-                </Flex>
-              </AlertDialog.Content>
-            </AlertDialog.Root>
+              return (
+                <>
+                  {/* Edit button gate */}
+                  <CapabilityGate
+                    cap="staff.invite"
+                    feature="staff.invite"
+                    neededPlan={'starter' as Plan}
+                    showUpgradeHint={false}
+                    context="view-instructor:edit"
+                    fallback={
+                      <SoftTooltip
+                        content={getRequiredPlanText({ neededPlan: 'starter' })}
+                      >
+                        <div>
+                          <RadixButton
+                            variant="outline"
+                            disabled
+                            className="opacity-60 cursor-not-allowed text-gray-400 dark:text-gray-300"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                          </RadixButton>
+                        </div>
+                      </SoftTooltip>
+                    }
+                  >
+                    <RadixButton variant="outline" onClick={handleEdit}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </RadixButton>
+                  </CapabilityGate>
+
+                  {/* Delete button gate */}
+                  <CapabilityGate
+                    cap="staff.invite"
+                    feature="staff.invite"
+                    neededPlan={'starter' as Plan}
+                    showUpgradeHint={false}
+                    context="view-instructor:delete"
+                    fallback={
+                      <SoftTooltip
+                        content={getRequiredPlanText({ neededPlan: 'starter' })}
+                      >
+                        <div>
+                          <RadixButton
+                            variant="outline"
+                            color="red"
+                            disabled
+                            className="opacity-60 cursor-not-allowed text-gray-400 dark:text-gray-300"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </RadixButton>
+                        </div>
+                      </SoftTooltip>
+                    }
+                  >
+                    <AlertDialog.Root>
+                      <AlertDialog.Trigger>
+                        <RadixButton variant="outline" color="red">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </RadixButton>
+                      </AlertDialog.Trigger>
+                      <AlertDialog.Content style={{ maxWidth: 450 }}>
+                        <AlertDialog.Title>Delete Instructor</AlertDialog.Title>
+                        <AlertDialog.Description size="2">
+                          Are you sure you want to delete{' '}
+                          <strong>{instructor?.name}</strong>? This action
+                          cannot be undone and will permanently remove all
+                          instructor data including course assignments and
+                          teaching history.
+                        </AlertDialog.Description>
+
+                        <Flex gap="3" mt="4" justify="end">
+                          <AlertDialog.Cancel>
+                            <Button variant="soft" color="gray">
+                              Cancel
+                            </Button>
+                          </AlertDialog.Cancel>
+                          <AlertDialog.Action>
+                            <Button
+                              variant="solid"
+                              color="red"
+                              onClick={handleDelete}
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? 'Deleting...' : 'Delete Instructor'}
+                            </Button>
+                          </AlertDialog.Action>
+                        </Flex>
+                      </AlertDialog.Content>
+                    </AlertDialog.Root>
+                  </CapabilityGate>
+                </>
+              );
+            })()}
           </Flex>
         </Flex>
 

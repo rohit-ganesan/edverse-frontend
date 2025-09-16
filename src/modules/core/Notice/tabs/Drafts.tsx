@@ -1,8 +1,10 @@
-import { Box, Flex, Text, Heading, Grid } from '@radix-ui/themes';
+import { Box, Flex, Text, Heading, Grid, Tooltip } from '@radix-ui/themes';
 import { RadixCard } from 'components/ui/RadixCard';
 import { RadixButton } from 'components/ui/RadixButton';
-import { FileText, Plus, Edit, Trash2, Send, Save } from 'lucide-react';
-import { NoticeCard } from '../components/NoticeCard';
+import { FileText, Plus, Edit, Trash2, Send, Save, Lock } from 'lucide-react';
+import { CapabilityGate } from 'components/guards/CapabilityGate';
+import type { Plan } from 'types/access';
+// import { NoticeCard } from '../components/NoticeCard';
 import { useNoticeData } from '../hooks/useNoticeData';
 import { useNoticeManagement } from '../hooks/useNoticeManagement';
 import { SkeletonCard } from 'components/ui/Skeleton';
@@ -240,30 +242,128 @@ export function Drafts({
                       </Box>
                     </Flex>
 
-                    {/* Actions */}
+                    {/* Actions with gating */}
                     <Flex gap="2" className="flex-shrink-0">
-                      <RadixButton
-                        variant="outline"
-                        size="2"
-                        onClick={() => handleEditNotice(notice.id)}
+                      {/* Edit notice: cap notices.send, Starter+ */}
+                      <CapabilityGate
+                        cap="notices.send"
+                        feature="notices.view"
+                        neededPlan={'starter' as Plan}
+                        showUpgradeHint={false}
+                        context="notice-drafts:edit"
+                        fallback={
+                          <Tooltip
+                            content={
+                              <div className="flex items-center gap-2">
+                                <Lock className="w-3 h-3 text-amber-500" />
+                                <span className="text-amber-300">
+                                  Requires STARTER plan
+                                </span>
+                              </div>
+                            }
+                          >
+                            <div>
+                              <RadixButton
+                                variant="outline"
+                                size="2"
+                                disabled
+                                className="opacity-60 cursor-not-allowed text-gray-400"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </RadixButton>
+                            </div>
+                          </Tooltip>
+                        }
                       >
-                        <Edit className="w-4 h-4" />
-                      </RadixButton>
-                      <RadixButton
-                        variant="solid"
-                        size="2"
-                        onClick={() => handlePublishNotice(notice.id)}
-                        disabled={notice.content.length < 10}
+                        <RadixButton
+                          variant="outline"
+                          size="2"
+                          onClick={() => handleEditNotice(notice.id)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </RadixButton>
+                      </CapabilityGate>
+
+                      {/* Publish (send) notice: cap notices.send, Starter+ */}
+                      <CapabilityGate
+                        cap="notices.send"
+                        feature="notices.view"
+                        neededPlan={'starter' as Plan}
+                        showUpgradeHint={false}
+                        context="notice-drafts:publish"
+                        fallback={
+                          <Tooltip
+                            content={
+                              <div className="flex items-center gap-2">
+                                <Lock className="w-3 h-3 text-amber-500" />
+                                <span className="text-amber-300">
+                                  Requires STARTER plan
+                                </span>
+                              </div>
+                            }
+                          >
+                            <div>
+                              <RadixButton
+                                variant="solid"
+                                size="2"
+                                disabled
+                                className="opacity-60 cursor-not-allowed text-gray-400"
+                              >
+                                <Send className="w-4 h-4" />
+                              </RadixButton>
+                            </div>
+                          </Tooltip>
+                        }
                       >
-                        <Send className="w-4 h-4" />
-                      </RadixButton>
-                      <RadixButton
-                        variant="ghost"
-                        size="2"
-                        onClick={() => handleDeleteNotice(notice.id)}
+                        <RadixButton
+                          variant="solid"
+                          size="2"
+                          onClick={() => handlePublishNotice(notice.id)}
+                          disabled={notice.content.length < 10}
+                        >
+                          <Send className="w-4 h-4" />
+                        </RadixButton>
+                      </CapabilityGate>
+
+                      {/* Delete notice: cap notices.send (manage), Starter+ */}
+                      <CapabilityGate
+                        cap="notices.send"
+                        feature="notices.view"
+                        neededPlan={'starter' as Plan}
+                        showUpgradeHint={false}
+                        context="notice-drafts:delete"
+                        fallback={
+                          <Tooltip
+                            content={
+                              <div className="flex items-center gap-2">
+                                <Lock className="w-3 h-3 text-amber-500" />
+                                <span className="text-amber-300">
+                                  Requires STARTER plan
+                                </span>
+                              </div>
+                            }
+                          >
+                            <div>
+                              <RadixButton
+                                variant="ghost"
+                                size="2"
+                                disabled
+                                className="opacity-60 cursor-not-allowed text-gray-400"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </RadixButton>
+                            </div>
+                          </Tooltip>
+                        }
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </RadixButton>
+                        <RadixButton
+                          variant="ghost"
+                          size="2"
+                          onClick={() => handleDeleteNotice(notice.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </RadixButton>
+                      </CapabilityGate>
                     </Flex>
                   </Flex>
                 </RadixCard>

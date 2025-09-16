@@ -10,7 +10,13 @@ import {
 } from '@radix-ui/themes';
 import { RadixCard } from './RadixCard';
 import { RadixButton } from './RadixButton';
-import { Search, Filter, Download } from 'lucide-react';
+import { Tooltip } from '@radix-ui/themes';
+import { CapabilityGate } from '../guards/CapabilityGate';
+import type { Plan } from '../../types/access';
+import { Search, Filter, Download, Lock } from 'lucide-react';
+import { getMinPlanForFeature } from '../../config/planFeatures';
+import { useAccess } from '../../context/AccessContext';
+import { PLAN_RANKS } from '../../types/access';
 
 export interface DataTableColumn<T> {
   key: string;
@@ -26,6 +32,12 @@ export interface DataTableAction<T> {
   onClick: (item: T) => void;
   variant?: 'ghost' | 'soft' | 'solid';
   color?: string;
+  gate?: {
+    cap?: string;
+    feature?: string;
+    neededPlan?: Plan;
+    tooltip?: string;
+  };
 }
 
 export interface DataTableFilter {
@@ -57,7 +69,26 @@ export interface DataTableProps<T> {
     icon: ReactNode;
     onClick: () => void;
     variant?: 'ghost' | 'soft' | 'solid';
+    gate?: {
+      cap?: string;
+      feature?: string;
+      neededPlan?: Plan;
+      tooltip?: string;
+    };
   }[];
+  // Per-action gating for built-in header controls
+  advancedFilterGate?: {
+    cap?: string;
+    feature?: string;
+    neededPlan?: Plan;
+    tooltip?: string;
+  };
+  exportGate?: {
+    cap?: string;
+    feature?: string;
+    neededPlan?: Plan;
+    tooltip?: string;
+  };
 
   // Customization
   emptyStateIcon?: ReactNode;
@@ -88,6 +119,8 @@ export function DataTable<T>({
   sortOptions = [],
   actions = [],
   headerActions = [],
+  advancedFilterGate,
+  exportGate,
   emptyStateIcon,
   emptyStateTitle = 'No records found',
   emptyStateSubtitle = 'Try adjusting your search terms or add a new record',
@@ -99,6 +132,100 @@ export function DataTable<T>({
   error,
   selectedRowKey,
 }: DataTableProps<T>): JSX.Element {
+  // ---------- Gating helpers ----------
+  const SoftTooltip = ({
+    content,
+    children,
+  }: {
+    content: ReactNode;
+    children: ReactNode;
+  }) => (
+    <Tooltip content={content}>
+      <div className="[&_[data-radix-tooltip-content]]:bg-gray-900/85">
+        {children}
+      </div>
+    </Tooltip>
+  );
+
+  function getRequiredPlanText(opts?: {
+    neededPlan?: string;
+    feature?: string;
+  }) {
+    const plan = (
+      opts?.neededPlan ||
+      getMinPlanForFeature(opts?.feature || '') ||
+      'starter'
+    ).toUpperCase();
+    return (
+      <div className="flex items-center gap-2">
+        <Lock className="w-3 h-3 text-amber-500" />
+        <span className="text-amber-300">Requires {plan} plan</span>
+      </div>
+    );
+  }
+
+  function GatedHeaderButton({
+    label,
+    icon,
+    onClick,
+    gate,
+    variant = 'soft' as const,
+    testId,
+  }: {
+    label: string;
+    icon: ReactNode;
+    onClick?: () => void;
+    gate?: { cap?: string; feature?: string; neededPlan?: any };
+    variant?: 'ghost' | 'soft' | 'solid';
+    testId?: string;
+  }) {
+    const button = (
+      <RadixButton
+        variant={variant}
+        size="2"
+        onClick={onClick}
+        data-testid={testId}
+      >
+        {icon}
+        {label}
+      </RadixButton>
+    );
+
+    if (!gate) return button;
+
+    return (
+      <CapabilityGate
+        cap={gate.cap}
+        feature={gate.feature}
+        neededPlan={gate.neededPlan as any}
+        showUpgradeHint={false}
+        context={`datatable:header:${label}`}
+        fallback={
+          <SoftTooltip
+            content={getRequiredPlanText({
+              neededPlan: gate.neededPlan as any,
+              feature: gate.feature,
+            })}
+          >
+            <div>
+              <RadixButton
+                variant={variant}
+                size="2"
+                disabled
+                className="opacity-60 cursor-not-allowed text-gray-400 dark:text-gray-300"
+              >
+                {icon}
+                {label}
+              </RadixButton>
+            </div>
+          </SoftTooltip>
+        }
+      >
+        {button}
+      </CapabilityGate>
+    );
+  }
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState(sortOptions[0]?.value || '');
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
@@ -156,6 +283,27 @@ export function DataTable<T>({
     onFilter,
     onSort,
   ]);
+
+  // Access context for computing global allowed state for actions column
+  const { plan, features, capabilities } = useAccess();
+
+  function isGateAllowed(gate?: {
+    cap?: string;
+    feature?: string;
+    neededPlan?: Plan;
+  }): boolean {
+    if (!gate) return true;
+    const needed =
+      gate.neededPlan ||
+      (gate.feature ? (getMinPlanForFeature(gate.feature) as Plan) : undefined);
+    const meetsPlan = !needed || PLAN_RANKS[plan] >= PLAN_RANKS[needed];
+    const hasFeature = !gate.feature || features.includes(gate.feature);
+    const hasCap =
+      !gate.cap ||
+      capabilities.includes('*') ||
+      capabilities.includes(gate.cap);
+    return meetsPlan && hasFeature && hasCap;
+  }
 
   const handleFilterChange = (filterKey: string, value: string) => {
     setFilterValues((prev) => ({ ...prev, [filterKey]: value }));
@@ -236,33 +384,116 @@ export function DataTable<T>({
               </Box>
             </Flex>
             <Flex gap="2">
-              <RadixButton
-                variant="soft"
-                size="2"
-                className="bg-white/70 hover:bg-white"
-              >
-                <Filter className="w-4 h-4 mr-1" />
-                Advanced Filter
-              </RadixButton>
-              <RadixButton
-                variant="soft"
-                size="2"
-                className="bg-white/70 hover:bg-white"
-                onClick={handleExport}
-              >
-                <Download className="w-4 h-4 mr-1" />
-                Export
-              </RadixButton>
-              {headerActions.map((action, index) => (
-                <RadixButton
-                  key={index}
-                  variant={action.variant || 'solid'}
-                  size="2"
-                  onClick={action.onClick}
+              {/* Advanced Filter */}
+              {advancedFilterGate ? (
+                <CapabilityGate
+                  cap={advancedFilterGate.cap || 'students.update'}
+                  feature={advancedFilterGate.feature}
+                  neededPlan={advancedFilterGate.neededPlan}
+                  showUpgradeHint={false}
+                  context="datatable:advanced_filter"
+                  fallback={
+                    <SoftTooltip
+                      content={getRequiredPlanText({
+                        neededPlan: advancedFilterGate.neededPlan as any,
+                        feature: advancedFilterGate.feature,
+                      })}
+                    >
+                      <div>
+                        <RadixButton
+                          variant="soft"
+                          size="2"
+                          className="bg-white/70 hover:bg-white opacity-60 cursor-not-allowed text-gray-400 dark:text-gray-300"
+                          disabled
+                        >
+                          <Filter className="w-4 h-4 mr-1" />
+                          Filter
+                        </RadixButton>
+                      </div>
+                    </SoftTooltip>
+                  }
                 >
-                  {action.icon}
-                  {action.label}
+                  <RadixButton
+                    variant="soft"
+                    size="2"
+                    className="bg-white/70 hover:bg-white"
+                  >
+                    <Filter className="w-4 h-4 mr-1" />
+                    Filter
+                  </RadixButton>
+                </CapabilityGate>
+              ) : (
+                <RadixButton
+                  variant="soft"
+                  size="2"
+                  className="bg-white/70 hover:bg-white"
+                >
+                  <Filter className="w-4 h-4 mr-1" />
+                  Filter
                 </RadixButton>
+              )}
+
+              {/* Export */}
+              {exportGate ? (
+                <CapabilityGate
+                  cap={exportGate.cap || 'students.view'}
+                  feature={exportGate.feature}
+                  neededPlan={exportGate.neededPlan}
+                  showUpgradeHint={false}
+                  context="datatable:export"
+                  fallback={
+                    <SoftTooltip
+                      content={getRequiredPlanText({
+                        neededPlan: exportGate.neededPlan as any,
+                        feature: exportGate.feature,
+                      })}
+                    >
+                      <div>
+                        <RadixButton
+                          variant="soft"
+                          size="2"
+                          className="bg-white/70 hover:bg-white opacity-60 cursor-not-allowed text-gray-400 dark:text-gray-300"
+                          disabled
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          Export
+                        </RadixButton>
+                      </div>
+                    </SoftTooltip>
+                  }
+                >
+                  <RadixButton
+                    variant="soft"
+                    size="2"
+                    className="bg-white/70 hover:bg-white"
+                    onClick={handleExport}
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    Export
+                  </RadixButton>
+                </CapabilityGate>
+              ) : (
+                <RadixButton
+                  variant="soft"
+                  size="2"
+                  className="bg-white/70 hover:bg-white"
+                  onClick={handleExport}
+                >
+                  <Download className="w-4 h-4 mr-1" />
+                  Export
+                </RadixButton>
+              )}
+
+              {/* Header Actions (e.g., Add Student) */}
+              {headerActions.map((action, index) => (
+                <GatedHeaderButton
+                  key={index}
+                  label={action.label as string}
+                  icon={action.icon}
+                  onClick={action.onClick}
+                  gate={action.gate}
+                  variant={action.variant || 'solid'}
+                />
               ))}
             </Flex>
           </Flex>
@@ -352,11 +583,7 @@ export function DataTable<T>({
                   ))}
                   {actions.length > 0 && (
                     <Table.ColumnHeaderCell className="py-4 px-6 text-left text-gray-700 dark:text-gray-300">
-                      <Text
-                        size="2"
-                        weight="medium"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
+                      <Text size="2" weight="medium">
                         Actions
                       </Text>
                     </Table.ColumnHeaderCell>
@@ -392,18 +619,22 @@ export function DataTable<T>({
                     {actions.length > 0 && (
                       <Table.Cell className="py-4 px-6">
                         <Flex gap="1">
-                          {actions.map((action, actionIndex) => (
-                            <RadixButton
-                              key={actionIndex}
-                              variant={action.variant || 'ghost'}
-                              size="2"
-                              onClick={() => action.onClick(item)}
-                              className="p-2"
-                              title={action.label}
-                            >
-                              {action.icon}
-                            </RadixButton>
-                          ))}
+                          {actions.map((action, actionIndex) => {
+                            const allowed = isGateAllowed(action.gate);
+                            if (!allowed) return null; // Hide actions the user cannot perform
+                            return (
+                              <RadixButton
+                                key={actionIndex}
+                                variant={action.variant || 'ghost'}
+                                size="2"
+                                onClick={() => action.onClick(item)}
+                                className="p-2"
+                                title={action.label}
+                              >
+                                {action.icon}
+                              </RadixButton>
+                            );
+                          })}
                         </Flex>
                       </Table.Cell>
                     )}

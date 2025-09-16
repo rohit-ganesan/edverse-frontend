@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useAccessCheck } from '../../hooks/useAccessCheck';
 import { UpgradeHint } from '../upsell/UpgradeHint';
+import InlineUpgradeHint from '../upsell/InlineUpgradeHint';
+import { Box } from '@radix-ui/themes';
 import type { Plan } from '../../types/access';
 import { usePlan } from '../../context/AccessContext';
 import { useAccessTelemetry } from '../../hooks/useAccessTelemetry';
@@ -13,6 +15,8 @@ type Props = {
   fallback?: React.ReactNode;
   /** Show upgrade hint instead of fallback when feature is locked */
   showUpgradeHint?: boolean;
+  /** When true, render children with a soft lock overlay + inline hint */
+  softLock?: boolean;
 };
 
 export function FeatureGate({
@@ -21,6 +25,7 @@ export function FeatureGate({
   children,
   fallback = null,
   showUpgradeHint = true,
+  softLock = false,
 }: Props) {
   const accessCheck = useAccessCheck({ feature, neededPlan });
   const plan = usePlan();
@@ -52,6 +57,22 @@ export function FeatureGate({
     showUpgradeHint &&
     (accessCheck.reason?.neededPlan || accessCheck.reason?.missingFeature)
   ) {
+    if (softLock) {
+      const needed = (accessCheck.reason?.neededPlan as Plan) || 'starter';
+      return (
+        <Box className="relative">
+          <Box className="pointer-events-none opacity-40 select-none">
+            {children}
+          </Box>
+          <Box className="absolute inset-0 flex items-center justify-center">
+            <InlineUpgradeHint
+              neededPlan={needed}
+              context={`feature:${feature}`}
+            />
+          </Box>
+        </Box>
+      );
+    }
     return (
       <UpgradeHint
         neededPlan={accessCheck.reason?.neededPlan}

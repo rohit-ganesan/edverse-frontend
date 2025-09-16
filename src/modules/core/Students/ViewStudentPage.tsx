@@ -7,6 +7,7 @@ import {
   Heading,
   AlertDialog,
   Button,
+  Tooltip,
 } from '@radix-ui/themes';
 import { DashboardLayout } from 'components/layout/DashboardLayout';
 import { RadixCard } from 'components/ui/RadixCard';
@@ -21,7 +22,11 @@ import {
   Mail,
   Phone,
   GraduationCap,
+  Lock,
 } from 'lucide-react';
+import { CapabilityGate } from 'components/guards/CapabilityGate';
+import type { Plan } from 'types/access';
+import { getMinPlanForFeature } from 'config/planFeatures';
 
 interface StudentData {
   id: string;
@@ -60,7 +65,7 @@ export function ViewStudentPage(): JSX.Element {
           setError(
             'No student data found. Please select a student from the list.'
           );
-          navigate('/students');
+          navigate('/students/overview');
           return;
         }
 
@@ -110,7 +115,7 @@ export function ViewStudentPage(): JSX.Element {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      navigate('/students');
+      navigate('/students/overview');
     } catch (error) {
       console.error('Error deleting student:', error);
       setError('Failed to delete student. Please try again.');
@@ -150,7 +155,10 @@ export function ViewStudentPage(): JSX.Element {
             <Text color="red" size="3" className="block mb-4">
               {error || 'Student not found'}
             </Text>
-            <RadixButton variant="soft" onClick={() => navigate('/students')}>
+            <RadixButton
+              variant="soft"
+              onClick={() => navigate('/students/overview')}
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Students
             </RadixButton>
@@ -168,7 +176,7 @@ export function ViewStudentPage(): JSX.Element {
           <Flex align="center" gap="3">
             <RadixButton
               variant="ghost"
-              onClick={() => navigate('/students')}
+              onClick={() => navigate('/students/overview')}
               className="p-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -184,46 +192,135 @@ export function ViewStudentPage(): JSX.Element {
           </Flex>
 
           <Flex gap="2">
-            <RadixButton variant="outline" onClick={handleEdit}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </RadixButton>
+            {/* Helper tooltip for gated actions */}
+            {(() => {
+              const getRequiredPlanText = (opts?: {
+                neededPlan?: string;
+                feature?: string;
+              }) => {
+                const plan = (
+                  opts?.neededPlan ||
+                  getMinPlanForFeature(opts?.feature || '') ||
+                  'starter'
+                ).toUpperCase();
+                return (
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-3 h-3 text-amber-500" />
+                    <span className="text-amber-300">Requires {plan} plan</span>
+                  </div>
+                );
+              };
 
-            <AlertDialog.Root>
-              <AlertDialog.Trigger>
-                <RadixButton variant="outline" color="red">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </RadixButton>
-              </AlertDialog.Trigger>
-              <AlertDialog.Content style={{ maxWidth: 450 }}>
-                <AlertDialog.Title>Delete Student</AlertDialog.Title>
-                <AlertDialog.Description size="2">
-                  Are you sure you want to delete{' '}
-                  <strong>{student?.name}</strong>? This action cannot be undone
-                  and will permanently remove all student data including
-                  academic records and attendance history.
-                </AlertDialog.Description>
+              const SoftTooltip = ({
+                content,
+                children,
+              }: {
+                content: React.ReactNode;
+                children: React.ReactNode;
+              }) => (
+                <Tooltip content={content}>
+                  <div className="[&_[data-radix-tooltip-content]]:bg-gray-900/85">
+                    {children}
+                  </div>
+                </Tooltip>
+              );
 
-                <Flex gap="3" mt="4" justify="end">
-                  <AlertDialog.Cancel>
-                    <Button variant="soft" color="gray">
-                      Cancel
-                    </Button>
-                  </AlertDialog.Cancel>
-                  <AlertDialog.Action>
-                    <Button
-                      variant="solid"
-                      color="red"
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                    >
-                      {isDeleting ? 'Deleting...' : 'Delete Student'}
-                    </Button>
-                  </AlertDialog.Action>
-                </Flex>
-              </AlertDialog.Content>
-            </AlertDialog.Root>
+              return (
+                <>
+                  {/* Edit button gate */}
+                  <CapabilityGate
+                    cap="students.update"
+                    feature="students.view"
+                    neededPlan={'starter' as Plan}
+                    showUpgradeHint={false}
+                    context="view-student:edit"
+                    fallback={
+                      <SoftTooltip
+                        content={getRequiredPlanText({ neededPlan: 'starter' })}
+                      >
+                        <div>
+                          <RadixButton
+                            variant="outline"
+                            disabled
+                            className="opacity-60 cursor-not-allowed text-gray-400 dark:text-gray-300"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                          </RadixButton>
+                        </div>
+                      </SoftTooltip>
+                    }
+                  >
+                    <RadixButton variant="outline" onClick={handleEdit}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </RadixButton>
+                  </CapabilityGate>
+
+                  {/* Delete button gate */}
+                  <CapabilityGate
+                    cap="students.delete"
+                    feature="students.view"
+                    neededPlan={'starter' as Plan}
+                    showUpgradeHint={false}
+                    context="view-student:delete"
+                    fallback={
+                      <SoftTooltip
+                        content={getRequiredPlanText({ neededPlan: 'starter' })}
+                      >
+                        <div>
+                          <RadixButton
+                            variant="outline"
+                            color="red"
+                            disabled
+                            className="opacity-60 cursor-not-allowed text-gray-400 dark:text-gray-300"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </RadixButton>
+                        </div>
+                      </SoftTooltip>
+                    }
+                  >
+                    <AlertDialog.Root>
+                      <AlertDialog.Trigger>
+                        <RadixButton variant="outline" color="red">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </RadixButton>
+                      </AlertDialog.Trigger>
+                      <AlertDialog.Content style={{ maxWidth: 450 }}>
+                        <AlertDialog.Title>Delete Student</AlertDialog.Title>
+                        <AlertDialog.Description size="2">
+                          Are you sure you want to delete{' '}
+                          <strong>{student?.name}</strong>? This action cannot
+                          be undone and will permanently remove all student data
+                          including academic records and attendance history.
+                        </AlertDialog.Description>
+
+                        <Flex gap="3" mt="4" justify="end">
+                          <AlertDialog.Cancel>
+                            <Button variant="soft" color="gray">
+                              Cancel
+                            </Button>
+                          </AlertDialog.Cancel>
+                          <AlertDialog.Action>
+                            <Button
+                              variant="solid"
+                              color="red"
+                              onClick={handleDelete}
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? 'Deleting...' : 'Delete Student'}
+                            </Button>
+                          </AlertDialog.Action>
+                        </Flex>
+                      </AlertDialog.Content>
+                    </AlertDialog.Root>
+                  </CapabilityGate>
+                </>
+              );
+            })()}
           </Flex>
         </Flex>
 

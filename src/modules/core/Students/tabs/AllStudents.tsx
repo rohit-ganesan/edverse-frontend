@@ -5,7 +5,8 @@ import {
   DataTableColumn,
   DataTableAction,
 } from 'components/ui/DataTable';
-import { Users, User, Eye, UserPlus } from 'lucide-react';
+import { Users, User, Eye, UserPlus, Pencil } from 'lucide-react';
+import type { Plan } from 'types/access';
 import { useStudentData } from '../hooks/useStudentData';
 import { useStudentManagement } from '../hooks/useStudentManagement';
 import type { Student } from '../types';
@@ -157,10 +158,19 @@ export function AllStudents({
   ];
 
   const actions: DataTableAction<Student>[] = [
+    // View is allowed for users who can read students (free owner included)
     {
       icon: <Eye className="w-5 h-5" />,
-      label: 'View Details',
+      label: 'View',
       onClick: handleViewStudent,
+      gate: { cap: 'students.view' as any },
+    },
+    // Edit is restricted by role/plan (Starter+ with proper capability)
+    {
+      icon: <Pencil className="w-5 h-5" />,
+      label: 'Edit',
+      onClick: handleViewStudent, // TODO: wire to edit flow
+      gate: { cap: 'students.update' as any, neededPlan: 'starter' as Plan },
     },
   ];
 
@@ -216,6 +226,16 @@ export function AllStudents({
           icon={<Users className="w-5 h-5 text-purple-600" />}
           searchPlaceholder="Search by student name, roll number, or parent..."
           searchFields={['name', 'rollNumber', 'parentEmail', 'parentName']}
+          advancedFilterGate={{
+            cap: 'students.update',
+            neededPlan: 'starter' as Plan,
+            tooltip: 'Upgrade to Starter to use Advanced Filter',
+          }}
+          exportGate={{
+            cap: 'students.view',
+            neededPlan: 'starter' as Plan,
+            tooltip: 'Upgrade to Starter to export',
+          }}
           filters={[
             {
               key: 'class',
@@ -244,6 +264,11 @@ export function AllStudents({
               label: 'Add Student',
               icon: <UserPlus className="w-4 h-4 mr-1" />,
               onClick: handleAddStudent,
+              gate: {
+                cap: 'students.create',
+                neededPlan: 'starter' as Plan,
+                tooltip: 'Upgrade to Starter to add students',
+              },
             },
           ]}
           onSort={handleSort}

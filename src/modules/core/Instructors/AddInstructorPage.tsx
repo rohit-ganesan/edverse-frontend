@@ -133,8 +133,8 @@ export function AddInstructorPage(): JSX.Element {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Navigate back to instructors page
-      navigate('/instructors');
+      // Navigate back to instructors overview
+      navigate('/instructors/overview');
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Handle validation errors
@@ -160,7 +160,7 @@ export function AddInstructorPage(): JSX.Element {
   };
 
   const handleCancel = () => {
-    navigate('/instructors');
+    navigate('/instructors/overview');
   };
 
   return (

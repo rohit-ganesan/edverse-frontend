@@ -145,7 +145,7 @@ export function EditStudentPage(): JSX.Element {
             general:
               'No student data found. Please select a student from the list.',
           });
-          navigate('/students');
+          navigate('/students/overview');
           return;
         }
 
@@ -218,7 +218,7 @@ export function EditStudentPage(): JSX.Element {
         });
       } else {
         // Fallback to list if no data available
-        navigate('/students');
+        navigate('/students/overview');
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -253,7 +253,7 @@ export function EditStudentPage(): JSX.Element {
       });
     } else {
       // Fallback to list if no data available
-      navigate('/students');
+      navigate('/students/overview');
     }
   };
 
@@ -282,7 +282,7 @@ export function EditStudentPage(): JSX.Element {
                     state: { studentData },
                   });
                 } else {
-                  navigate('/students');
+                  navigate('/students/overview');
                 }
               }}
               className="p-2"

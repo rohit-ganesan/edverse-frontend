@@ -18,6 +18,28 @@ import { WhatsNewPage } from '../pages/WhatsNewPage';
 import { SupportPage } from '../pages/SupportPage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { OnboardingPage } from '../pages/OnboardingPage';
+// Students - standalone pages
+import {
+  ViewStudentPage,
+  AddStudentPage,
+  EditStudentPage,
+} from '../modules/core/Students';
+// Instructors - standalone pages
+import {
+  ViewInstructorPage,
+  AddInstructorPage,
+  EditInstructorPage,
+} from '../modules/core/Instructors';
+// Students - detail placeholders
+import { StudentAttendancePage } from 'modules/core/Students/StudentAttendancePage';
+import { StudentAcademicsPage } from 'modules/core/Students/StudentAcademicsPage';
+import { StudentGradesPage } from 'modules/core/Students/StudentGradesPage';
+import { StudentFeesPage } from 'modules/core/Students/StudentFeesPage';
+import { StudentFeeCollectPage } from 'modules/core/Students/StudentFeeCollectPage';
+// Attendance - mark placeholder
+import { AttendanceMarkPage } from 'modules/core/Attendance/AttendanceMarkPage';
+// Instructors - performance placeholder
+import { InstructorPerformancePage } from 'modules/core/Instructors/InstructorPerformancePage';
 
 // Protected routes component with OnboardingGate
 function ProtectedRoutes() {
@@ -36,6 +58,119 @@ function ProtectedRoutes() {
               feature="students.view"
               cap="students.view"
             />
+          }
+        />
+
+        {/* Redirect bare paths to overview tabs */}
+        <Route
+          path="/students"
+          element={<Navigate to="/students/overview" replace />}
+        />
+        <Route
+          path="/instructors"
+          element={<Navigate to="/instructors/overview" replace />}
+        />
+
+        {/* Students standalone pages */}
+        <Route
+          path="/view-student"
+          element={
+            <RouteGuard
+              feature="students.view"
+              cap="students.view"
+              routePath="/view-student"
+            >
+              <ViewStudentPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/add-student"
+          element={
+            <RouteGuard
+              feature="students.view"
+              cap="students.create"
+              neededPlan="starter"
+              routePath="/add-student"
+            >
+              <AddStudentPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/edit-student"
+          element={
+            <RouteGuard
+              feature="students.view"
+              cap="students.update"
+              neededPlan="starter"
+              routePath="/edit-student"
+            >
+              <EditStudentPage />
+            </RouteGuard>
+          }
+        />
+
+        {/* Students detail routes */}
+        <Route
+          path="/students/:id/attendance"
+          element={
+            <RouteGuard
+              feature="attendance.view"
+              cap="attendance.view"
+              routePath="/students/:id/attendance"
+            >
+              <StudentAttendancePage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/students/:id/academics"
+          element={
+            <RouteGuard
+              feature="results.view"
+              cap="results.view"
+              routePath="/students/:id/academics"
+            >
+              <StudentAcademicsPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/students/:id/grades"
+          element={
+            <RouteGuard
+              feature="results.view"
+              cap="results.view"
+              routePath="/students/:id/grades"
+            >
+              <StudentGradesPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/students/:id/fees"
+          element={
+            <RouteGuard
+              feature="fees.view"
+              cap="fees.view"
+              routePath="/students/:id/fees"
+            >
+              <StudentFeesPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/students/:id/fees/collect"
+          element={
+            <RouteGuard
+              feature="fees.view"
+              cap="fees.record_manual"
+              neededPlan="starter"
+              routePath="/students/:id/fees/collect"
+            >
+              <StudentFeeCollectPage />
+            </RouteGuard>
           }
         />
 
@@ -72,6 +207,21 @@ function ProtectedRoutes() {
           }
         />
 
+        {/* Attendance mark */}
+        <Route
+          path="/attendance/mark"
+          element={
+            <RouteGuard
+              feature="attendance.view"
+              cap="attendance.record"
+              neededPlan="starter"
+              routePath="/attendance/mark"
+            >
+              <AttendanceMarkPage />
+            </RouteGuard>
+          }
+        />
+
         <Route
           path="/results/:tab"
           element={
@@ -102,6 +252,58 @@ function ProtectedRoutes() {
               feature="staff.invite"
               cap="staff.invite"
             />
+          }
+        />
+
+        {/* Instructors standalone pages */}
+        <Route
+          path="/view-instructor"
+          element={
+            <RouteGuard
+              feature="staff.invite"
+              cap="staff.invite"
+              routePath="/view-instructor"
+            >
+              <ViewInstructorPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/add-instructor"
+          element={
+            <RouteGuard
+              feature="staff.invite"
+              cap="staff.invite"
+              neededPlan="starter"
+              routePath="/add-instructor"
+            >
+              <AddInstructorPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/edit-instructor"
+          element={
+            <RouteGuard
+              feature="staff.invite"
+              cap="staff.invite"
+              neededPlan="starter"
+              routePath="/edit-instructor"
+            >
+              <EditInstructorPage />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/instructors/:id/performance"
+          element={
+            <RouteGuard
+              feature="analytics.view"
+              neededPlan="growth"
+              routePath="/instructors/:id/performance"
+            >
+              <InstructorPerformancePage />
+            </RouteGuard>
           }
         />
 

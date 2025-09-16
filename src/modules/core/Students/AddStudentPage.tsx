@@ -161,8 +161,8 @@ export function AddStudentPage(): JSX.Element {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Navigate back to students page
-      navigate('/students');
+      // Navigate back to students overview
+      navigate('/students/overview');
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Handle validation errors
@@ -188,7 +188,7 @@ export function AddStudentPage(): JSX.Element {
   };
 
   const handleCancel = () => {
-    navigate('/students');
+    navigate('/students/overview');
   };
 
   return (

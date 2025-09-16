@@ -30,6 +30,10 @@ import {
   MoreHorizontal,
   CheckCircle,
 } from 'lucide-react';
+import { CapabilityGate } from 'components/guards/CapabilityGate';
+import type { Plan } from 'types/access';
+import { Tooltip } from '@radix-ui/themes';
+import { Lock } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import { useInstructorManagement } from '../hooks/useInstructorManagement';
 import { SkeletonCard } from 'components/ui/Skeleton';
@@ -812,12 +816,74 @@ export function Reports({
                       <RadixButton variant="ghost" size="1">
                         <Eye className="w-4 h-4" />
                       </RadixButton>
-                      <RadixButton variant="ghost" size="1">
-                        <Edit className="w-4 h-4" />
-                      </RadixButton>
-                      <RadixButton variant="ghost" size="1" color="red">
-                        <Trash2 className="w-4 h-4" />
-                      </RadixButton>
+                      <CapabilityGate
+                        cap="staff.invite"
+                        feature="staff.invite"
+                        neededPlan={'starter' as Plan}
+                        showUpgradeHint={false}
+                        context="instructors-reports:edit"
+                        fallback={
+                          <Tooltip
+                            content={
+                              <div className="flex items-center gap-2">
+                                <Lock className="w-3 h-3 text-amber-500" />
+                                <span className="text-amber-300">
+                                  Requires STARTER plan
+                                </span>
+                              </div>
+                            }
+                          >
+                            <div>
+                              <RadixButton
+                                variant="ghost"
+                                size="1"
+                                disabled
+                                className="opacity-60 cursor-not-allowed"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </RadixButton>
+                            </div>
+                          </Tooltip>
+                        }
+                      >
+                        <RadixButton variant="ghost" size="1">
+                          <Edit className="w-4 h-4" />
+                        </RadixButton>
+                      </CapabilityGate>
+                      <CapabilityGate
+                        cap="staff.invite"
+                        feature="staff.invite"
+                        neededPlan={'starter' as Plan}
+                        showUpgradeHint={false}
+                        context="instructors-reports:delete"
+                        fallback={
+                          <Tooltip
+                            content={
+                              <div className="flex items-center gap-2">
+                                <Lock className="w-3 h-3 text-amber-500" />
+                                <span className="text-amber-300">
+                                  Requires STARTER plan
+                                </span>
+                              </div>
+                            }
+                          >
+                            <div>
+                              <RadixButton
+                                variant="ghost"
+                                size="1"
+                                disabled
+                                className="opacity-60 cursor-not-allowed"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </RadixButton>
+                            </div>
+                          </Tooltip>
+                        }
+                      >
+                        <RadixButton variant="ghost" size="1" color="red">
+                          <Trash2 className="w-4 h-4" />
+                        </RadixButton>
+                      </CapabilityGate>
                     </Flex>
                   </Table.Cell>
                 </Table.Row>

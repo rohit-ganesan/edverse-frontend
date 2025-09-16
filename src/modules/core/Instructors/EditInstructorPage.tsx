@@ -116,7 +116,7 @@ export function EditInstructorPage(): JSX.Element {
             general:
               'No instructor data found. Please select an instructor from the list.',
           });
-          navigate('/instructors');
+          navigate('/instructors/overview');
           return;
         }
 
@@ -191,7 +191,7 @@ export function EditInstructorPage(): JSX.Element {
         });
       } else {
         // Fallback to list if no data available
-        navigate('/instructors');
+        navigate('/instructors/overview');
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -226,7 +226,7 @@ export function EditInstructorPage(): JSX.Element {
       });
     } else {
       // Fallback to list if no data available
-      navigate('/instructors');
+      navigate('/instructors/overview');
     }
   };
 
@@ -255,7 +255,7 @@ export function EditInstructorPage(): JSX.Element {
                     state: { instructorData },
                   });
                 } else {
-                  navigate('/instructors');
+                  navigate('/instructors/overview');
                 }
               }}
               className="p-2"
