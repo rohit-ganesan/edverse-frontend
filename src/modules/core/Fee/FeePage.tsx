@@ -14,6 +14,7 @@ import {
   Plus,
   ArrowUpRight,
   ArrowDownRight,
+  Lock,
 } from 'lucide-react';
 import { Overview } from './tabs/Overview';
 import { Analytics } from './tabs/Analytics';
@@ -41,10 +42,10 @@ export function FeePage(): JSX.Element {
       'payments',
       'fee-structures',
       'reports',
-      ...(hasAnalytics ? ['analytics'] : []),
+      'analytics',
       'settings',
     ],
-    basePath: '/fee',
+    basePath: '/fees',
   });
 
   const handleCreateFeeStructure = () => {
@@ -175,10 +176,23 @@ export function FeePage(): JSX.Element {
           },
           {
             value: 'analytics',
-            label: 'Analytics',
-            content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
-            disabled: !hasAnalytics,
-            tooltip: 'Requires GROWTH plan',
+            label: (
+              <span className="inline-flex items-center gap-1">
+                Analytics
+                {!hasAnalytics && <Lock className="w-3 h-3 text-amber-500" />}
+              </span>
+            ),
+            content: (
+              <FeatureGate
+                feature="analytics.view"
+                neededPlan="growth"
+                showUpgradeHint
+                modalLock
+                backHref="/fees/overview"
+              >
+                <Analytics isLoading={isLoading} />
+              </FeatureGate>
+            ),
           },
           {
             value: 'settings',

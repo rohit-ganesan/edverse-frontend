@@ -7,7 +7,14 @@ import {
 } from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
 import { FeatureGate } from 'components/guards/FeatureGate';
-import { Users, Calendar, Award, ArrowUpRight, UserPlus } from 'lucide-react';
+import {
+  Users,
+  Calendar,
+  Award,
+  ArrowUpRight,
+  UserPlus,
+  Lock,
+} from 'lucide-react';
 import { useInstructorData } from './hooks/useInstructorData';
 import { AllInstructors } from './tabs/AllInstructors';
 import { Departments } from './tabs/Departments';
@@ -32,12 +39,7 @@ export function InstructorsPage(): JSX.Element {
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'all-teachers',
-    validTabs: [
-      'all-teachers',
-      'departments',
-      ...(hasAnalytics ? ['analytics'] : []),
-      'reports',
-    ],
+    validTabs: ['all-teachers', 'departments', 'analytics', 'reports'],
     basePath: '/teachers',
   });
 
@@ -133,13 +135,22 @@ export function InstructorsPage(): JSX.Element {
     },
     {
       value: 'analytics',
-      label: en.tabs.analytics,
-      content: hasAnalytics ? <Analytics isLoading={isLoading} /> : <div />,
-      disabled: !hasAnalytics,
-      tooltip: (
-        <div className="flex items-center gap-2">
-          <span className="text-amber-300">Requires GROWTH plan</span>
-        </div>
+      label: (
+        <span className="inline-flex items-center gap-1">
+          {en.tabs.analytics}
+          {!hasAnalytics && <Lock className="w-3 h-3 text-amber-500" />}
+        </span>
+      ),
+      content: (
+        <FeatureGate
+          feature="analytics.view"
+          neededPlan="growth"
+          showUpgradeHint
+          modalLock
+          backHref="/teachers/overview"
+        >
+          <Analytics isLoading={isLoading} />
+        </FeatureGate>
       ),
     },
     {

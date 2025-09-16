@@ -5,7 +5,14 @@ import {
   ColoredStatItem,
 } from '../../../components/ui/ModernStatsGridColored';
 import { TabContainer } from '../../../components/ui/TabContainer';
-import { GraduationCap, BookOpen, Users, Award, Plus } from 'lucide-react';
+import {
+  GraduationCap,
+  BookOpen,
+  Users,
+  Award,
+  Plus,
+  Lock,
+} from 'lucide-react';
 import { Overview } from './tabs/Overview';
 import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
@@ -25,7 +32,7 @@ export function CoursesPage(): JSX.Element {
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'overview',
-    validTabs: ['overview', ...(hasAnalytics ? ['analytics'] : []), 'settings'],
+    validTabs: ['overview', 'analytics', 'settings'],
     basePath: '/courses',
   });
 
@@ -125,10 +132,23 @@ export function CoursesPage(): JSX.Element {
           },
           {
             value: 'analytics',
-            label: 'Analytics',
-            content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
-            disabled: !hasAnalytics,
-            tooltip: 'Requires GROWTH plan',
+            label: (
+              <span className="inline-flex items-center gap-1">
+                Analytics
+                {!hasAnalytics && <Lock className="w-3 h-3 text-amber-500" />}
+              </span>
+            ),
+            content: (
+              <FeatureGate
+                feature="analytics.view"
+                neededPlan="growth"
+                showUpgradeHint
+                modalLock
+                backHref="/courses/overview"
+              >
+                <Analytics isLoading={isLoading} />
+              </FeatureGate>
+            ),
           },
           {
             value: 'settings',

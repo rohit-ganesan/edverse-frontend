@@ -1,10 +1,4 @@
-import {
-  Lock,
-  ArrowLeft,
-  Sparkles,
-  CreditCard,
-  ExternalLink,
-} from 'lucide-react';
+import { Lock, ArrowLeft, Sparkles, ExternalLink } from 'lucide-react';
 import { usePlan } from '../../context/AccessContext';
 import { useUpgradeTelemetry } from '../../hooks/useUpgradeTelemetry';
 // MVP: Simplified imports - add-ons disabled
@@ -32,12 +26,14 @@ export function UpgradeHint({
   message,
   ctaHref = '/billing',
   context = 'route_guard',
+  backHref,
 }: {
   neededPlan?: Needed;
   feature?: string;
   message?: string;
   ctaHref?: string;
   context?: string;
+  backHref?: string;
 }): JSX.Element {
   const plan = usePlan();
   const navigate = useNavigate();
@@ -57,6 +53,10 @@ export function UpgradeHint({
   };
 
   const handleGoBack = () => {
+    if (backHref) {
+      navigate(backHref);
+      return;
+    }
     navigate(-1);
   };
 
@@ -69,7 +69,7 @@ export function UpgradeHint({
 
   let displayMessage = message;
   let primaryCtaText = 'Upgrade';
-  let secondaryCtaText = '';
+  // const secondaryCtaText = '';
   // MVP: Only plan upgrades, no add-ons
 
   if (neededPlan) {

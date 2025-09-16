@@ -12,6 +12,7 @@ import {
   CheckCircle,
   TrendingUp,
   Plus,
+  Lock,
 } from 'lucide-react';
 import { AllNotices } from './tabs/AllNotices';
 import { Recent } from './tabs/Recent';
@@ -21,6 +22,7 @@ import { useNoticeData } from './hooks/useNoticeData';
 import { useNoticeManagement } from './hooks/useNoticeManagement';
 import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import { FeatureGate } from 'components/guards/FeatureGate';
 import { Plan } from 'types/access';
 
 export function NoticePage(): JSX.Element {
@@ -133,8 +135,23 @@ export function NoticePage(): JSX.Element {
           },
           {
             value: 'analytics',
-            label: en.tabs.analytics,
-            content: <Analytics isLoading={isLoading} />,
+            label: (
+              <span className="inline-flex items-center gap-1">
+                {en.tabs.analytics}
+                <Lock className="w-3 h-3 text-amber-500" />
+              </span>
+            ),
+            content: (
+              <FeatureGate
+                feature="analytics.view"
+                neededPlan="growth"
+                showUpgradeHint
+                modalLock
+                backHref="/notices/all-notices"
+              >
+                <Analytics isLoading={isLoading} />
+              </FeatureGate>
+            ),
           },
         ]}
       />

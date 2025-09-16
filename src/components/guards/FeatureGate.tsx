@@ -17,6 +17,10 @@ type Props = {
   showUpgradeHint?: boolean;
   /** When true, render children with a soft lock overlay + inline hint */
   softLock?: boolean;
+  /** When true, blur children and show full-screen UpgradeHint modal */
+  modalLock?: boolean;
+  /** Optional explicit back destination for the UpgradeHint Go Back CTA */
+  backHref?: string;
 };
 
 export function FeatureGate({
@@ -26,6 +30,8 @@ export function FeatureGate({
   fallback = null,
   showUpgradeHint = true,
   softLock = false,
+  modalLock = false,
+  backHref,
 }: Props) {
   const accessCheck = useAccessCheck({ feature, neededPlan });
   const plan = usePlan();
@@ -57,6 +63,25 @@ export function FeatureGate({
     showUpgradeHint &&
     (accessCheck.reason?.neededPlan || accessCheck.reason?.missingFeature)
   ) {
+    // New: modalLock mirrors Fees > Payments UX (full-screen modal over blurred page)
+    if (modalLock) {
+      const needed = (accessCheck.reason?.neededPlan as Plan) || neededPlan;
+      return (
+        <>
+          <Box className="relative">
+            <Box className="pointer-events-none opacity-40 select-none">
+              {children}
+            </Box>
+          </Box>
+          <UpgradeHint
+            neededPlan={needed}
+            feature={accessCheck.reason?.missingFeature}
+            context="feature_gate_modal"
+            backHref={backHref}
+          />
+        </>
+      );
+    }
     if (softLock) {
       const needed = (accessCheck.reason?.neededPlan as Plan) || 'starter';
       return (
@@ -78,6 +103,7 @@ export function FeatureGate({
         neededPlan={accessCheck.reason?.neededPlan}
         feature={accessCheck.reason?.missingFeature}
         context="feature_gate"
+        backHref={backHref}
       />
     );
   }

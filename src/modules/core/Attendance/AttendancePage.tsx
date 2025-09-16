@@ -5,7 +5,7 @@ import {
   ColoredStatItem,
 } from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
-import { UserCheck, UserX, AlertCircle, TrendingUp } from 'lucide-react';
+import { UserCheck, UserX, AlertCircle, TrendingUp, Lock } from 'lucide-react';
 import { Overview } from './tabs/Overview';
 import { LiveTracking } from './tabs/LiveTracking';
 import { Records } from './tabs/Records';
@@ -29,7 +29,7 @@ export function AttendancePage(): JSX.Element {
       'overview',
       'live-tracking',
       'records',
-      ...(hasAnalytics ? ['analytics'] : []),
+      'analytics',
       'settings',
     ],
     basePath: '/attendance',
@@ -132,10 +132,23 @@ export function AttendancePage(): JSX.Element {
           },
           {
             value: 'analytics',
-            label: 'Analytics',
-            content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
-            disabled: !hasAnalytics,
-            tooltip: 'Requires GROWTH plan',
+            label: (
+              <span className="inline-flex items-center gap-1">
+                Analytics
+                {!hasAnalytics && <Lock className="w-3 h-3 text-amber-500" />}
+              </span>
+            ),
+            content: (
+              <FeatureGate
+                feature="analytics.view"
+                neededPlan="growth"
+                showUpgradeHint
+                modalLock
+                backHref="/attendance/overview"
+              >
+                <Analytics isLoading={isLoading} />
+              </FeatureGate>
+            ),
           },
           {
             value: 'settings',

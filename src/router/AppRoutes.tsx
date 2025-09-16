@@ -67,8 +67,44 @@ function ProtectedRoutes() {
           element={<Navigate to="/students/overview" replace />}
         />
         <Route
+          path="/courses"
+          element={<Navigate to="/courses/overview" replace />}
+        />
+        <Route
+          path="/classes"
+          element={<Navigate to="/classes/overview" replace />}
+        />
+        <Route
+          path="/attendance"
+          element={<Navigate to="/attendance/overview" replace />}
+        />
+        <Route
+          path="/results"
+          element={<Navigate to="/results/overview" replace />}
+        />
+        <Route
+          path="/notices"
+          element={<Navigate to="/notices/all-notices" replace />}
+        />
+        <Route
           path="/teachers"
           element={<Navigate to="/teachers/overview" replace />}
+        />
+        <Route
+          path="/fees"
+          element={<Navigate to="/fees/overview" replace />}
+        />
+        <Route
+          path="/admins"
+          element={<Navigate to="/admins/overview" replace />}
+        />
+        <Route
+          path="/organization"
+          element={<Navigate to="/organization/overview" replace />}
+        />
+        <Route
+          path="/settings"
+          element={<Navigate to="/settings/overview" replace />}
         />
 
         {/* Students standalone pages */}

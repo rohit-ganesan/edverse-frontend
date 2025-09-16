@@ -5,7 +5,7 @@ import {
   ColoredStatItem,
 } from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
-import { Plus, Users, CheckCircle, Star, Trophy } from 'lucide-react';
+import { Plus, Users, CheckCircle, Star, Trophy, Lock } from 'lucide-react';
 import { useResultData } from './hooks/useResultData';
 // import { useResultManagement } from './hooks/useResultManagement';
 import { Overview } from './tabs/Overview';
@@ -27,13 +27,8 @@ export function ResultPage(): JSX.Element {
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'overview',
-    validTabs: [
-      'overview',
-      'student-results',
-      ...(hasAnalytics ? ['analytics'] : []),
-      'publish-results',
-    ],
-    basePath: '/result',
+    validTabs: ['overview', 'student-results', 'analytics', 'publish-results'],
+    basePath: '/results',
   });
 
   const headerActions = [
@@ -139,10 +134,23 @@ export function ResultPage(): JSX.Element {
           },
           {
             value: 'analytics',
-            label: 'Analytics',
-            content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
-            disabled: !hasAnalytics,
-            tooltip: 'Requires GROWTH plan',
+            label: (
+              <span className="inline-flex items-center gap-1">
+                Analytics
+                {!hasAnalytics && <Lock className="w-3 h-3 text-amber-500" />}
+              </span>
+            ),
+            content: (
+              <FeatureGate
+                feature="analytics.view"
+                neededPlan="growth"
+                showUpgradeHint
+                modalLock
+                backHref="/results/overview"
+              >
+                <Analytics isLoading={isLoading} />
+              </FeatureGate>
+            ),
           },
           {
             value: 'publish-results',

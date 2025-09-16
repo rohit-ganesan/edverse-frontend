@@ -46,6 +46,8 @@ import {
 } from 'lucide-react';
 import { useTabRouting } from 'lib/useTabRouting';
 import { Plan } from 'types/access';
+import { FeatureGate } from 'components/guards/FeatureGate';
+import { SkeletonCard } from 'components/ui/Skeleton';
 
 interface Department {
   id: string;
@@ -93,6 +95,7 @@ export function OrganizationPage(): JSX.Element {
   });
 
   const [editMode, setEditMode] = useState(false);
+  const [isLoading] = useState(false); // Mock loading state
 
   const departments: Department[] = [
     {
@@ -855,12 +858,26 @@ export function OrganizationPage(): JSX.Element {
         ]}
       />
 
-      <ModernStatsGridColored
-        stats={organizationStats}
-        columns="4"
-        gap="6"
-        isLoading={false}
-      />
+      <FeatureGate
+        feature="analytics.view"
+        neededPlan="growth"
+        showUpgradeHint={false}
+      >
+        {isLoading ? (
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <SkeletonCard key={i} height="120px" />
+            ))}
+          </div>
+        ) : (
+          <ModernStatsGridColored
+            stats={organizationStats}
+            columns="4"
+            gap="6"
+            isLoading={false}
+          />
+        )}
+      </FeatureGate>
 
       <TabContainer
         tabs={tabs}

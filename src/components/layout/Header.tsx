@@ -164,15 +164,15 @@ export function Header({
   };
 
   const getUserRole = (): string => {
-    return userProfile?.role || 'Administrator';
+    return userProfile?.role || '';
   };
 
   const getUserEmail = (): string => {
     return user?.email || '';
   };
 
-  const getUserAddress = (): string | null => {
-    return userProfile?.address || null;
+  const getUserAddress = (): string => {
+    return userProfile?.address || '';
   };
 
   return (
@@ -186,20 +186,6 @@ export function Header({
         <Flex justify="between" align="center">
           {/* Left Section - Search and Breadcrumbs */}
           <Flex align="center" gap="6" className="flex-1">
-            {/* Search */}
-            <Box className="w-80">
-              <Box className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 z-10" />
-                <RadixTextField
-                  placeholder="Search..."
-                  value={searchValue}
-                  onChange={handleSearchChange}
-                  size="2"
-                  className="w-full pl-12 pr-4 py-2 rounded-full bg-gray-50 dark:bg-gray-900 border border-gray-300/50 dark:border-gray-600/50 shadow-sm hover:shadow-md transition-all duration-200 focus:bg-white dark:focus:bg-gray-800 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-400/20 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
-                />
-              </Box>
-            </Box>
-
             {/* Breadcrumbs */}
             <Flex align="center" gap="2">
               {breadcrumbs?.map((item, index) => (

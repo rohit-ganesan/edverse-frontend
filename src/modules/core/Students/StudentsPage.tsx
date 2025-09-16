@@ -12,6 +12,7 @@ import {
   UserCheck,
   ArrowUpRight,
   UserPlus,
+  Lock,
 } from 'lucide-react';
 import { useStudentData } from './hooks/useStudentData';
 import { AllStudents } from './tabs/AllStudents';
@@ -32,11 +33,7 @@ export function StudentsPage(): JSX.Element {
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'all-students',
-    validTabs: [
-      'all-students',
-      ...(hasAnalytics ? ['analytics'] : []),
-      'reports',
-    ],
+    validTabs: ['all-students', 'analytics', 'reports'],
     basePath: '/students',
   });
 
@@ -135,10 +132,23 @@ export function StudentsPage(): JSX.Element {
     },
     {
       value: 'analytics',
-      label: 'Analytics',
-      content: hasAnalytics ? <Analytics isLoading={isLoading} /> : null,
-      disabled: !hasAnalytics,
-      tooltip: 'Requires GROWTH plan',
+      label: (
+        <span className="inline-flex items-center gap-1">
+          Analytics
+          {!hasAnalytics && <Lock className="w-3 h-3 text-amber-500" />}
+        </span>
+      ),
+      content: (
+        <FeatureGate
+          feature="analytics.view"
+          neededPlan="growth"
+          showUpgradeHint
+          modalLock
+          backHref="/students/overview"
+        >
+          <Analytics isLoading={isLoading} />
+        </FeatureGate>
+      ),
     },
     {
       value: 'reports',
