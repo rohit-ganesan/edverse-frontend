@@ -5,7 +5,7 @@ import {
   DataTableColumn,
   DataTableAction,
 } from 'components/ui/DataTable';
-import { Users, User, Eye, UserPlus, Pencil } from 'lucide-react';
+import { Users, User, Eye, Pencil } from 'lucide-react';
 import type { Plan } from 'types/access';
 import { useStudentData } from '../hooks/useStudentData';
 import { useStudentManagement } from '../hooks/useStudentManagement';
@@ -18,7 +18,7 @@ export function AllStudents({
   isLoading?: boolean;
 }): JSX.Element {
   const { students } = useStudentData();
-  const { handleViewStudent, handleAddStudent } = useStudentManagement();
+  const { handleViewStudent } = useStudentManagement();
 
   // Get unique classes for filter
   const classes = useMemo(() => {
@@ -259,18 +259,7 @@ export function AllStudents({
             { value: 'attendance', label: 'Sort by Attendance' },
             { value: 'grade', label: 'Sort by Grade' },
           ]}
-          headerActions={[
-            {
-              label: 'Add Student',
-              icon: <UserPlus className="w-4 h-4 mr-1" />,
-              onClick: handleAddStudent,
-              gate: {
-                cap: 'students.create',
-                neededPlan: 'starter' as Plan,
-                tooltip: 'Upgrade to Starter to add students',
-              },
-            },
-          ]}
+          headerActions={[]}
           onSort={handleSort}
           onFilter={handleFilter}
           getRowKey={(student, index) => student.id.toString()}

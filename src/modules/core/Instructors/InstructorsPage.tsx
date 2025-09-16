@@ -7,7 +7,7 @@ import {
 } from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
 import { FeatureGate } from 'components/guards/FeatureGate';
-import { Users, Calendar, Award, ArrowUpRight } from 'lucide-react';
+import { Users, Calendar, Award, ArrowUpRight, UserPlus } from 'lucide-react';
 import { useInstructorData } from './hooks/useInstructorData';
 import { AllInstructors } from './tabs/AllInstructors';
 import { Departments } from './tabs/Departments';
@@ -16,11 +16,18 @@ import { Reports } from './tabs/Reports';
 import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
 import { useAccess } from 'context/AccessContext';
+import { useAccessCheck } from 'hooks/useAccessCheck';
+import { useInstructorManagement } from './hooks/useInstructorManagement';
 
 export function InstructorsPage(): JSX.Element {
   const { stats, isLoading } = useInstructorData();
   const { features } = useAccess();
   const hasAnalytics = features.includes('analytics.view');
+  const { handleAddInstructor } = useInstructorManagement();
+  const { allowed: canAddTeacher } = useAccessCheck({
+    cap: 'staff.invite',
+    neededPlan: 'starter' as any,
+  });
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -39,7 +46,23 @@ export function InstructorsPage(): JSX.Element {
     icon: any;
     isPrimary: boolean;
     onClick: () => void;
-  }> = [];
+    gate?: {
+      cap?: string;
+      feature?: string;
+      neededPlan?: any;
+      tooltip?: string;
+    };
+  }> = canAddTeacher
+    ? [
+        {
+          label: `Add ${en.labels.instructor}`,
+          icon: UserPlus,
+          isPrimary: true,
+          onClick: handleAddInstructor,
+          gate: { cap: 'staff.invite', neededPlan: 'starter' as any },
+        },
+      ]
+    : [];
 
   // Convert stats to ModernStatsGridColored format
   const coloredStats: ColoredStatItem[] = [

@@ -5,7 +5,7 @@ import {
   DataTableColumn,
   DataTableAction,
 } from 'components/ui/DataTable';
-import { Users, Eye, User } from 'lucide-react';
+import { Users, Eye } from 'lucide-react';
 import { useInstructorData } from '../hooks/useInstructorData';
 import { useInstructorManagement } from '../hooks/useInstructorManagement';
 import type { Instructor } from '../types';
@@ -18,7 +18,7 @@ export function AllInstructors({
   isLoading?: boolean;
 }): JSX.Element {
   const { instructors, isLoading: dataLoading, error } = useInstructorData();
-  const { handleAddInstructor, handleViewDetails } = useInstructorManagement();
+  const { handleViewDetails } = useInstructorManagement();
 
   // Get unique departments for filter
   const departments = useMemo(() => {
@@ -242,14 +242,7 @@ export function AllInstructors({
             { value: 'experience', label: 'Sort by Experience' },
             { value: 'rating', label: 'Sort by Rating' },
           ]}
-          headerActions={[
-            {
-              label: 'Add Teacher',
-              icon: <User className="w-4 h-4 mr-1" />,
-              onClick: handleAddInstructor,
-              gate: { cap: 'staff.invite', neededPlan: 'starter' as any },
-            },
-          ]}
+          headerActions={[]}
           advancedFilterGate={{
             cap: 'staff.update',
             neededPlan: 'starter' as Plan,

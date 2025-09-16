@@ -5,7 +5,7 @@ import {
   ColoredStatItem,
 } from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
-import { Users, Calendar, BookOpen, Clock } from 'lucide-react';
+import { Users, Calendar, BookOpen, Clock, Plus } from 'lucide-react';
 import { Overview } from './tabs/Overview';
 import { AllClasses } from './tabs/AllClasses';
 import { Analytics } from './tabs/Analytics';
@@ -15,11 +15,18 @@ import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
 import { FeatureGate } from 'components/guards/FeatureGate';
 import { useAccess } from 'context/AccessContext';
+import { useAccessCheck } from 'hooks/useAccessCheck';
+import { useNavigate } from 'react-router-dom';
 
 export function ClassesPage(): JSX.Element {
   const { stats, isLoading } = useClassesData();
   const { features } = useAccess();
   const hasAnalytics = features.includes('analytics.view');
+  const navigate = useNavigate();
+  const { allowed: canAddClass } = useAccessCheck({
+    cap: 'classes.create',
+    neededPlan: 'starter' as any,
+  });
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -90,6 +97,15 @@ export function ClassesPage(): JSX.Element {
       <PageHeader
         title="Classes Management"
         description="Manage class schedules, assignments, and student enrollment with comprehensive tracking"
+        actions={[
+          {
+            label: 'Add Class',
+            icon: Plus,
+            isPrimary: true,
+            onClick: () => navigate('/classes/overview?add=1'),
+            gate: { cap: 'classes.create', neededPlan: 'starter' as any },
+          },
+        ]}
       />
 
       {/* Stats Skeleton */}

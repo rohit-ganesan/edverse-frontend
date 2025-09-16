@@ -5,7 +5,7 @@ import {
   ColoredStatItem,
 } from '../../../components/ui/ModernStatsGridColored';
 import { TabContainer } from '../../../components/ui/TabContainer';
-import { GraduationCap, BookOpen, Users, Award } from 'lucide-react';
+import { GraduationCap, BookOpen, Users, Award, Plus } from 'lucide-react';
 import { Overview } from './tabs/Overview';
 import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
@@ -14,11 +14,13 @@ import { useTabRouting } from '../../../lib/useTabRouting';
 import { SkeletonCard } from '../../../components/ui/Skeleton';
 import { FeatureGate } from '../../../components/guards/FeatureGate';
 import { useAccess } from '../../../context/AccessContext';
+import { useNavigate } from 'react-router-dom';
 
 export function CoursesPage(): JSX.Element {
   const { stats, isLoading } = useCoursesData();
   const { features } = useAccess();
   const hasAnalytics = features.includes('analytics.view');
+  const navigate = useNavigate();
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -84,6 +86,15 @@ export function CoursesPage(): JSX.Element {
       <PageHeader
         title="Courses Management"
         description="Manage course curriculum, enrollment, and academic programs with comprehensive tracking"
+        actions={[
+          {
+            label: 'Add Course',
+            icon: Plus,
+            isPrimary: true,
+            onClick: () => navigate('/courses/overview?add=1'),
+            gate: { cap: 'courses.create', neededPlan: 'starter' as any },
+          },
+        ]}
       />
 
       {/* Stats Skeleton */}

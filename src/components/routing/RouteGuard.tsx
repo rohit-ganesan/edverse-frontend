@@ -99,7 +99,7 @@ export function RouteGuard({
     routePath,
   ]);
 
-  // Show loading while auth or access is being initialized
+  // Show loading while auth or access is being initialized. Avoid flashing lock if token refresh is mid-flight.
   if (!ready || !accessInitialized) {
     console.log('🟡 RouteGuard: Loading', {
       ready,

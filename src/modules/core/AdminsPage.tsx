@@ -43,6 +43,7 @@ import {
   Target,
 } from 'lucide-react';
 import { useTabRouting } from '../../lib/useTabRouting';
+import { Plan } from 'types/access';
 
 interface Admin {
   id: string;
@@ -646,15 +647,11 @@ export function AdminsPage(): JSX.Element {
         description="Manage system administrators, roles, and permissions"
         actions={[
           {
-            label: 'Export List',
-            icon: Download,
-            onClick: () => console.log('Export clicked'),
-          },
-          {
             label: 'Add Admin',
             icon: UserPlus,
             onClick: () => console.log('Add admin clicked'),
             isPrimary: true,
+            gate: { cap: 'staff.invite', neededPlan: 'starter' as Plan },
           },
         ]}
       />

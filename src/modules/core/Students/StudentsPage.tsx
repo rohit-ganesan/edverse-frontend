@@ -11,6 +11,7 @@ import {
   BookOpen,
   UserCheck,
   ArrowUpRight,
+  UserPlus,
 } from 'lucide-react';
 import { useStudentData } from './hooks/useStudentData';
 import { AllStudents } from './tabs/AllStudents';
@@ -20,6 +21,8 @@ import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
 import { FeatureGate } from 'components/guards/FeatureGate';
 import { useAccess } from 'context/AccessContext';
+// gating handled inside PageHeader via gate prop
+import { useStudentManagement } from './hooks/useStudentManagement';
 
 export function StudentsPage(): JSX.Element {
   const { stats, isLoading } = useStudentData();
@@ -37,12 +40,28 @@ export function StudentsPage(): JSX.Element {
     basePath: '/students',
   });
 
+  const { handleAddStudent } = useStudentManagement();
+
   const headerActions: Array<{
     label: string;
     icon: any;
     isPrimary: boolean;
     onClick: () => void;
-  }> = [];
+    gate?: {
+      cap?: string;
+      feature?: string;
+      neededPlan?: any;
+      tooltip?: string;
+    };
+  }> = [
+    {
+      label: 'Add Student',
+      icon: UserPlus,
+      isPrimary: true,
+      onClick: handleAddStudent,
+      gate: { cap: 'students.create', neededPlan: 'starter' as any },
+    },
+  ];
 
   // Convert stats to ModernStatsGridColored format
   const coloredStats: ColoredStatItem[] = [

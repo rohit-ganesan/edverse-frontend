@@ -32,7 +32,6 @@ import {
   Plus,
   Save,
   Upload,
-  Download,
   Eye,
   ChevronRight,
   Building2,
@@ -46,6 +45,7 @@ import {
   Info,
 } from 'lucide-react';
 import { useTabRouting } from 'lib/useTabRouting';
+import { Plan } from 'types/access';
 
 interface Department {
   id: string;
@@ -846,15 +846,11 @@ export function OrganizationPage(): JSX.Element {
         description={en.pages.organization.description}
         actions={[
           {
-            label: 'Export Report',
-            icon: Download,
-            onClick: () => console.log('Export clicked'),
-          },
-          {
             label: 'Add Department',
             icon: Plus,
             onClick: () => console.log('Add department clicked'),
             isPrimary: true,
+            gate: { cap: 'org.manage', neededPlan: 'starter' as Plan },
           },
         ]}
       />

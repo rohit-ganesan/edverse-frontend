@@ -12,8 +12,6 @@ import {
   TrendingUp,
   Users,
   Plus,
-  Download,
-  CreditCard,
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react';
@@ -28,6 +26,7 @@ import { useTabRouting } from '../../../lib/useTabRouting';
 import { SkeletonCard } from '../../../components/ui/Skeleton';
 import { FeatureGate } from '../../../components/guards/FeatureGate';
 import { useAccess } from '../../../context/AccessContext';
+import { Plan } from 'types/access';
 
 export function FeePage(): JSX.Element {
   const { stats, isLoading } = useFeeData();
@@ -52,13 +51,7 @@ export function FeePage(): JSX.Element {
     console.log('Create new fee structure');
   };
 
-  const handleExportData = () => {
-    console.log('Export fee data');
-  };
-
-  const handleRecordPayment = () => {
-    console.log('Record new payment');
-  };
+  // Export and record actions handled within respective tabs
 
   // Convert stats to ModernStatsGridColored format
   const coloredStats: ColoredStatItem[] = [
@@ -131,22 +124,11 @@ export function FeePage(): JSX.Element {
         description="Manage fee structures, payments, and financial reporting"
         actions={[
           {
-            label: 'Export Data',
-            icon: Download,
-            variant: 'outline',
-            onClick: handleExportData,
-          },
-          {
-            label: 'Record Payment',
-            icon: CreditCard,
-            variant: 'outline',
-            onClick: handleRecordPayment,
-          },
-          {
-            label: 'New Fee Structure',
+            label: 'New Fee',
             icon: Plus,
             isPrimary: true,
             onClick: handleCreateFeeStructure,
+            gate: { cap: 'fees.record_manual', neededPlan: 'starter' as Plan },
           },
         ]}
       />

@@ -12,7 +12,6 @@ import {
   CheckCircle,
   TrendingUp,
   Plus,
-  Download,
 } from 'lucide-react';
 import { AllNotices } from './tabs/AllNotices';
 import { Recent } from './tabs/Recent';
@@ -22,10 +21,11 @@ import { useNoticeData } from './hooks/useNoticeData';
 import { useNoticeManagement } from './hooks/useNoticeManagement';
 import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import { Plan } from 'types/access';
 
 export function NoticePage(): JSX.Element {
   const { analytics, isLoading } = useNoticeData();
-  const { handleCreateNotice, handleExportNotices } = useNoticeManagement();
+  const { handleCreateNotice } = useNoticeManagement();
 
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
@@ -93,16 +93,11 @@ export function NoticePage(): JSX.Element {
         description={en.pages.announcements.description}
         actions={[
           {
-            label: en.cta.export_notices,
-            icon: Download,
-            variant: 'outline',
-            onClick: handleExportNotices,
-          },
-          {
             label: en.cta.create_notice,
             icon: Plus,
             isPrimary: true,
             onClick: handleCreateNotice,
+            gate: { cap: 'notices.send', neededPlan: 'starter' as Plan },
           },
         ]}
       />

@@ -75,7 +75,11 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
   const callTokenRef = useRef(0);
 
   // Derive a stable role string to avoid re-runs when role value is same but re-wrapped
-  const effectiveRole = userProfile?.role ?? undefined;
+  // Fallback to auth user's metadata role if profile hasn't loaded yet
+  const effectiveRole =
+    (userProfile?.role as Role | undefined) ||
+    ((user as any)?.user_metadata?.role as Role | undefined) ||
+    undefined;
 
   const initializeAccess = useCallback(async () => {
     const myToken = ++callTokenRef.current;
@@ -120,8 +124,12 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
           ? remote.plan
           : 'free';
 
+      // Prefer server role; fall back to profile role; then auth metadata; else student
       const role: Role =
-        (effectiveRole as Role) || (remote?.role as Role) || 'student';
+        (remote?.role as Role) ||
+        (effectiveRole as Role) ||
+        ((user as any)?.user_metadata?.role as Role) ||
+        'student';
 
       const rawFeatures =
         Array.isArray(remote?.features) && remote.features.length
@@ -144,10 +152,14 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
         };
         return shallowEqual(prev, next) ? prev : next;
       });
-    } catch {
+    } catch (err) {
       if (callTokenRef.current !== myToken) return;
 
-      const role: Role = (effectiveRole as Role) || 'student';
+      // If the network call failed (e.g., token refresh in-flight), use best-known role hint
+      const role: Role =
+        ((user as any)?.user_metadata?.role as Role) ||
+        (effectiveRole as Role) ||
+        'student';
 
       setState((prev) => {
         const fallbackFeatures = getFeaturesForPlan('free');

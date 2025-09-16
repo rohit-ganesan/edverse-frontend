@@ -105,9 +105,7 @@ export function AllClasses({
     // Navigate to attendance marking page
   };
 
-  const handleAddClass = () => {
-    console.log('Add new class');
-  };
+  // Add Class now handled via page header action
 
   const handleEditClass = (classSection: ClassSection) => {
     console.log('Edit class:', classSection.id);
@@ -278,14 +276,7 @@ export function AllClasses({
             { value: 'subjects', label: 'Sort by Subjects' },
             { value: 'teacher', label: 'Sort by Teacher' },
           ]}
-          headerActions={[
-            {
-              label: 'Add Class',
-              icon: <GraduationCap className="w-4 h-4 mr-1" />,
-              onClick: handleAddClass,
-              gate: { cap: 'classes.create', neededPlan: 'starter' as Plan },
-            },
-          ]}
+          headerActions={[]}
           advancedFilterGate={{
             cap: 'classes.update',
             neededPlan: 'starter' as Plan,

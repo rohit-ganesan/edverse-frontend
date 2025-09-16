@@ -5,9 +5,9 @@ import {
   ColoredStatItem,
 } from 'components/ui/ModernStatsGridColored';
 import { TabContainer } from 'components/ui/TabContainer';
-import { Download, Plus, Users, CheckCircle, Star, Trophy } from 'lucide-react';
+import { Plus, Users, CheckCircle, Star, Trophy } from 'lucide-react';
 import { useResultData } from './hooks/useResultData';
-import { useResultManagement } from './hooks/useResultManagement';
+// import { useResultManagement } from './hooks/useResultManagement';
 import { Overview } from './tabs/Overview';
 import { StudentResults } from './tabs/StudentResults';
 import { Analytics } from './tabs/Analytics';
@@ -16,10 +16,11 @@ import { useTabRouting } from 'lib/useTabRouting';
 import { SkeletonCard } from 'components/ui/Skeleton';
 import { FeatureGate } from 'components/guards/FeatureGate';
 import { useAccess } from 'context/AccessContext';
+import { Plan } from 'types/access';
 
 export function ResultPage(): JSX.Element {
   const { analytics, isLoading } = useResultData();
-  const { exportResults } = useResultManagement();
+  // exportResults available inside tabs when needed
   const { features } = useAccess();
   const hasAnalytics = features.includes('analytics.view');
 
@@ -37,16 +38,11 @@ export function ResultPage(): JSX.Element {
 
   const headerActions = [
     {
-      label: 'Export Results',
-      icon: Download,
-      variant: 'outline' as const,
-      onClick: () => exportResults([]),
-    },
-    {
       label: 'Add Result',
       icon: Plus,
       isPrimary: true,
       onClick: () => console.log('Add result'),
+      gate: { cap: 'results.enter', neededPlan: 'starter' as Plan },
     },
   ];
 
