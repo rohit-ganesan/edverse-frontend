@@ -124,8 +124,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('ensure_profile timeout')), 3000)
           );
-          await Promise.race([ensurePromise, timeoutPromise]);
-          log('STEP 1: ensure_profile RPC completed successfully');
+          const result = (await Promise.race([
+            ensurePromise,
+            timeoutPromise,
+          ])) as any;
+          if (result?.error) {
+            log(
+              'STEP 1: ensure_profile returned error',
+              result.error.message || result.error
+            );
+          } else {
+            log('STEP 1: ensure_profile RPC completed successfully');
+          }
         } catch (ensureError) {
           log(
             'STEP 1: ensure_profile failed',

@@ -141,9 +141,9 @@ export function DataTable<T>({
     children: ReactNode;
   }) => (
     <Tooltip content={content}>
-      <div className="[&_[data-radix-tooltip-content]]:bg-gray-900/85">
+      <span className="inline-flex [&_[data-radix-tooltip-content]]:bg-gray-900/85">
         {children}
-      </div>
+      </span>
     </Tooltip>
   );
 
