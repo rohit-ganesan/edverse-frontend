@@ -5,19 +5,78 @@ import {
   DataTableColumn,
   DataTableAction,
 } from 'components/ui/DataTable';
-import { GraduationCap, Users, BookOpen, Eye, User } from 'lucide-react';
-import { useStudentData } from '../hooks/useStudentData';
-import { useStudentManagement } from '../hooks/useStudentManagement';
+import {
+  GraduationCap,
+  Users,
+  BookOpen,
+  Eye,
+  User,
+  Edit,
+  Trash2,
+} from 'lucide-react';
+// import { useClassesData } from '../hooks/useClassesData'; // Will be used when integrating with real data
 import type { ClassSection } from '../types';
 import { SkeletonCard } from 'components/ui/Skeleton';
+import type { Plan } from 'types/access';
 
-export function Classes({
+// Mock class sections data - this should eventually come from the API
+const mockClassSections: ClassSection[] = [
+  {
+    id: '1',
+    className: 'Grade 10',
+    section: 'A',
+    strength: 25,
+    classTeacher: 'Dr. Smith',
+    subjects: ['Mathematics', 'Physics', 'Chemistry', 'English'],
+  },
+  {
+    id: '2',
+    className: 'Grade 10',
+    section: 'B',
+    strength: 22,
+    classTeacher: 'Prof. Johnson',
+    subjects: ['Mathematics', 'Biology', 'Chemistry', 'English'],
+  },
+  {
+    id: '3',
+    className: 'Grade 11',
+    section: 'A',
+    strength: 28,
+    classTeacher: 'Dr. Williams',
+    subjects: ['Mathematics', 'Physics', 'Chemistry', 'Computer Science'],
+  },
+  {
+    id: '4',
+    className: 'Grade 11',
+    section: 'B',
+    strength: 24,
+    classTeacher: 'Ms. Brown',
+    subjects: ['Mathematics', 'Biology', 'Chemistry', 'English'],
+  },
+  {
+    id: '5',
+    className: 'Grade 12',
+    section: 'A',
+    strength: 30,
+    classTeacher: 'Dr. Davis',
+    subjects: ['Mathematics', 'Physics', 'Chemistry', 'English'],
+  },
+  {
+    id: '6',
+    className: 'Grade 12',
+    section: 'B',
+    strength: 26,
+    classTeacher: 'Prof. Wilson',
+    subjects: ['Mathematics', 'Biology', 'Chemistry', 'English'],
+  },
+];
+
+export function AllClasses({
   isLoading = false,
 }: {
   isLoading?: boolean;
 }): JSX.Element {
-  const { classSections } = useStudentData();
-  const { handleMarkAttendance } = useStudentManagement();
+  // const { classes } = useClassesData(); // Will be used when integrating with real data
 
   const getStrengthColor = (strength: number) => {
     if (strength >= 40) return 'red';
@@ -42,11 +101,22 @@ export function Classes({
   };
 
   const handleAttendance = (classSection: ClassSection) => {
-    handleMarkAttendance(classSection.id, classSection.section);
+    console.log('Mark attendance for:', classSection.id);
+    // Navigate to attendance marking page
   };
 
   const handleAddClass = () => {
     console.log('Add new class');
+  };
+
+  const handleEditClass = (classSection: ClassSection) => {
+    console.log('Edit class:', classSection.id);
+    // Navigate to edit class page
+  };
+
+  const handleDeleteClass = (classSection: ClassSection) => {
+    console.log('Delete class:', classSection.id);
+    // Show confirmation dialog and delete
   };
 
   const columns: DataTableColumn<ClassSection>[] = [
@@ -153,6 +223,18 @@ export function Classes({
       label: 'Manage Class',
       onClick: handleManageClass,
     },
+    {
+      icon: <Edit className="w-4 h-4" />,
+      label: 'Edit Class',
+      onClick: handleEditClass,
+      gate: { cap: 'classes.update', neededPlan: 'starter' as Plan },
+    },
+    {
+      icon: <Trash2 className="w-4 h-4" />,
+      label: 'Delete Class',
+      onClick: handleDeleteClass,
+      gate: { cap: 'classes.delete', neededPlan: 'starter' as Plan },
+    },
   ];
 
   const handleSort = (sortBy: string, data: ClassSection[]) => {
@@ -183,10 +265,10 @@ export function Classes({
         </div>
       ) : (
         <DataTable
-          data={classSections}
+          data={mockClassSections}
           columns={columns}
           actions={actions}
-          title="Class Sections"
+          title="All Classes"
           icon={<GraduationCap className="w-5 h-5 text-purple-600" />}
           searchPlaceholder="Search by class, section, teacher, or subjects..."
           searchFields={['className', 'section', 'classTeacher', 'subjects']}
@@ -201,6 +283,7 @@ export function Classes({
               label: 'Add Class',
               icon: <GraduationCap className="w-4 h-4 mr-1" />,
               onClick: handleAddClass,
+              gate: { cap: 'classes.create', neededPlan: 'starter' as Plan },
             },
           ]}
           onSort={handleSort}

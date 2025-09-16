@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { useStudentData } from './hooks/useStudentData';
 import { AllStudents } from './tabs/AllStudents';
-import { Classes } from './tabs/Classes';
 import { Analytics } from './tabs/Analytics';
 import { Reports } from './tabs/Reports';
 import { useTabRouting } from 'lib/useTabRouting';
@@ -26,7 +25,7 @@ export function StudentsPage(): JSX.Element {
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'all-students',
-    validTabs: ['all-students', 'classes', 'analytics', 'reports'],
+    validTabs: ['all-students', 'analytics', 'reports'],
     basePath: '/students',
   });
 
@@ -106,11 +105,6 @@ export function StudentsPage(): JSX.Element {
       value: 'all-students',
       label: 'All Students',
       content: <AllStudents isLoading={isLoading} />,
-    },
-    {
-      value: 'classes',
-      label: 'Classes',
-      content: <Classes isLoading={isLoading} />,
     },
     {
       value: 'analytics',

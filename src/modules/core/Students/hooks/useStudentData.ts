@@ -1,10 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import type {
-  Student,
-  StudentFilters,
-  StudentStats,
-  ClassSection,
-} from '../types';
+import type { Student, StudentFilters, StudentStats } from '../types';
 
 // Mock data - replace with actual API calls
 const mockStudents: Student[] = [
@@ -127,31 +122,6 @@ const mockStudents: Student[] = [
       pendingAmount: 0,
       lastPaymentDate: '2024-01-15',
     },
-  },
-];
-
-const mockClassSections: ClassSection[] = [
-  {
-    id: '1',
-    className: 'Grade 10',
-    section: 'A',
-    strength: 35,
-    classTeacher: 'Dr. Sarah Johnson',
-    subjects: ['Mathematics', 'Physics', 'Chemistry', 'English', 'History'],
-  },
-  {
-    id: '2',
-    className: 'Grade 10',
-    section: 'B',
-    strength: 32,
-    classTeacher: 'Prof. Michael Chen',
-    subjects: [
-      'Mathematics',
-      'Physics',
-      'Computer Science',
-      'English',
-      'Geography',
-    ],
   },
 ];
 
@@ -294,7 +264,7 @@ export function useStudentData() {
       totalStudents,
       activeStudents,
       averageAttendance,
-      totalClasses: mockClassSections.length,
+      totalClasses: 6, // This should come from the classes module
       gradeDistribution,
       attendanceDistribution,
     };
@@ -318,7 +288,6 @@ export function useStudentData() {
   return {
     students: filteredStudents,
     allStudents: mockStudents,
-    classSections: mockClassSections,
     stats,
     filters,
     updateFilter,

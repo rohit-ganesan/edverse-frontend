@@ -67,12 +67,3 @@ export interface StudentStats {
     percentage: number;
   }[];
 }
-
-export interface ClassSection {
-  id: string;
-  className: string;
-  section: string;
-  strength: number;
-  classTeacher: string;
-  subjects: string[];
-}

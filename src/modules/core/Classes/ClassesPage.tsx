@@ -7,6 +7,7 @@ import {
 import { TabContainer } from 'components/ui/TabContainer';
 import { Users, Calendar, BookOpen, Clock } from 'lucide-react';
 import { Overview } from './tabs/Overview';
+import { AllClasses } from './tabs/AllClasses';
 import { Analytics } from './tabs/Analytics';
 import { Settings } from './tabs/Settings';
 import { useClassesData } from './hooks/useClassesData';
@@ -19,7 +20,7 @@ export function ClassesPage(): JSX.Element {
   // Use tab routing instead of local state
   const { activeTab, setActiveTab } = useTabRouting({
     defaultTab: 'overview',
-    validTabs: ['overview', 'analytics', 'settings'],
+    validTabs: ['overview', 'all-classes', 'analytics', 'settings'],
     basePath: '/classes',
   });
 
@@ -101,6 +102,11 @@ export function ClassesPage(): JSX.Element {
             value: 'overview',
             label: 'Overview',
             content: <Overview isLoading={isLoading} />,
+          },
+          {
+            value: 'all-classes',
+            label: 'All Classes',
+            content: <AllClasses isLoading={isLoading} />,
           },
           {
             value: 'analytics',

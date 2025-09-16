@@ -1,6 +1,6 @@
 import { Users, BookOpen, User } from 'lucide-react';
 import { RadixButton } from 'components/ui/RadixButton';
-import type { ClassSection } from '../types';
+import type { ClassSection } from '../../Classes/types';
 
 interface ClassSectionCardProps {
   classSection: ClassSection;
