@@ -30,13 +30,13 @@ export function useStudentManagement() {
       rollNumber: student.rollNumber,
     };
 
-    navigate('/view-student', {
+    navigate('/students/view-student', {
       state: { studentData },
     });
   };
 
   const handleAddStudent = () => {
-    navigate('/add-student');
+    navigate('/students/add-student');
   };
 
   const handleDeleteStudent = (studentId: number | string) => {

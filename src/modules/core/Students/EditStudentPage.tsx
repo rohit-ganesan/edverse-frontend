@@ -213,7 +213,7 @@ export function EditStudentPage(): JSX.Element {
           ...studentData,
           ...formData,
         };
-        navigate('/view-student', {
+        navigate('/students/view-student', {
           state: { studentData: updatedStudentData },
         });
       } else {
@@ -278,7 +278,7 @@ export function EditStudentPage(): JSX.Element {
               onClick={() => {
                 const studentData = location.state?.studentData;
                 if (studentData) {
-                  navigate('/view-student', {
+                  navigate('/students/view-student', {
                     state: { studentData },
                   });
                 } else {

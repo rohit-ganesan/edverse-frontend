@@ -73,38 +73,38 @@ function ProtectedRoutes() {
 
         {/* Students standalone pages */}
         <Route
-          path="/view-student"
+          path="/students/view-student"
           element={
             <RouteGuard
               feature="students.view"
               cap="students.view"
-              routePath="/view-student"
+              routePath="/students/view-student"
             >
               <ViewStudentPage />
             </RouteGuard>
           }
         />
         <Route
-          path="/add-student"
+          path="/students/add-student"
           element={
             <RouteGuard
               feature="students.view"
               cap="students.create"
               neededPlan="starter"
-              routePath="/add-student"
+              routePath="/students/add-student"
             >
               <AddStudentPage />
             </RouteGuard>
           }
         />
         <Route
-          path="/edit-student"
+          path="/students/edit-student"
           element={
             <RouteGuard
               feature="students.view"
               cap="students.update"
               neededPlan="starter"
-              routePath="/edit-student"
+              routePath="/students/edit-student"
             >
               <EditStudentPage />
             </RouteGuard>
@@ -257,38 +257,38 @@ function ProtectedRoutes() {
 
         {/* Instructors standalone pages */}
         <Route
-          path="/view-instructor"
+          path="/instructors/view-instructor"
           element={
             <RouteGuard
               feature="staff.invite"
               cap="staff.invite"
-              routePath="/view-instructor"
+              routePath="/instructors/view-instructor"
             >
               <ViewInstructorPage />
             </RouteGuard>
           }
         />
         <Route
-          path="/add-instructor"
+          path="/instructors/add-instructor"
           element={
             <RouteGuard
               feature="staff.invite"
               cap="staff.invite"
               neededPlan="starter"
-              routePath="/add-instructor"
+              routePath="/instructors/add-instructor"
             >
               <AddInstructorPage />
             </RouteGuard>
           }
         />
         <Route
-          path="/edit-instructor"
+          path="/instructors/edit-instructor"
           element={
             <RouteGuard
               feature="staff.invite"
               cap="staff.invite"
               neededPlan="starter"
-              routePath="/edit-instructor"
+              routePath="/instructors/edit-instructor"
             >
               <EditInstructorPage />
             </RouteGuard>

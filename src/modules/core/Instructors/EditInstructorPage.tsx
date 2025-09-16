@@ -186,7 +186,7 @@ export function EditInstructorPage(): JSX.Element {
           ...instructorData,
           ...formData,
         };
-        navigate('/view-instructor', {
+        navigate('/instructors/view-instructor', {
           state: { instructorData: updatedInstructorData },
         });
       } else {
@@ -251,7 +251,7 @@ export function EditInstructorPage(): JSX.Element {
               onClick={() => {
                 const instructorData = location.state?.instructorData;
                 if (instructorData) {
-                  navigate('/view-instructor', {
+                  navigate('/instructors/view-instructor', {
                     state: { instructorData },
                   });
                 } else {

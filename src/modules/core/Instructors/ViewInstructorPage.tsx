@@ -98,7 +98,7 @@ export function ViewInstructorPage(): JSX.Element {
 
   const handleEdit = () => {
     if (instructor) {
-      navigate('/edit-instructor', {
+      navigate('/instructors/edit-instructor', {
         state: { instructorData: instructor },
       });
     }

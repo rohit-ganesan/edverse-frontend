@@ -100,7 +100,7 @@ export function ViewStudentPage(): JSX.Element {
 
   const handleEdit = () => {
     if (student) {
-      navigate('/edit-student', {
+      navigate('/students/edit-student', {
         state: { studentData: student },
       });
     }
