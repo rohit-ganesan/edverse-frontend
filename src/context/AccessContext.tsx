@@ -21,6 +21,8 @@ export type AccessState = {
   capabilities: Capability[];
   isLoading: boolean;
   isInitialized: boolean;
+  trial_ends_at: string | null;
+  tenant_name: string | null;
 };
 
 const DEFAULT_ACCESS: AccessState = {
@@ -30,6 +32,8 @@ const DEFAULT_ACCESS: AccessState = {
   capabilities: [], // <— was ROLE_CAPS.student; make empty for guests/unauthenticated
   isLoading: false,
   isInitialized: false,
+  trial_ends_at: null,
+  tenant_name: null,
 };
 
 const AccessContext = createContext<
@@ -93,6 +97,8 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
         capabilities: [],
         isLoading: false,
         isInitialized: true,
+        trial_ends_at: null,
+        tenant_name: null,
       };
       setState((prev) => (shallowEqual(prev, next) ? prev : next));
       return;
@@ -149,6 +155,8 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
           capabilities: stableArray(prev.capabilities, capabilities),
           isLoading: false,
           isInitialized: true,
+          trial_ends_at: remote?.trial_ends_at || null,
+          tenant_name: remote?.tenant_name || null,
         };
         return shallowEqual(prev, next) ? prev : next;
       });
@@ -173,6 +181,8 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
           ),
           isLoading: false,
           isInitialized: true,
+          trial_ends_at: null,
+          tenant_name: null,
         };
         return shallowEqual(prev, next) ? prev : next;
       });

@@ -3,10 +3,17 @@ import { z } from 'zod';
 import { RadixButton } from '../../../components/ui/RadixButton';
 import { RadixTextField } from '../../../components/ui/RadixTextField';
 import { RadixCard } from '../../../components/ui/RadixCard';
-import { RadioGroup } from '@radix-ui/themes';
 import { Toast } from '../../../components/ui/Toast';
-import { Building2, Users, GraduationCap, User } from 'lucide-react';
+import {
+  Building2,
+  Users,
+  GraduationCap,
+  User,
+  CheckCircle,
+  AlertCircle,
+} from 'lucide-react';
 import { useAuth } from '../AuthContext';
+import { authAPI } from '../../../lib/supabase-api';
 
 // Zod schemas for validation
 const step1Schema = z
@@ -56,6 +63,7 @@ interface FormData {
 
   // Step 2: Role Selection
   role: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
+  join_code?: string; // For non-owner/admin roles
 
   // Step 3: Role-specific Info
   school_name?: string; // Only for owner/admin
@@ -142,6 +150,8 @@ export const StepByStepSignUpForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState<string | null>(null);
+  const [verifyingCode, setVerifyingCode] = useState(false);
+  const [joinCodeInfo, setJoinCodeInfo] = useState<any>(null);
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -219,6 +229,44 @@ export const StepByStepSignUpForm: React.FC = () => {
     validateField(field);
   };
 
+  const handleVerifyJoinCode = async () => {
+    const code = formData.join_code?.trim();
+    if (!code) {
+      setJoinCodeInfo(null);
+      return;
+    }
+
+    setVerifyingCode(true);
+    setFormErrors((prev) => ({ ...prev, join_code: '' }));
+
+    try {
+      const result = await authAPI.verifyJoinCode(code);
+
+      if (result.valid) {
+        setJoinCodeInfo(result);
+        setFormErrors((prev) => {
+          const { join_code, ...rest } = prev;
+          return rest;
+        });
+      } else {
+        setJoinCodeInfo(null);
+        setFormErrors((prev) => ({
+          ...prev,
+          join_code: 'Invalid or expired join code',
+        }));
+      }
+    } catch (error: any) {
+      console.error('Join code verification error:', error);
+      setJoinCodeInfo(null);
+      setFormErrors((prev) => ({
+        ...prev,
+        join_code: error.message || 'Unable to verify code. Please try again.',
+      }));
+    } finally {
+      setVerifyingCode(false);
+    }
+  };
+
   const validateStep = (step: number): boolean => {
     try {
       switch (step) {
@@ -275,12 +323,52 @@ export const StepByStepSignUpForm: React.FC = () => {
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prev) => prev + 1);
+      const next = currentStep + 1;
+      setCurrentStep(next);
+      // Persist local draft for finalize
+      try {
+        const draft = {
+          step: next,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          address: formData.address,
+          role: formData.role,
+          tenant_name:
+            formData.role === 'owner' || formData.role === 'admin'
+              ? formData.school_name || null
+              : null,
+          join_code:
+            formData.role === 'teacher' ||
+            formData.role === 'student' ||
+            formData.role === 'parent'
+              ? formData.join_code || null
+              : null,
+          subjects:
+            formData.role === 'teacher' ? formData.subjects || [] : undefined,
+          grade:
+            formData.role === 'student' ? formData.grade || null : undefined,
+          parent_email:
+            formData.role === 'student'
+              ? formData.parent_email || null
+              : undefined,
+          plan_key: 'free',
+        };
+        localStorage.setItem('edverse_onboarding_draft', JSON.stringify(draft));
+      } catch {}
     }
   };
 
   const prevStep = () => {
-    setCurrentStep((prev) => prev - 1);
+    const prev = currentStep - 1;
+    setCurrentStep(prev);
+    try {
+      const existing = localStorage.getItem('edverse_onboarding_draft');
+      if (existing) {
+        const obj = JSON.parse(existing);
+        obj.step = prev;
+        localStorage.setItem('edverse_onboarding_draft', JSON.stringify(obj));
+      }
+    } catch {}
   };
 
   const handleSubmit = async () => {
@@ -294,8 +382,39 @@ export const StepByStepSignUpForm: React.FC = () => {
 
     try {
       await signUp(formData.email, formData.password, formData);
+      // Save final draft for finalize step after verification/login
+      try {
+        const draft = {
+          step: 3,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          address: formData.address || null,
+          role: formData.role,
+          tenant_name:
+            formData.role === 'owner' || formData.role === 'admin'
+              ? formData.school_name || null
+              : null,
+          join_code:
+            formData.role === 'teacher' ||
+            formData.role === 'student' ||
+            formData.role === 'parent'
+              ? formData.join_code || null
+              : null,
+          subjects:
+            formData.role === 'teacher' ? formData.subjects || [] : undefined,
+          grade:
+            formData.role === 'student' ? formData.grade || null : undefined,
+          parent_email:
+            formData.role === 'student'
+              ? formData.parent_email || null
+              : undefined,
+          plan_key: 'free',
+        };
+        localStorage.setItem('edverse_onboarding_draft', JSON.stringify(draft));
+      } catch {}
+
       setSuccess(
-        'Account created successfully! Please check your email to verify your account.'
+        'Account created! Check your email to verify, then we will finish setup.'
       );
     } catch (err: any) {
       setFormErrors({ submit: err.message || 'Failed to create account' });
@@ -410,39 +529,106 @@ export const StepByStepSignUpForm: React.FC = () => {
         </p>
       </div>
 
-      <RadioGroup.Root
-        value={formData.role}
-        onValueChange={(value: string) => handleInputChange('role', value)}
-        onBlur={() => handleInputBlur('role')}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8"
-      >
-        {ROLE_OPTIONS.map((role) => {
-          const IconComponent = role.icon;
-          return (
-            <RadioGroup.Item
-              key={role.value}
-              value={role.value}
-              className={`p-8 border rounded-lg cursor-pointer transition-colors flex flex-col justify-start min-h-[180px] min-w-[280px] ${
-                formData.role === role.value
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-center mb-4">
-                <IconComponent className="w-8 h-8 mr-3 text-blue-600" />
-                <span className="font-semibold text-xl">{role.label}</span>
-              </div>
-              <p className="text-base text-gray-600 leading-relaxed flex-grow">
-                {role.description}
-              </p>
-            </RadioGroup.Item>
-          );
-        })}
-      </RadioGroup.Root>
+      {/* Role Selection Dropdown */}
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Role
+          </label>
+          <select
+            value={formData.role}
+            onChange={(e) => handleInputChange('role', e.target.value)}
+            onBlur={() => handleInputBlur('role')}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+          >
+            {ROLE_OPTIONS.map((role) => (
+              <option key={role.value} value={role.value}>
+                {role.label}
+              </option>
+            ))}
+          </select>
 
-      {formErrors.role && (
-        <p className="text-red-500 text-sm mt-2">{formErrors.role}</p>
-      )}
+          {/* Role Description */}
+          <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              {(() => {
+                const selectedRole = ROLE_OPTIONS.find(
+                  (r) => r.value === formData.role
+                );
+                const IconComponent = selectedRole?.icon || User;
+                return (
+                  <IconComponent className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0" />
+                );
+              })()}
+              <div>
+                <h4 className="font-semibold text-blue-900 mb-1">
+                  {ROLE_OPTIONS.find((r) => r.value === formData.role)?.label}
+                </h4>
+                <p className="text-blue-800 text-sm leading-relaxed">
+                  {
+                    ROLE_OPTIONS.find((r) => r.value === formData.role)
+                      ?.description
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {formErrors.role && (
+          <p className="text-red-500 text-sm mt-2">{formErrors.role}</p>
+        )}
+
+        {/* Join code for non-owner/admin roles */}
+        {!(formData.role === 'owner' || formData.role === 'admin') && (
+          <div className="max-w-md">
+            <RadixTextField
+              label="Join Code"
+              value={formData.join_code || ''}
+              onChange={(e) =>
+                handleInputChange('join_code', e.target.value.toUpperCase())
+              }
+              onBlur={handleVerifyJoinCode}
+              placeholder="Enter the code from your school admin"
+              disabled={verifyingCode}
+            />
+
+            {verifyingCode && (
+              <p className="text-blue-600 text-sm mt-2 flex items-center gap-2">
+                <span className="inline-block w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
+                Verifying code...
+              </p>
+            )}
+
+            {joinCodeInfo && !formErrors.join_code && (
+              <div className="bg-green-50 border border-green-200 rounded-md p-3 mt-2">
+                <p className="text-green-800 text-sm font-medium flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  Valid code for {joinCodeInfo.tenant_name}
+                </p>
+                <p className="text-green-700 text-xs mt-1">
+                  Role: {joinCodeInfo.role}
+                  {joinCodeInfo.remaining_uses !== null &&
+                    ` • ${joinCodeInfo.remaining_uses} uses remaining`}
+                </p>
+              </div>
+            )}
+
+            {formErrors.join_code && (
+              <p className="text-red-500 text-sm mt-2 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                {formErrors.join_code}
+              </p>
+            )}
+
+            {!joinCodeInfo && !formErrors.join_code && !verifyingCode && (
+              <p className="text-gray-500 text-xs mt-1">
+                If you don't have a code, contact your school admin.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { authAPI } from '../lib/supabase-api';
 import { Box, Flex, Text, Button, Spinner } from '@radix-ui/themes';
 
 interface UserProfile {
@@ -78,9 +79,39 @@ export const OnboardingPage: React.FC = () => {
 
     try {
       setSaving(true);
+      // Pull any local draft and finalize on server
+      let localDraft: any = null;
+      try {
+        const raw = localStorage.getItem('edverse_onboarding_draft');
+        if (raw) {
+          localDraft = JSON.parse(raw);
 
-      // Update the profile with the form data
-      const { error } = await supabase
+          // Save draft to DB before finalizing (ensures join_code is persisted)
+          if (localDraft.join_code) {
+            await authAPI.saveOnboardingDraft({
+              step: localDraft.step || 3,
+              data: localDraft,
+              invite_code: localDraft.join_code,
+              tenant_hint: null,
+            });
+          }
+        }
+      } catch (e) {
+        console.error('Error processing draft:', e);
+      }
+
+      // Fallback minimal payload from profile if no draft
+      const payload = localDraft || {
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        role: 'student',
+        plan_key: 'free',
+      };
+
+      await authAPI.finalizeOnboarding(payload);
+
+      // Mark onboarding complete in users
+      await supabase
         .from('users')
         .update({
           onboarding_status: 'complete',
@@ -88,10 +119,8 @@ export const OnboardingPage: React.FC = () => {
         })
         .eq('id', profile.id);
 
-      if (error) {
-        console.error('Error updating profile:', error);
-        throw error;
-      }
+      // Clear localStorage draft after successful completion
+      localStorage.removeItem('edverse_onboarding_draft');
 
       // Redirect to dashboard
       navigate('/dashboard');

@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Box, Flex, Text } from '@radix-ui/themes';
-import { RadixTextField } from 'components/ui/RadixTextField';
 import { Button } from 'components/ui/RadixButton';
 import {
-  Search,
   Bell,
   MessageSquare,
   ChevronRight,
@@ -15,9 +13,13 @@ import {
   Sun,
   ArrowUpDown,
   Check,
+  Clock,
+  Sparkles,
+  X,
 } from 'lucide-react';
 import { useAuth } from 'features/auth/AuthContext';
 import { useTheme } from 'contexts/ThemeContext';
+import { useAccess } from 'context/AccessContext';
 import { SignOutConfirmationModal } from '../ui/SignOutConfirmationModal';
 
 interface HeaderProps {
@@ -38,11 +40,13 @@ export function Header({
 }: HeaderProps): JSX.Element {
   const authContext = useAuth();
   const themeContext = useTheme();
+  const accessContext = useAccess();
   const location = useLocation();
-  const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [signOutLoading, setSignOutLoading] = useState(false);
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close the user menu when clicking outside the profile/menu container
@@ -98,12 +102,6 @@ export function Header({
 
   const handleSignOutCancel = (): void => {
     setShowSignOutModal(false);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (e?.target) {
-      setSearchValue(e.target.value);
-    }
   };
 
   const handleToggleUserMenu = (): void => {
@@ -175,8 +173,92 @@ export function Header({
     return userProfile?.address || '';
   };
 
+  // Calculate trial status
+  const getTrialStatus = () => {
+    const { trial_ends_at, plan } = accessContext;
+
+    if (!trial_ends_at) return null;
+
+    const now = new Date();
+    const trialEnd = new Date(trial_ends_at);
+    const msLeft = trialEnd.getTime() - now.getTime();
+
+    if (msLeft <= 0) {
+      return { expired: true, daysLeft: 0 };
+    }
+
+    const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+    return { expired: false, daysLeft, plan };
+  };
+
+  const trialStatus = getTrialStatus();
+  const showTrialBanner = trialStatus && !trialBannerDismissed;
+
   return (
     <>
+      {/* Trial Banner */}
+      {showTrialBanner && (
+        <Box
+          className={`
+            ${trialStatus.expired ? 'bg-red-500' : trialStatus.daysLeft <= 3 ? 'bg-orange-500' : 'bg-blue-500'}
+            text-white px-6 py-3
+          `}
+        >
+          <Flex justify="between" align="center">
+            <Flex align="center" gap="3">
+              {trialStatus.expired ? (
+                <Clock className="w-5 h-5" />
+              ) : (
+                <Sparkles className="w-5 h-5" />
+              )}
+              <Text size="2" weight="medium">
+                {trialStatus.expired ? (
+                  <>
+                    Your {trialStatus.plan} trial has expired. Upgrade now to
+                    continue using premium features.
+                  </>
+                ) : (
+                  <>
+                    {trialStatus.daysLeft}{' '}
+                    {trialStatus.daysLeft === 1 ? 'day' : 'days'} left in your{' '}
+                    {trialStatus.plan} trial
+                  </>
+                )}
+              </Text>
+            </Flex>
+
+            <Flex align="center" gap="3">
+              {trialStatus.expired ? (
+                <Button
+                  size="1"
+                  onClick={() => navigate('/billing')}
+                  className="bg-white text-red-600 hover:bg-gray-100"
+                >
+                  Upgrade Now
+                </Button>
+              ) : (
+                <Button
+                  size="1"
+                  variant="ghost"
+                  onClick={() => navigate('/billing')}
+                  className="text-white hover:bg-white/20"
+                >
+                  View Plans
+                </Button>
+              )}
+
+              <button
+                onClick={() => setTrialBannerDismissed(true)}
+                className="text-white hover:bg-white/20 rounded p-1"
+                aria-label="Dismiss trial banner"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </Flex>
+          </Flex>
+        </Box>
+      )}
+
       <Box
         className={`
           bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200/30 dark:border-gray-700/30

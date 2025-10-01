@@ -38,6 +38,33 @@ const callEdgeFunction = async (functionName: string, data?: any) => {
   return response.json();
 };
 
+// Lightweight GET helper for functions that use query params
+const callEdgeFunctionGet = async (
+  functionName: string,
+  query: Record<string, string>
+) => {
+  const url = new URL(getEdgeFunctionUrl(functionName));
+  for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (session?.access_token)
+    headers.Authorization = `Bearer ${session.access_token}`;
+
+  const response = await fetch(url.toString(), { method: 'GET', headers });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+  return response.json();
+};
+
 // Dashboard Statistics Interface
 export interface DashboardStats {
   totalStudents: number;
@@ -145,6 +172,42 @@ export const authAPI = {
 
   deleteUser: async (id: string) => {
     return callEdgeFunction('delete-user', { id });
+  },
+
+  // Onboarding helpers
+  saveOnboardingDraft: async (payload: {
+    step: number;
+    data: Record<string, unknown>;
+    invite_code?: string | null;
+    tenant_hint?: string | null;
+  }) => {
+    return callEdgeFunction('onboarding-save-draft', payload);
+  },
+
+  finalizeOnboarding: async (payload: {
+    first_name: string;
+    last_name: string;
+    address?: string | null;
+    role: 'owner' | 'admin' | 'teacher' | 'student' | 'parent';
+    join_code?: string | null;
+    join_email?: string | null;
+    tenant_name?: string | null;
+    subjects?: string[];
+    grade?: string | null;
+    parent_email?: string | null;
+    plan_key?: 'free' | 'starter' | 'growth';
+    currency?: string;
+    region?: string | null;
+    period?: 'month' | 'year';
+  }) => {
+    return callEdgeFunction('onboarding-finalize', payload);
+  },
+
+  verifyJoinCode: async (code: string) => {
+    return callEdgeFunctionGet('verify-join-code', { code });
+  },
+  redeemJoinCode: async (code: string, email?: string | null) => {
+    return callEdgeFunction('redeem-join-code', { code, email: email ?? null });
   },
 };
 
@@ -354,9 +417,12 @@ export function useSupabaseQuery<T>(
     }
   }, [queryFn, retryCount, maxRetries]); // Remove deps from here to prevent infinite loops
 
+  // Create a stable key for dynamic deps to satisfy hooks linting
+  const depsKey = React.useMemo(() => JSON.stringify(deps), [deps]);
+
   React.useEffect(() => {
     fetchData();
-  }, deps); // Only depend on the deps array, not fetchData
+  }, [fetchData, depsKey]);
 
   return { data, loading, error, refetch: fetchData };
 }

@@ -86,6 +86,16 @@ export default function AuthCallbackPage(): JSX.Element {
               data.session.user.email_confirmed_at ? 'Yes' : 'No'
             );
 
+            // Verify email is confirmed before allowing onboarding
+            if (!data.session.user.email_confirmed_at) {
+              console.error('❌ Email not verified');
+              setError(
+                'Please verify your email before continuing. Check your inbox.'
+              );
+              setTimeout(() => navigate('/login', { replace: true }), 3000);
+              return;
+            }
+
             // Check if this is email verification
             if (type === 'signup' || type === 'email_confirmation') {
               console.log(
@@ -132,6 +142,16 @@ export default function AuthCallbackPage(): JSX.Element {
               '📧 Email confirmed:',
               data.session.user.email_confirmed_at ? 'Yes' : 'No'
             );
+
+            // Verify email is confirmed before allowing onboarding
+            if (!data.session.user.email_confirmed_at) {
+              console.error('❌ Email not verified');
+              setError(
+                'Please verify your email before continuing. Check your inbox.'
+              );
+              setTimeout(() => navigate('/login', { replace: true }), 3000);
+              return;
+            }
 
             console.log(
               '✅ Token verification successful, redirecting to onboarding'
