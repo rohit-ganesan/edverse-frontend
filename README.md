@@ -2,6 +2,16 @@
 
 A modern, comprehensive learning management system built with React, TypeScript, and Supabase.
 
+## 📚 Documentation
+
+Comprehensive documentation is available in the [`/docs`](./docs/) folder:
+
+- **[Documentation Index](./docs/README.md)** - Complete documentation navigation
+- **[Access Control Guide](./docs/ACCESS_CONTROL_ANALYSIS_README.md)** - Access control implementation
+- **[JWT Onboarding](./docs/JWT_ONBOARDING_VISUAL_SUMMARY.md)** - User onboarding flow
+- **[Environment Setup](./docs/ENVIRONMENT_VARIABLES.md)** - Configuration guide
+- **[Access Control Matrix](./docs/ACCESS_CONTROL_MATRIX.md)** - Role and plan permissions
+
 ## 🚀 Features
 
 - **Modern React Architecture** - Built with React 18, TypeScript, and functional components
@@ -244,14 +254,15 @@ This project is licensed under the MIT License.
 
 For support and questions:
 
-- Create an issue in the repository
-- Check the documentation in `/docs/`
-- Review the Supabase documentation
+- **Documentation**: Check the [comprehensive documentation](./docs/README.md) in `/docs/`
+- **Issues**: Create an issue in the repository
+- **Supabase**: Review the [Supabase documentation](https://supabase.com/docs)
+- **Access Control**: See [Access Control guides](./docs/ACCESS_CONTROL_ANALYSIS_README.md)
 
-## 🔄 Migration from Firebase
+## 🔄 Backend Integration
 
-This project has been migrated from Firebase to Supabase. For migration details, see:
+This project uses Supabase for backend services:
 
-- [Migration Plan](./docs/SUPABASE_MIGRATION_PLAN.md)
-- [Migration Complete](./docs/MIGRATION_COMPLETE.md)
-- [Backend Documentation](../edverse-backend/README.md)
+- **Backend Repository**: See [edverse-backend](../edverse-backend/README.md) for Edge Functions and database schema
+- **Access Control**: Implemented with JWT + Simplified RLS (see [documentation](./docs/ACCESS_CONTROL_DECISION_SUMMARY.md))
+- **Multi-tenant**: Full multi-tenant support with plan-based feature gating
