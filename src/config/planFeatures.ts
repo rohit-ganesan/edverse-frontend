@@ -1,70 +1,107 @@
 // src/config/planFeatures.ts
-// Simplified plan features for core 5 features: Teachers, Students, Classes, Attendance, Fees
-
 import type { Plan } from '../types/access';
 
 // NOTE: Features gate PLAN access. Caps gate ROLE ability.
 // UI must check BOTH when rendering write controls.
-// Free: view-only. Starter: daily ops. Growth: Starter + online payments, SMS.
+// Free: view-only. Starter: daily ops. Growth: Starter + analytics.
 
 export const FEATURES_BY_PLAN: Record<Plan, string[]> = {
   free: [
-    // View-only access to core 5 features
-    'teachers.view',
+    // read-only
     'students.view',
+    'courses.view',
     'classes.view',
     'attendance.view',
+    'results.view',
+    'notices.view',
     'fees.view',
+    // allow admin screens visibility for owners/admins even on Free
+    'staff.invite',
+    'org.manage',
+    'settings.integrations',
   ],
 
   starter: [
-    // View
-    'teachers.view',
+    // inherits free (duplicated here to keep single-source list)
     'students.view',
+    'courses.view',
     'classes.view',
     'attendance.view',
+    'results.view',
+    'notices.view',
     'fees.view',
-    // CRUD
-    'teachers.create',
-    'teachers.update',
-    'teachers.delete',
+
+    // ---- WRITE (Starter enables daily ops) ----
+    // Students
     'students.create',
     'students.update',
     'students.delete',
+    // Courses
+    'courses.create',
+    'courses.update',
+    'courses.delete',
+    // Classes
     'classes.create',
     'classes.update',
     'classes.delete',
     'classes.reschedule',
+    // Attendance
     'attendance.record',
     'attendance.import',
+    // Results
+    'results.enter',
+    'results.publish',
+    'results.export',
+    // Notices
+    'notices.send',
+    // Fees
     'fees.record_manual',
     'fees.export',
+    // Org/Integrations
+    'staff.invite',
+    'org.manage',
+    'settings.integrations',
+
+    // ---- Basic portals ----
+    'portal.parent',
+    'portal.student',
   ],
 
   growth: [
-    // All Starter features
-    'teachers.view',
-    'teachers.create',
-    'teachers.update',
-    'teachers.delete',
+    // inherits starter (duplicated for explicitness)
     'students.view',
+    'courses.view',
+    'classes.view',
+    'attendance.view',
+    'results.view',
+    'notices.view',
+    'fees.view',
     'students.create',
     'students.update',
     'students.delete',
-    'classes.view',
+    'courses.create',
+    'courses.update',
+    'courses.delete',
     'classes.create',
     'classes.update',
     'classes.delete',
     'classes.reschedule',
-    'attendance.view',
     'attendance.record',
     'attendance.import',
-    'fees.view',
+    'results.enter',
+    'results.publish',
+    'results.export',
+    'notices.send',
     'fees.record_manual',
     'fees.export',
-    // Growth-only
-    'fees.online_payment',
-    'fees.sms_reminders',
+    'staff.invite',
+    'org.manage',
+    'settings.integrations',
+    'portal.parent',
+    'portal.student',
+
+    // growth-only
+    'analytics.view',
   ],
 };
 
