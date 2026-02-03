@@ -11,7 +11,6 @@ import { supabase } from '../lib/supabase';
 import type { Plan, Role, Capability } from '../types/access';
 import { getFeaturesForPlan } from '../config/planFeatures';
 import { ROLE_CAPS } from '../types/access';
-import { logger } from '../lib/logger';
 
 export type AccessState = {
   plan: Plan;
@@ -45,16 +44,11 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Load access data from JWT
     const loadAccess = async () => {
-      logger.info('[AccessContext] Loading access data from JWT');
-
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
-        logger.info(
-          '[AccessContext] No user session - setting default (guest) access'
-        );
         // No user - set default (guest) access
         setState({
           plan: 'free',
@@ -73,14 +67,6 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       // Extract access data from JWT app_metadata
       const metadata = session.user.app_metadata || {};
 
-      logger.debug('[AccessContext] JWT app_metadata', {
-        user_id: session.user.id,
-        email: session.user.email,
-        has_metadata: !!metadata,
-        metadata_keys: Object.keys(metadata),
-        raw_metadata: metadata,
-      });
-
       const role = (metadata.role as Role) || 'teacher';
       const plan = (metadata.plan as Plan) || 'free';
       const features = Array.isArray(metadata.features)
@@ -90,16 +76,6 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       const tenantId = metadata.tenant_id || null;
       const tenantName = metadata.tenant_name || null;
       const trialEndsAt = metadata.trial_ends_at || null;
-
-      logger.info('[AccessContext] Extracted access data', {
-        role,
-        plan,
-        features_count: features.length,
-        capabilities_count: capabilities.length,
-        tenantId,
-        tenantName,
-        trialEndsAt,
-      });
 
       setState({
         plan,
@@ -112,8 +88,6 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
         isLoading: false,
         isInitialized: true,
       });
-
-      logger.info('[AccessContext] Access state updated successfully');
     };
 
     loadAccess();
@@ -122,26 +96,15 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      logger.info('[AccessContext] Auth state changed', {
-        event,
-        has_session: !!session,
-        user_id: session?.user?.id,
-        timestamp: new Date().toISOString(),
-      });
-
       if (
         event === 'TOKEN_REFRESHED' ||
         event === 'SIGNED_IN' ||
         event === 'USER_UPDATED'
       ) {
         // JWT updated - reload access data
-        logger.info('[AccessContext] JWT updated - reloading access data');
         await loadAccess();
       } else if (event === 'SIGNED_OUT') {
         // User signed out - reset to default
-        logger.info(
-          '[AccessContext] User signed out - resetting to default access'
-        );
         setState({
           plan: 'free',
           role: 'teacher',
@@ -153,8 +116,6 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
           isLoading: false,
           isInitialized: true,
         });
-      } else {
-        logger.debug('[AccessContext] Unhandled auth event', { event });
       }
     });
 
